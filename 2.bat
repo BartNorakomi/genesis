@@ -1,0 +1,1 @@
+C:\sgdk211\bin\make -f C:\sgdk211\makefile.gen

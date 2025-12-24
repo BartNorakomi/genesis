@@ -1,0 +1,14 @@
+# Path to SGDK
+SGDKDIR = C:/sgdk211
+
+# Target ROM
+TARGET = rom
+
+# Source files
+SRC = src/main.c
+
+# Resource file
+RES = res/resources.res
+
+# Include SGDK build rules
+include $(SGDKDIR)/makefile.gen
