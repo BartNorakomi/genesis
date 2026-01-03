@@ -17,6 +17,7 @@ int playerY = 100;
 #define SFX_SF2KENVOICE2 65
 #define SFX_SF3KENSHORYUKEN 66
 
+u16 our_level_palette[64];
 u8 tileContent = 0;
 const u8* currentColMap;   // Active collision map
 
@@ -99,6 +100,9 @@ static void drawRoomBackground(u8 room)
     // Update active collision map
     currentColMap = collisionMaps[room];
 
+    // Fade out current room
+    PAL_fadeOut(0, 63, 8, FALSE);   // fade out
+
     VDP_setEnable(FALSE);
     PAL_setPalette(PAL0, bg->palette->data, DMA);
     VDP_drawImageEx(
@@ -109,7 +113,14 @@ static void drawRoomBackground(u8 room)
         FALSE,
         TRUE
     );
+
+    memcpy(&our_level_palette[0], bg->palette->data, 16*2);
+    memcpy(&our_level_palette[32], playerSpriteDef.palette->data, 16 * 2);
+
+    PAL_setColors(0, palette_black, 64, DMA);
+
     VDP_setEnable(TRUE);
+    PAL_fadeIn(0, 63, our_level_palette, 8, TRUE);
 }
 
 // =========================================================
