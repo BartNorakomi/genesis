@@ -14,7 +14,6 @@ C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapArcade1.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/music/Sonic+the+Hedgehog+2+-+Hill+Top+Zone.vgm \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaparmoryvault.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/music/Sonic_the_Hedgehog_2_-_Mystic_Cave_Zone.vgm \
-C:/Users/bartf/Documents/GitHub/genesis/res/music/Castlevania+Aria+of+Sorrow+Clock+Tower.vgm \
 C:/Users/bartf/Documents/GitHub/genesis/res/backgrounds/armoryvault.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/backgrounds/holodeck.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapmedicalbay.bin \
@@ -34,4 +33,5 @@ C:/Users/bartf/Documents/GitHub/genesis/res/music/Castlevania+LoI+-+Ghostly+Thea
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapBiopod.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/music/Shinobi_III_-_Japonesque.vgm \
 C:/Users/bartf/Documents/GitHub/genesis/res/backgrounds/reactorchamber.bmp \
-C:/Users/bartf/Documents/GitHub/genesis/res/music/Infected+Mushroom+-+Bombat.vgm
+C:/Users/bartf/Documents/GitHub/genesis/res/music/Infected+Mushroom+-+Bombat.vgm \
+C:/Users/bartf/Documents/GitHub/genesis/res/music/Castlevania_Aria_of_Sorrow_-_Clock_Tower.vgm

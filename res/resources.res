@@ -26,7 +26,7 @@ BIN level_col_trainingdeck "collisionmaps/tilemaptrainingdeck.bin"
 
 SPRITE playerSpriteDef "graphics/playersprite.bmp" 10 10 FAST 3
 
-XGM my_track1 "music/Castlevania+Aria+of+Sorrow+Clock+Tower.vgm"
+XGM my_track1 "music/Castlevania_Aria_of_Sorrow_-_Clock_Tower.vgm"
 XGM my_track2 "music/Castlevania+LoI+-+Ghostly+Theatre.vgm"
 XGM my_track3 "music/Castlevania+SotN+-+Marble+Gallery.vgm"
 XGM my_track4 "music/Command_Conquer_-_Act_on_Instinct.vgm"
