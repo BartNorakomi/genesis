@@ -1,63 +1,27 @@
 #include <genesis.h>
 #include "resources.h"
+#include "rooms.h"
+#include "game_state.h"
+#include "player.h"
+#include "room_sleeping.h"
+#include "room_arcade1.h"
+#include "room_titlescreen.h"
 
-// =========================================================
-// Player globals
-// =========================================================
-int playerX = 100;
-int playerY = 100;
-
-#define COL_MAP_WIDTH   64
-#define COL_MAP_HEIGHT  58
-
-#define ADDXTOPLAYERSPRITE   -40
-#define ADDYTOPLAYERSPRITE   22
-
-#define SFX_SF1HADOKEN 64
-#define SFX_SF2KENVOICE2 65
-#define SFX_SF3KENSHORYUKEN 66
-
+// ---------------------------------------------------------
+// 2. Global engine state
+// ---------------------------------------------------------
 u16 our_level_palette[64];
 u8 tileContent = 0;
-const u8* currentColMap;   // Active collision map
-
-// 0=idle, 1=sitting, 2=running
-enum {
-    POSE_IDLE,
-    POSE_SITTING,
-    POSE_RUNNING
-};
-int playerSpritePose = POSE_SITTING; 
-Sprite *playerSprite;
-
-// =========================================================
-// Room IDs
-// =========================================================
-typedef enum
-{
-    ROOM_ARCADE1 = 0,
-    ROOM_ARCADE2,
-    ROOM_BIOPOD,
-    ROOM_HYDROPONICSBAY,
-    ROOM_HANGARBAY,
-    ROOM_TRAININGDECK,
-    ROOM_REACTORCHAMBER,
-    ROOM_SLEEPINGQUARTERS,
-    ROOM_ARMORYVAULT,
-    ROOM_HOLODECK,
-    ROOM_MEDICALBAY,
-    ROOM_SCIENCELAB,
-
-    ROOM_COUNT
-} RoomId;
-
+const u8* currentColMap;        // Active collision map
 u8 currentRoom = ROOM_SLEEPINGQUARTERS;
+u32 currentMusic = 0xFFFFFFFF;   // invalid pointer
 
-// =========================================================
-// Collision maps table
-// =========================================================
+// ---------------------------------------------------------
+// 3. Collision map table
+// ---------------------------------------------------------
 const u8* const collisionMaps[ROOM_COUNT] =
 {
+    NULL,                   // ROOM_TITLESCREEN
     level_col_arcade1,
     level_col_arcade2,
     level_col_biopod,
@@ -72,16 +36,18 @@ const u8* const collisionMaps[ROOM_COUNT] =
     level_col_sciencelab
 };
 
-// =========================================================
-// Background rendering
-// =========================================================
-static void drawRoomBackground(u8 room)
+
+// ---------------------------------------------------------
+// 4. Background rendering
+// ---------------------------------------------------------
+void drawRoomBackground(u8 room)
 {
     u16 ind = TILE_USER_INDEX;
     const Image *bg = NULL;
 
     switch (room)
     {
+        case ROOM_TITLESCREEN:      bg = &titlescreen; break;
         case ROOM_ARCADE1:          bg = &arcade1; break;
         case ROOM_ARCADE2:          bg = &arcade2; break;
         case ROOM_BIOPOD:           bg = &biopod; break;
@@ -101,10 +67,11 @@ static void drawRoomBackground(u8 room)
     currentColMap = collisionMaps[room];
 
     // Fade out current room
-    PAL_fadeOut(0, 63, 8, FALSE);   // fade out
+    PAL_fadeOut(0, 63, 8, FALSE);
 
     VDP_setEnable(FALSE);
     PAL_setPalette(PAL0, bg->palette->data, DMA);
+
     VDP_drawImageEx(
         BG_B,
         bg,
@@ -114,7 +81,7 @@ static void drawRoomBackground(u8 room)
         TRUE
     );
 
-    memcpy(&our_level_palette[0], bg->palette->data, 16*2);
+    memcpy(&our_level_palette[0], bg->palette->data, 16 * 2);
     memcpy(&our_level_palette[32], playerSpriteDef.palette->data, 16 * 2);
 
     PAL_setColors(0, palette_black, 64, DMA);
@@ -123,171 +90,63 @@ static void drawRoomBackground(u8 room)
     PAL_fadeIn(0, 63, our_level_palette, 8, TRUE);
 }
 
-// =========================================================
-// Collision query
-// =========================================================
-static void getTileContentPlayer(void)
+// ---------------------------------------------------------
+// 5. Debug info
+// ---------------------------------------------------------
+void drawDebugInfo(void)
 {
-    u16 tileX = playerX >> 2;
-    u16 tileY = (playerY + 102) >> 2; // player's feet
+    char buf[4];
 
-    if(tileX < COL_MAP_WIDTH && tileY < COL_MAP_HEIGHT)
-        tileContent = currentColMap[tileY * COL_MAP_WIDTH + tileX];
-    else
-        tileContent = 1; // treat out-of-bounds as solid
+    sprintf(buf, "%u", tileContent);
+    VDP_drawTextBG(BG_A, buf, 19, 27);
+
+    sprintf(buf, "%3i", playerX);
+    VDP_drawTextBG(BG_A, buf, 2, 27);
+
+    sprintf(buf, "%3i", playerY);
+    VDP_drawTextBG(BG_A, buf, 9, 27);
 }
 
-// =========================================================
-// Input handling
-// =========================================================
-static void handleInput(void)
+void playMusic(const u8* track)
 {
-    static u16 prevJoy = 0;
-    u16 joy = JOY_readJoypad(JOY_1);
-
-    // ---- Room change ----
-    if ((joy & BUTTON_A) && !(prevJoy & BUTTON_A))
+    if (currentMusic != (u32)track)
     {
-        if (currentRoom < ROOM_COUNT - 1) currentRoom++;
-        else currentRoom = 0;
-        drawRoomBackground(currentRoom);
+        //XGM_startPlay(track); // old
+        XGM2_play(track); // new
+        currentMusic = (u32)track;
     }
-
-    if ((joy & BUTTON_B) && !(prevJoy & BUTTON_B))
-    {
-        if (currentRoom > 0) currentRoom--;
-        else currentRoom = ROOM_COUNT - 1;
-        drawRoomBackground(currentRoom);
-    }
-
-    playerSpritePose = POSE_IDLE;
-
-    // ---- Sprite movement ----
-    if (joy & BUTTON_RIGHT)
-    {
-        playerX += 2;
-        playerSpritePose = POSE_RUNNING;        
-        SPR_setHFlip(playerSprite, FALSE);
-
-        getTileContentPlayer();
-        if (tileContent == 1) 
-        {
-            // try top
-            playerY -= 4;
-            getTileContentPlayer();
-            if (tileContent == 1) 
-            {
-                // try bottom
-                playerY += 8;
-                getTileContentPlayer();
-                if (tileContent == 1) 
-                {
-                    playerX -= 2;
-                    playerY -= 4;
-                }
-                else playerY -= 3;
-            }       
-            else playerY += 3;    
-        }    
-    }
-
-    if (joy & BUTTON_LEFT)
-    {
-        playerX -= 2;
-        playerSpritePose = POSE_RUNNING;        
-        SPR_setHFlip(playerSprite, TRUE);
-
-        getTileContentPlayer();
-        if (tileContent == 1) 
-        {
-            playerY -= 4;
-            getTileContentPlayer();
-            if (tileContent == 1) 
-            {
-                playerY += 8;
-                getTileContentPlayer();
-                if (tileContent == 1) 
-                {
-                    playerX += 2;
-                    playerY -= 4;
-                }
-                else playerY -= 3;
-            }       
-            else playerY += 3;    
-        }    
-    }
-
-    if (joy & BUTTON_UP)    
-    {
-        playerY -= 1;
-        playerSpritePose = POSE_RUNNING;
-        getTileContentPlayer();
-        if (tileContent == 1) playerY += 1;
-    }
-
-    if (joy & BUTTON_DOWN)
-    {
-        playerY += 1;
-        playerSpritePose = POSE_RUNNING;        
-        getTileContentPlayer();
-        if (tileContent == 1) playerY -= 1;
-    }
-
-    if (joy & BUTTON_A) XGM_startPlayPCM(SFX_SF1HADOKEN, 15, SOUND_PCM_CH2);
-    if (joy & BUTTON_B) XGM_startPlayPCM(SFX_SF2KENVOICE2, 15, SOUND_PCM_CH3);
-    if (joy & BUTTON_C) XGM_startPlayPCM(SFX_SF3KENSHORYUKEN, 15, SOUND_PCM_CH4);
-
-    // ---- Bounds ----
-    if (playerX < 0) playerX = 0;
-    if (playerX > 255) playerX = 255;
-    if (playerY < 0) playerY = 0;
-    if (playerY > 125) playerY = 125;
-
-    prevJoy = joy;
 }
 
-// =========================================================
-// Main
-// =========================================================
+// ---------------------------------------------------------
+// 6. Main entry point
+// ---------------------------------------------------------
 int main(bool hardReset)
 {
     VDP_setScreenWidth256();
-
-    drawRoomBackground(currentRoom); // sets background + collision map
-
     SPR_init();
-    PAL_setPalette(PAL2, playerSpriteDef.palette->data, CPU);
-
-    playerSprite = SPR_addSprite(
-        &playerSpriteDef,
-        playerX, playerY,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
-
     VDP_drawText("x:     y:     tile:", 0, 27);
-
-    XGM_startPlay(my_track1);
-    
-    XGM_setPCM(SFX_SF1HADOKEN, sfx_hadoken, sizeof(sfx_hadoken));
-    XGM_setPCM(SFX_SF2KENVOICE2, sfx_kenvoice2, sizeof(sfx_kenvoice2));
+    XGM_setPCM(SFX_SF1HADOKEN,      sfx_hadoken,   sizeof(sfx_hadoken));
+    XGM_setPCM(SFX_SF2KENVOICE2,    sfx_kenvoice2, sizeof(sfx_kenvoice2));
     XGM_setPCM(SFX_SF3KENSHORYUKEN, sfx_shoryuken, sizeof(sfx_shoryuken));
 
-    while (TRUE)
+    GameState state = STATE_TITLE;
+
+    while (state != STATE_QUIT)
     {
-        handleInput();
+        switch (state)
+        {
+            case STATE_TITLE:
+                state = runTitleScreen();
+                break;
 
-        getTileContentPlayer();
-        char text[2];
-        sprintf(text, "%1u", tileContent);
-        VDP_drawTextBG(BG_A, text, 19, 27);
+            case STATE_SLEEPING:
+                state = runSleepingQuarters();
+                break;
 
-        SPR_setAnim(playerSprite, playerSpritePose);
-        SPR_setPosition(playerSprite,
-            playerX + ADDXTOPLAYERSPRITE,
-            playerY + ADDYTOPLAYERSPRITE);
-
-        SPR_update();
-        SYS_doVBlankProcess();
+            case STATE_ARCADE1:
+                state = runArcade1();
+                break;
+        }
     }
 
     return 0;

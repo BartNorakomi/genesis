@@ -1,0 +1,13 @@
+#ifndef GAME_STATE_H
+#define GAME_STATE_H
+
+typedef enum
+{
+    STATE_TITLE,
+    STATE_SLEEPING,
+    STATE_ARCADE1,
+    STATE_QUIT
+} GameState;
+
+
+#endif

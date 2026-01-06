@@ -1,0 +1,3 @@
+Pretty sure SR used to use deflemask and later moved to furnace
+If you're using SGDK then just let rescomp/xgmtool convert them to 
+XGM and play the files with the provided functions in SGDK

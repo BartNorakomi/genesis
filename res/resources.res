@@ -1,15 +1,17 @@
-IMAGE arcade1 "backgrounds/arcade1.bmp" BEST ALL
-IMAGE arcade2 "backgrounds/arcade2.bmp" BEST ALL
-IMAGE armoryvault "backgrounds/armoryvault.bmp" BEST ALL
-IMAGE biopod "backgrounds/biopod.bmp" BEST ALL
-IMAGE hangarbay "backgrounds/hangarbay.bmp" BEST ALL
-IMAGE holodeck "backgrounds/holodeck.bmp" BEST ALL
-IMAGE hydroponicsbay "backgrounds/hydroponicsbay.bmp" BEST ALL
-IMAGE medicalbay "backgrounds/medicalbay.bmp" BEST ALL
-IMAGE reactorchamber "backgrounds/reactorchamber.bmp" BEST ALL
-IMAGE sciencelab "backgrounds/sciencelab.bmp" BEST ALL
-IMAGE sleepingquarters "backgrounds/sleepingquarters.bmp" BEST ALL
-IMAGE trainingdeck "backgrounds/trainingdeck.bmp" BEST ALL
+IMAGE arcade1 "graphics/backgrounds/arcade1.bmp" BEST ALL
+IMAGE arcade2 "graphics/backgrounds/arcade2.bmp" BEST ALL
+IMAGE armoryvault "graphics/backgrounds/armoryvault.bmp" BEST ALL
+IMAGE biopod "graphics/backgrounds/biopod.bmp" BEST ALL
+IMAGE hangarbay "graphics/backgrounds/hangarbay.bmp" BEST ALL
+IMAGE holodeck "graphics/backgrounds/holodeck.bmp" BEST ALL
+IMAGE hydroponicsbay "graphics/backgrounds/hydroponicsbay.bmp" BEST ALL
+IMAGE medicalbay "graphics/backgrounds/medicalbay.bmp" BEST ALL
+IMAGE reactorchamber "graphics/backgrounds/reactorchamber.bmp" BEST ALL
+IMAGE sciencelab "graphics/backgrounds/sciencelab.bmp" BEST ALL
+IMAGE sleepingquarters "graphics/backgrounds/sleepingquarters.bmp" BEST ALL
+IMAGE trainingdeck "graphics/backgrounds/trainingdeck.bmp" BEST ALL
+
+IMAGE titlescreen "graphics/titlescreen/titlescreen.bmp" BEST ALL
 
 BIN level_col_arcade1 "collisionmaps/tilemapArcade1.bin"
 BIN level_col_arcade2 "collisionmaps/tilemapArcade2.bin"
@@ -24,16 +26,22 @@ BIN level_col_sciencelab "collisionmaps/tilemapsciencelab.bin"
 BIN level_col_sleepingquarters "collisionmaps/tilemapsleepingquarters.bin"
 BIN level_col_trainingdeck "collisionmaps/tilemaptrainingdeck.bin"
 
-SPRITE playerSpriteDef "graphics/playersprite.bmp" 10 10 FAST 3
+SPRITE playerSpriteDef "sprites/player/playersprite.bmp" 10 10 FAST 3
+SPRITE titlescreenpressbuttonSpriteDef "sprites/titlescreen/titlescreenpressbuttonsprite.bmp" 10 2 FAST 26
 
-XGM my_track1 "music/Castlevania_Aria_of_Sorrow_-_Clock_Tower.vgm"
-XGM my_track2 "music/Castlevania+LoI+-+Ghostly+Theatre.vgm"
-XGM my_track3 "music/Castlevania+SotN+-+Marble+Gallery.vgm"
-XGM my_track4 "music/Command_Conquer_-_Act_on_Instinct.vgm"
-XGM my_track5 "music/Infected+Mushroom+-+Bombat.vgm"
-XGM my_track6 "music/Shinobi_III_-_Japonesque.vgm"
-XGM my_track7 "music/Sonic_the_Hedgehog_2_-_Mystic_Cave_Zone.vgm"
-XGM my_track8 "music/Sonic+the+Hedgehog+2+-+Hill+Top+Zone.vgm"
+XGM2 my_track1 "music/Castlevania_Aria_of_Sorrow_-_Clock_Tower.vgm"
+XGM2 my_track2 "music/Castlevania+LoI+-+Ghostly+Theatre.vgm"
+XGM2 my_track3 "music/Castlevania+SotN+-+Marble+Gallery.vgm"
+XGM2 my_track4 "music/Shinobi_III_-_Japonesque.vgm"
+XGM2 my_track5 "music/Sonic_the_Hedgehog_2_-_Mystic_Cave_Zone.vgm"
+XGM2 my_track6 "music/Sonic+the+Hedgehog+2+-+Hill+Top+Zone.vgm"
+XGM2 tune_ship "music/Castlevania Portrait of Ruin - The Gears Go Awry.vgm"
+XGM2 tune_arcadehall "music/Castlevania_Lament_of_Innocence_-_Lament_of_Innocence.vgm"
+XGM2 tune_titlescreen "music/Castlevania+Dawn+of+Sorrow+-+Pitch+Black+Intrusion.vgm"
+
+# XGM my_track10 "music/Command_Conquer_-_Act_on_Instinct.vgm"
+# XGM my_track11 "music/Castlevania_Portrait_of_Ruin_-_The_Hidden_Curse.vgm"
+# XGM my_track12 "music/Castlevania+DoS+-+Condemned+Tower.vgm"
 
 WAV sfx_hadoken "sfx/hadoken.wav" XGM
 WAV sfx_kenvoice2 "sfx/ken_voice2.wav" XGM
