@@ -20,5 +20,6 @@ out/src/rooms/room_sleeping.o: src/rooms/room_sleeping.c \
  C:/sgdk211/inc/types.h C:/sgdk211/inc/ext/flash-save/saveman.h \
  C:/sgdk211/inc/ext/console.h C:/sgdk211/inc/config.h \
  C:/sgdk211/inc/string.h C:/sgdk211/inc/maths.h C:/sgdk211/inc/dma.h \
- res/resources.h inc/rooms.h inc/room_sleeping.h inc/game_state.h \
- inc/player.h inc/game_state.h inc/room_arcade1.h inc/rooms.h
+ res/resources.h res/music.h inc/rooms.h inc/room_sleeping.h \
+ inc/game_state.h inc/player.h inc/game_state.h inc/room_arcade1.h \
+ inc/rooms.h

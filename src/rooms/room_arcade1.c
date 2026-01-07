@@ -1,5 +1,6 @@
 #include <genesis.h>
 #include "resources.h"
+#include "music.h"
 #include "rooms.h"
 #include "room_arcade1.h"
 #include "player.h"          // for playerHandleInput, playerUpdateSprite

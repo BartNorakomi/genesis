@@ -1,11 +1,13 @@
 #include <genesis.h>
 #include "resources.h"
+#include "music.h"
 #include "rooms.h"
 #include "game_state.h"
 #include "player.h"
 #include "room_sleeping.h"
 #include "room_arcade1.h"
 #include "room_titlescreen.h"
+#include "sfx.h"
 
 // ---------------------------------------------------------
 // 2. Global engine state
@@ -125,9 +127,11 @@ int main(bool hardReset)
     VDP_setScreenWidth256();
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
-    XGM_setPCM(SFX_SF1HADOKEN,      sfx_hadoken,   sizeof(sfx_hadoken));
-    XGM_setPCM(SFX_SF2KENVOICE2,    sfx_kenvoice2, sizeof(sfx_kenvoice2));
-    XGM_setPCM(SFX_SF3KENSHORYUKEN, sfx_shoryuken, sizeof(sfx_shoryuken));
+    XGM_setPCM(SFX_HADOKEN,    sfx_hadoken,    sizeof(sfx_hadoken));
+    XGM_setPCM(SFX_KENVOICE2,  sfx_kenvoice2,  sizeof(sfx_kenvoice2));
+    XGM_setPCM(SFX_SHORYUKEN,  sfx_shoryuken,  sizeof(sfx_shoryuken));
+
+
 
     GameState state = STATE_TITLE;
 

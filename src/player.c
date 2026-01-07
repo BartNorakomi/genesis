@@ -1,5 +1,7 @@
 #include <genesis.h>
 #include "player.h"
+#include "sfx.h"
+#include "resources.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -133,9 +135,10 @@ void playerHandleInput(void)
     }
 
     // ---- Sound effects ----
-    if (joy & BUTTON_A) XGM_startPlayPCM(SFX_SF1HADOKEN, 15, SOUND_PCM_CH2);
-    if (joy & BUTTON_B) XGM_startPlayPCM(SFX_SF2KENVOICE2, 15, SOUND_PCM_CH3);
-    if (joy & BUTTON_C) XGM_startPlayPCM(SFX_SF3KENSHORYUKEN, 15, SOUND_PCM_CH4);
+
+    if (joy & BUTTON_A) XGM2_playPCMEx(sfx_hadoken, sizeof(sfx_hadoken), SOUND_PCM_CH1, 10, FALSE, FALSE); //priority, half rate, loop
+    if (joy & BUTTON_B) XGM2_playPCMEx(sfx_kenvoice2, sizeof(sfx_kenvoice2), SOUND_PCM_CH2, 10, FALSE, FALSE); //priority, half rate, loop
+    if (joy & BUTTON_C) XGM2_playPCMEx(sfx_shoryuken, sizeof(sfx_shoryuken), SOUND_PCM_CH3, 10, FALSE, FALSE); //priority, half rate, loop
 
     // ---- Bounds ----
     if (playerX < 0) playerX = 0;

@@ -9,10 +9,6 @@
 // ---------------------------------------------------------
 // 2. Constants / Defines
 // ---------------------------------------------------------
-#define SFX_SF1HADOKEN      64
-#define SFX_SF2KENVOICE2    65
-#define SFX_SF3KENSHORYUKEN 66
-
 #define COL_MAP_WIDTH       64
 #define COL_MAP_HEIGHT      58
 
