@@ -6,8 +6,9 @@ typedef enum
     STATE_TITLE,
     STATE_SLEEPING,
     STATE_ARCADE1,
+    STATE_MEDICALBAY,
+    STATE_HYDROPONICSBAY,
     STATE_QUIT
 } GameState;
-
 
 #endif

@@ -29,12 +29,10 @@ BIN level_col_trainingdeck "collisionmaps/tilemaptrainingdeck.bin"
 SPRITE playerSpriteDef "sprites/player/playersprite.bmp" 10 10 FAST 3
 SPRITE titlescreenpressbuttonSpriteDef "sprites/titlescreen/titlescreenpressbuttonsprite.bmp" 10 2 FAST 26
 
-#export audio in audacity: 16000 Hz, RAW, Signed 8-bit PCM
-BIN sfx_hadoken "sfx/test.raw"
-    
-#WAV sfx_hadoken "sfx/test.wav" XGM2
-WAV sfx_kenvoice2 "sfx/ken_voice2.wav" XGM
-WAV sfx_shoryuken "sfx/ken_sho_ryu_ken.wav" XGM
-
-WAV sfx_startgame "sfx/StartGame_ActionMusical_AP1.104.wav" XGM
-WAV sfx_playerfootstep "sfx/player_footstep.wav" XGM
+#option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"
+#option 2: export audio in audacity: 7500 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=TRUE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_7.5khz.raw"
+#the lower the khz the higher the pitch
+ 
+WAV startgame "sfx/startgame.wav" XGM2
+WAV playerfootstep "sfx/player_footstep.wav" XGM2
+WAV crowdapplause "sfx/Large Crowd Applause 04.wav" XGM2

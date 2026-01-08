@@ -2,7 +2,7 @@
 #include "resources.h"
 #include "music.h"
 #include "rooms.h"
-#include "room_sleeping.h"
+#include "room_medicalbay.h"
 #include "player.h"          // for playerHandleInput, playerUpdateSprite
 #include "game_state.h"      // for GameState
 #include "room_arcade1.h"    // for STATE_ARCADE1
@@ -19,17 +19,19 @@ extern void drawDebugInfo(void);
 // ---------------------------------------------------------
 // 2. Room logic
 // ---------------------------------------------------------
-GameState runSleepingQuarters(void)
+GameState runMedicalBay(void)
 {
-    drawRoomBackground(ROOM_SLEEPINGQUARTERS);
-    playMusic(tune_ship);
+    drawRoomBackground(ROOM_MEDICALBAY);
+    playMusic(tune_ship);   // or a new track if you want
 
+    // Reset sprite engine so we start clean
     SPR_reset();
     playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
                                  TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
     while (1)
     {
+        // Player movement + collision + SFX
         playerHandleInput();
 
         // ---- Room transition logic ----
@@ -39,7 +41,7 @@ GameState runSleepingQuarters(void)
         {
             playerX = EnterRoomLeft;
             playerY = 0x5A;
-            return STATE_MEDICALBAY;
+            return STATE_HYDROPONICSBAY;
         }
 
         // Left exit → Training Deck (Arcade1 for now)
@@ -47,7 +49,7 @@ GameState runSleepingQuarters(void)
         {
             playerX = EnterRoomRight;
             playerY = 0x5A;
-            return STATE_ARCADE1;
+            return STATE_SLEEPING;
         }
 
         // Debug + sprite update

@@ -1,5 +1,9 @@
 #ifndef ROOMS_H
 #define ROOMS_H
+#define EdgeRoomRight   250   // example, adjust to your map
+#define EdgeRoomLeft    0
+#define EnterRoomLeft   10
+#define EnterRoomRight  240
 
 // ---------------------------------------------------------
 // 1. Room identifiers

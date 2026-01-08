@@ -20,4 +20,4 @@ out/src/player.o: src/player.c C:/sgdk211/inc/genesis.h \
  C:/sgdk211/inc/types.h C:/sgdk211/inc/ext/flash-save/saveman.h \
  C:/sgdk211/inc/ext/console.h C:/sgdk211/inc/config.h \
  C:/sgdk211/inc/string.h C:/sgdk211/inc/maths.h C:/sgdk211/inc/dma.h \
- inc/player.h inc/sfx.h res/resources.h
+ inc/player.h res/resources.h

@@ -7,7 +7,8 @@
 #include "room_sleeping.h"
 #include "room_arcade1.h"
 #include "room_titlescreen.h"
-#include "sfx.h"
+#include "room_medicalbay.h"
+
 
 // ---------------------------------------------------------
 // 2. Global engine state
@@ -15,8 +16,9 @@
 u16 our_level_palette[64];
 u8 tileContent = 0;
 const u8* currentColMap;        // Active collision map
-u8 currentRoom = ROOM_SLEEPINGQUARTERS;
 u32 currentMusic = 0xFFFFFFFF;   // invalid pointer
+
+//order rooms:  science lab, hangar bay, training deck, sleeping quarters,medical bay, hydroponics bay, armory vault, bio pod, reactor chamber, holodeck 
 
 // ---------------------------------------------------------
 // 3. Collision map table
@@ -127,13 +129,11 @@ int main(bool hardReset)
     VDP_setScreenWidth256();
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
-    XGM_setPCM(SFX_HADOKEN,    sfx_hadoken,    sizeof(sfx_hadoken));
-    XGM_setPCM(SFX_KENVOICE2,  sfx_kenvoice2,  sizeof(sfx_kenvoice2));
-    XGM_setPCM(SFX_SHORYUKEN,  sfx_shoryuken,  sizeof(sfx_shoryuken));
+//    XGM_setPCM(SFX_HADOKEN,    sfx_hadoken,    sizeof(sfx_hadoken));
+ //   XGM_setPCM(SFX_KENVOICE2,  sfx_kenvoice2,  sizeof(sfx_kenvoice2));
+  //  XGM_setPCM(SFX_SHORYUKEN,  sfx_shoryuken,  sizeof(sfx_shoryuken));
 
-
-
-    GameState state = STATE_TITLE;
+    GameState state = STATE_SLEEPING;
 
     while (state != STATE_QUIT)
     {
@@ -150,6 +150,15 @@ int main(bool hardReset)
             case STATE_ARCADE1:
                 state = runArcade1();
                 break;
+
+            case STATE_MEDICALBAY:
+                state = runMedicalBay(); 
+                break;
+
+            case STATE_HYDROPONICSBAY:
+                state = runHydroponicsBay(); 
+                break;
+                
         }
     }
 

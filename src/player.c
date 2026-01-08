@@ -1,6 +1,5 @@
 #include <genesis.h>
 #include "player.h"
-#include "sfx.h"
 #include "resources.h"
 
 // ---------------------------------------------------------
@@ -20,40 +19,55 @@ extern u8 tileContent;
 // ---------------------------------------------------------
 int playerX = 100;
 int playerY = 100;
-bool playerFacingRight = true;   // default facing right
+bool playerFacingRight = true;
 
 int playerSpritePose = POSE_SITTING;
 Sprite *playerSprite;
 
 // ---------------------------------------------------------
-// 4. Internal helper functions
+// 4. Footstep SFX helper
+// ---------------------------------------------------------
+static void playerHandleFootsteps(void)
+{
+    static int prevFrame = -1;
+
+    int f = playerSprite->frameInd;
+
+    // Trigger only when entering frame 0 or 5
+    if ((f == 0 || f == 5) && prevFrame != f)
+    {
+        XGM2_playPCM(playerfootstep, sizeof(playerfootstep), SOUND_PCM_CH1);
+    }
+
+    prevFrame = f;
+}
+
+// ---------------------------------------------------------
+// 5. Internal helper functions
 // ---------------------------------------------------------
 void getTileContentPlayer(void)
 {
     u16 tileX = playerX >> 2;
-    u16 tileY = (playerY + 102) >> 2; // player's feet
+    u16 tileY = (playerY + 102) >> 2;
 
     if (tileX < COL_MAP_WIDTH && tileY < COL_MAP_HEIGHT)
         tileContent = currentColMap[tileY * COL_MAP_WIDTH + tileX];
     else
-        tileContent = 1; // treat out-of-bounds as solid
+        tileContent = 1;
 }
 
 // ---------------------------------------------------------
-// 5. Public API: sprite update
+// 6. Public API: sprite update
 // ---------------------------------------------------------
 void playerUpdateSprite(void)
 {
     SPR_setAnim(playerSprite, playerSpritePose);
     SPR_setPosition(playerSprite, playerX + ADDXTOPLAYERSPRITE, playerY + ADDYTOPLAYERSPRITE);
-
-    // Apply facing direction
     SPR_setHFlip(playerSprite, !playerFacingRight);
 }
 
-
 // ---------------------------------------------------------
-// 6. Public API: input + movement + collision + SFX
+// 7. Public API: input + movement + collision + SFX
 // ---------------------------------------------------------
 void playerHandleInput(void)
 {
@@ -68,6 +82,8 @@ void playerHandleInput(void)
         playerX += 2;
         playerSpritePose = POSE_RUNNING;
         playerFacingRight = true;
+
+        playerHandleFootsteps();
 
         getTileContentPlayer();
         if (tileContent == 1)
@@ -96,6 +112,8 @@ void playerHandleInput(void)
         playerSpritePose = POSE_RUNNING;
         playerFacingRight = false;
 
+        playerHandleFootsteps();
+
         getTileContentPlayer();
         if (tileContent == 1)
         {
@@ -121,8 +139,11 @@ void playerHandleInput(void)
     {
         playerY -= 1;
         playerSpritePose = POSE_RUNNING;
+
         getTileContentPlayer();
         if (tileContent == 1) playerY += 1;
+
+        playerHandleFootsteps();
     }
 
     // ---- Move Down ----
@@ -130,15 +151,12 @@ void playerHandleInput(void)
     {
         playerY += 1;
         playerSpritePose = POSE_RUNNING;
+
         getTileContentPlayer();
         if (tileContent == 1) playerY -= 1;
+
+        playerHandleFootsteps();
     }
-
-    // ---- Sound effects ----
-
-    if (joy & BUTTON_A) XGM2_playPCMEx(sfx_hadoken, sizeof(sfx_hadoken), SOUND_PCM_CH1, 10, FALSE, FALSE); //priority, half rate, loop
-    if (joy & BUTTON_B) XGM2_playPCMEx(sfx_kenvoice2, sizeof(sfx_kenvoice2), SOUND_PCM_CH2, 10, FALSE, FALSE); //priority, half rate, loop
-    if (joy & BUTTON_C) XGM2_playPCMEx(sfx_shoryuken, sizeof(sfx_shoryuken), SOUND_PCM_CH3, 10, FALSE, FALSE); //priority, half rate, loop
 
     // ---- Bounds ----
     if (playerX < 0) playerX = 0;

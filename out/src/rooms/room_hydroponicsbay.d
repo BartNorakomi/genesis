@@ -1,4 +1,4 @@
-out/src/rooms/room_titlescreen.o: src/rooms/room_titlescreen.c \
+out/src/rooms/room_hydroponicsbay.o: src/rooms/room_hydroponicsbay.c \
  C:/sgdk211/inc/genesis.h C:/sgdk211/inc/types.h C:/sgdk211/inc/config.h \
  C:/sgdk211/inc/asm.h C:/sgdk211/inc/sys.h C:/sgdk211/inc/sram.h \
  C:/sgdk211/inc/mapper.h C:/sgdk211/inc/memory.h \
@@ -20,5 +20,5 @@ out/src/rooms/room_titlescreen.o: src/rooms/room_titlescreen.c \
  C:/sgdk211/inc/types.h C:/sgdk211/inc/ext/flash-save/saveman.h \
  C:/sgdk211/inc/ext/console.h C:/sgdk211/inc/config.h \
  C:/sgdk211/inc/string.h C:/sgdk211/inc/maths.h C:/sgdk211/inc/dma.h \
- res/resources.h res/music.h inc/rooms.h inc/room_titlescreen.h \
- inc/game_state.h inc/player.h
+ res/resources.h res/music.h inc/rooms.h inc/room_hydroponicsbay.h \
+ inc/game_state.h inc/player.h inc/game_state.h inc/room_sleeping.h

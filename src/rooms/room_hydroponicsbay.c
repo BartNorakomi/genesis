@@ -2,10 +2,10 @@
 #include "resources.h"
 #include "music.h"
 #include "rooms.h"
-#include "room_sleeping.h"
-#include "player.h"          // for playerHandleInput, playerUpdateSprite
-#include "game_state.h"      // for GameState
-#include "room_arcade1.h"    // for STATE_ARCADE1
+#include "room_hydroponicsbay.h"
+#include "player.h"
+#include "game_state.h"
+#include "room_sleeping.h"    // for STATE_SLEEPING
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -19,9 +19,9 @@ extern void drawDebugInfo(void);
 // ---------------------------------------------------------
 // 2. Room logic
 // ---------------------------------------------------------
-GameState runSleepingQuarters(void)
+GameState runHydroponicsBay(void)
 {
-    drawRoomBackground(ROOM_SLEEPINGQUARTERS);
+    drawRoomBackground(ROOM_HYDROPONICSBAY);
     playMusic(tune_ship);
 
     SPR_reset();
@@ -34,19 +34,20 @@ GameState runSleepingQuarters(void)
 
         // ---- Room transition logic ----
 
-        // Right exit → Medical Bay
-        if (playerX >= EdgeRoomRight)
-        {
-            playerX = EnterRoomLeft;
-            playerY = 0x5A;
-            return STATE_MEDICALBAY;
-        }
-
-        // Left exit → Training Deck (Arcade1 for now)
+        // Left exit → back to Sleeping Quarters
         if (playerX < EdgeRoomLeft + 1)
         {
             playerX = EnterRoomRight;
             playerY = 0x5A;
+            return STATE_MEDICALBAY;
+        }
+
+        // Right exit → (future room, placeholder)
+        if (playerX >= EdgeRoomRight)
+        {
+            playerX = EnterRoomLeft;
+            playerY = 0x5A;
+            // Change this when you add the next room
             return STATE_ARCADE1;
         }
 

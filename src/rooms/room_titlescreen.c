@@ -3,8 +3,7 @@
 #include "music.h"
 #include "rooms.h"
 #include "room_titlescreen.h"
-#include "sfx.h"
-
+#include "player.h"
 extern void drawRoomBackground(u8 room);
 static Sprite* pressStartSprite;
 
@@ -21,12 +20,12 @@ GameState runTitleScreen(void)
     {
         if (JOY_readJoypad(JOY_1) & BUTTON_START)
         {
-            //XGM2_playPCM(hat1_13k, sizeof(hat1_13k), SOUND_PCM_CH2);
-
-            XGM2_playPCMEx(sfx_hadoken, sizeof(sfx_hadoken), SOUND_PCM_CH1, 10, FALSE, FALSE); //priority, half rate(TRUE=6650hz, FALSE=13300hz), loop
-//            return STATE_SLEEPING;
+ //           XGM2_playPCM(sfx_startgame, sizeof(sfx_startgame), SOUND_PCM_CH1, 10, FALSE, FALSE); //priority, half rate(TRUE=6650hz, FALSE=13300hz), loop
+            XGM2_stop();
+            XGM2_playPCM(startgame, sizeof(startgame), SOUND_PCM_CH1);
+            for (u16 i = 0; i < 60; i++) SYS_doVBlankProcess();
+            return STATE_SLEEPING;
         }
-
         SPR_update();
         SYS_doVBlankProcess();
     }
