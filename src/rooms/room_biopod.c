@@ -2,10 +2,11 @@
 #include "resources.h"
 #include "music.h"
 #include "rooms.h"
-#include "room_sleeping.h"
-#include "player.h"          // for playerHandleInput, playerUpdateSprite
-#include "game_state.h"      // for GameState
-#include "room_arcade1.h"    // for STATE_ARCADE1
+#include "room_biopod.h"
+#include "player.h"
+#include "game_state.h"
+#include "room_sleepingquarters.h"       // if Biopod connects to Sleeping
+#include "room_medicalbay.h"     // or whatever rooms you want
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -19,9 +20,9 @@ extern void drawDebugInfo(void);
 // ---------------------------------------------------------
 // 2. Room logic
 // ---------------------------------------------------------
-GameState runSleepingQuarters(void)
+GameState runBioPod(void)
 {
-    drawRoomBackground(ROOM_SLEEPINGQUARTERS);
+    drawRoomBackground(ROOM_BIOPOD);
     playMusic(tune_ship);
 
     SPR_reset();
@@ -34,20 +35,20 @@ GameState runSleepingQuarters(void)
 
         // ---- Room transition logic ----
 
-        // Right exit → Medical Bay
-        if (playerX >= EdgeRoomRight)
-        {
-            playerX = EnterRoomLeft;
-            playerY = 0x5A;
-            return STATE_MEDICALBAY;
-        }
-
-        // Left exit → Training Deck (Arcade1 for now)
+        // Left exit → Armory Vault
         if (playerX < EdgeRoomLeft + 1)
         {
             playerX = EnterRoomRight;
             playerY = 0x5A;
-            return STATE_ARCADE1;
+            return STATE_ARMORYVAULT;
+        }
+
+        // Right exit → Reactor Chamber (or next room)
+        if (playerX >= EdgeRoomRight)
+        {
+            playerX = EnterRoomLeft;
+            playerY = 0x5A;
+            return STATE_REACTORCHAMBER;
         }
 
         // Debug + sprite update

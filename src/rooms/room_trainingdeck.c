@@ -2,12 +2,10 @@
 #include "resources.h"
 #include "music.h"
 #include "rooms.h"
-#include "room_arcade1.h"
+#include "room_trainingdeck.h"
 #include "player.h"          // for playerHandleInput, playerUpdateSprite
 #include "game_state.h"      // for GameState
-#include "room_sleepingquarters.h"   // for STATE_SLEEPING
-#include "player.h"          // for player globals
-#include "player.h"          // (safe to include multiple times due to guards)
+#include "room_arcade1.h"    // for STATE_ARCADE1
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -21,23 +19,36 @@ extern void drawDebugInfo(void);
 // ---------------------------------------------------------
 // 2. Room logic
 // ---------------------------------------------------------
-GameState runArcade1(void)
+GameState runTrainingDeck(void)
 {
-    drawRoomBackground(ROOM_ARCADE1);
-    playMusic(tune_arcadehall);   // gameplay rooms
+    drawRoomBackground(ROOM_TRAININGDECK);
+    playMusic(tune_ship);
 
-    // Reset sprite engine so we start clean
     SPR_reset();
-    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
+                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
     while (1)
     {
-        // Player movement + collision + SFX
         playerHandleInput();
 
-        // Switch rooms with START
-        if (JOY_readJoypad(JOY_1) & BUTTON_START)
+        // ---- Room transition logic ----
+
+        // Right exit → Medical Bay
+        if (playerX >= EdgeRoomRight)
+        {
+            playerX = EnterRoomLeft;
+            playerY = 0x5A;
             return STATE_SLEEPINGQUARTERS;
+        }
+
+        // Left exit → Arcade1 (placeholder)
+        if (playerX < EdgeRoomLeft + 1)
+        {
+            playerX = EnterRoomRight;
+            playerY = 0x5A;
+            return STATE_HANGARBAY;
+        }
 
         // Debug + sprite update
         drawDebugInfo();

@@ -24,7 +24,7 @@ GameState runTitleScreen(void)
             XGM2_stop();
             XGM2_playPCM(startgame, sizeof(startgame), SOUND_PCM_CH1);
             for (u16 i = 0; i < 60; i++) SYS_doVBlankProcess();
-            return STATE_SLEEPING;
+            return STATE_SLEEPINGQUARTERS;
         }
         SPR_update();
         SYS_doVBlankProcess();

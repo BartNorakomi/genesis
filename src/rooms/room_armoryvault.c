@@ -2,10 +2,11 @@
 #include "resources.h"
 #include "music.h"
 #include "rooms.h"
-#include "room_hydroponicsbay.h"
+#include "room_armoryvault.h"
 #include "player.h"
 #include "game_state.h"
-#include "room_sleepingquarters.h"    // for STATE_SLEEPING
+#include "room_sleepingquarters.h"     // for STATE_SLEEPING
+#include "room_medicalbay.h"   // for STATE_MEDICALBAY (or whatever is next)
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -19,9 +20,9 @@ extern void drawDebugInfo(void);
 // ---------------------------------------------------------
 // 2. Room logic
 // ---------------------------------------------------------
-GameState runHydroponicsBay(void)
+GameState runArmoryVault(void)
 {
-    drawRoomBackground(ROOM_HYDROPONICSBAY);
+    drawRoomBackground(ROOM_ARMORYVAULT);
     playMusic(tune_ship);
 
     SPR_reset();
@@ -34,20 +35,20 @@ GameState runHydroponicsBay(void)
 
         // ---- Room transition logic ----
 
-        // Left exit → back to Sleeping Quarters
+        // Left exit → Sleeping Quarters
         if (playerX < EdgeRoomLeft + 1)
         {
             playerX = EnterRoomRight;
             playerY = 0x5A;
-            return STATE_MEDICALBAY;
+            return STATE_HYDROPONICSBAY;
         }
 
-        // Right exit → (future room, placeholder)
+        // Right exit → Medical Bay (or next room)
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;
             playerY = 0x5A;
-            return STATE_ARMORYVAULT;
+            return STATE_BIOPOD;
         }
 
         // Debug + sprite update

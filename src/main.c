@@ -4,7 +4,7 @@
 #include "rooms.h"
 #include "game_state.h"
 #include "player.h"
-#include "room_sleeping.h"
+#include "room_sleepingquarters.h"
 #include "room_arcade1.h"
 #include "room_titlescreen.h"
 #include "room_medicalbay.h"
@@ -133,7 +133,7 @@ int main(bool hardReset)
  //   XGM_setPCM(SFX_KENVOICE2,  sfx_kenvoice2,  sizeof(sfx_kenvoice2));
   //  XGM_setPCM(SFX_SHORYUKEN,  sfx_shoryuken,  sizeof(sfx_shoryuken));
 
-    GameState state = STATE_SLEEPING;
+    GameState state = STATE_SLEEPINGQUARTERS;
 
     while (state != STATE_QUIT)
     {
@@ -143,22 +143,54 @@ int main(bool hardReset)
                 state = runTitleScreen();
                 break;
 
-            case STATE_SLEEPING:
+            case STATE_ARCADE1:
+                state = runArcade1();
+                break;
+
+            case STATE_ARCADE2:
+                state = runArcade2();
+                break;
+
+            case STATE_BIOPOD:
+                state = runBioPod(); 
+                break;
+
+            case STATE_HYDROPONICSBAY:
+                state = runHydroponicsBay(); 
+                break;
+
+            case STATE_HANGARBAY:
+                state = runHangarBay(); 
+                break;
+
+            case STATE_TRAININGDECK:
+                state = runTrainingDeck(); 
+                break;
+                
+            case STATE_REACTORCHAMBER:
+                state = runReactorChamber(); 
+                break;
+
+            case STATE_SLEEPINGQUARTERS:
                 state = runSleepingQuarters();
                 break;
 
-            case STATE_ARCADE1:
-                state = runArcade1();
+            case STATE_ARMORYVAULT:
+                state = runArmoryVault(); 
+                break;
+                
+            case STATE_HOLODECK:
+                state = runHoloDeck(); 
                 break;
 
             case STATE_MEDICALBAY:
                 state = runMedicalBay(); 
                 break;
 
-            case STATE_HYDROPONICSBAY:
-                state = runHydroponicsBay(); 
+            case STATE_SCIENCELAB:
+                state = runScienceLab(); 
                 break;
-                
+
         }
     }
 

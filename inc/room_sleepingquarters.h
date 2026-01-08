@@ -1,5 +1,5 @@
-#ifndef ROOM_SLEEPING_H
-#define ROOM_SLEEPING_H
+#ifndef ROOM_SLEEPINGQUARTERS_H
+#define ROOM_SLEEPINGQUARTERS_H
 
 #include <genesis.h>
 #include "game_state.h"

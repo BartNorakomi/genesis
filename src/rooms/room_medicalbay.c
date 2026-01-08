@@ -49,7 +49,7 @@ GameState runMedicalBay(void)
         {
             playerX = EnterRoomRight;
             playerY = 0x5A;
-            return STATE_SLEEPING;
+            return STATE_SLEEPINGQUARTERS;
         }
 
         // Debug + sprite update
