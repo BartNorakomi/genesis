@@ -33,6 +33,9 @@ extern const Image sleepingquarters;
 extern const Image trainingdeck;
 extern const Image titlescreen;
 extern const SpriteDefinition playerSpriteDef;
+extern const SpriteDefinition girlSpriteDef;
+extern const SpriteDefinition capgirlSpriteDef;
+extern const SpriteDefinition redheadboySpriteDef;
 extern const SpriteDefinition titlescreenpressbuttonSpriteDef;
 
 #endif // _RES_RESOURCES_H_

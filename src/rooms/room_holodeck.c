@@ -39,7 +39,7 @@ GameState runHoloDeck(void)
         if (playerX < EdgeRoomLeft + 1)
         {
             playerX = EnterRoomRight;
-            playerY = 0x5A;
+            playerY = 0x5A -36;
             return STATE_REACTORCHAMBER;
         }
 
@@ -47,7 +47,7 @@ GameState runHoloDeck(void)
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;
-            playerY = 0x5A;
+            playerY = 0x5A +16;
             return STATE_SCIENCELAB;   // change when next room is ready
         }
 

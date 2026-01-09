@@ -40,7 +40,6 @@ const u8* const collisionMaps[ROOM_COUNT] =
     level_col_sciencelab
 };
 
-
 // ---------------------------------------------------------
 // 4. Background rendering
 // ---------------------------------------------------------
@@ -133,7 +132,7 @@ int main(bool hardReset)
  //   XGM_setPCM(SFX_KENVOICE2,  sfx_kenvoice2,  sizeof(sfx_kenvoice2));
   //  XGM_setPCM(SFX_SHORYUKEN,  sfx_shoryuken,  sizeof(sfx_shoryuken));
 
-    GameState state = STATE_SLEEPINGQUARTERS;
+    GameState state = STATE_ARCADE1;
 
     while (state != STATE_QUIT)
     {

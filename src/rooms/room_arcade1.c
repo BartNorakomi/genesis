@@ -3,11 +3,9 @@
 #include "music.h"
 #include "rooms.h"
 #include "room_arcade1.h"
-#include "player.h"          // for playerHandleInput, playerUpdateSprite
-#include "game_state.h"      // for GameState
-#include "room_sleepingquarters.h"   // for STATE_SLEEPING
-#include "player.h"          // for player globals
-#include "player.h"          // (safe to include multiple times due to guards)
+#include "player.h"
+#include "game_state.h"
+#include "room_sleepingquarters.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -19,27 +17,91 @@ extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
 // ---------------------------------------------------------
-// 2. Room logic
+// 2. Local sprite pointers (player + NPCs)
+// ---------------------------------------------------------
+static Sprite* girlSprite;
+static Sprite* capgirlSprite;
+static Sprite* redheadboySprite;
+
+// ---------------------------------------------------------
+// 3. NPC positions (easy to adjust)
+// ---------------------------------------------------------
+static int girlX       = 50;
+static int girlY       = 98;
+
+static int capgirlX    = 160;
+static int capgirlY    = 108;
+
+static int redheadboyX = 240;
+static int redheadboyY = 78;
+
+// ---------------------------------------------------------
+// 4. Unified depth sorting (correct top‑down behavior)
+// ---------------------------------------------------------
+// Using negative Y gives:
+//   - player BELOW NPC (higher Y) → deeper → in front
+//   - player ABOVE NPC (lower Y) → shallower → behind
+static void updateDepth(void)
+{
+    SPR_setDepth(playerSprite, -playerY);
+    SPR_setDepth(girlSprite,       -girlY);
+    SPR_setDepth(capgirlSprite,    -capgirlY);
+    SPR_setDepth(redheadboySprite, -redheadboyY);
+}
+
+// ---------------------------------------------------------
+// 5. Room logic
 // ---------------------------------------------------------
 GameState runArcade1(void)
 {
     drawRoomBackground(ROOM_ARCADE1);
-    playMusic(tune_arcadehall);   // gameplay rooms
+    playMusic(tune_arcadehall);
 
-    // Reset sprite engine so we start clean
     SPR_reset();
-    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
+    // Player sprite
+    playerSprite = SPR_addSprite(
+        &playerSpriteDef,
+        playerX,
+        playerY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // -----------------------------------------------------
+    // NPCs (static sprites with adjustable X/Y)
+    // -----------------------------------------------------
+    girlSprite = SPR_addSprite(
+        &girlSpriteDef,
+        girlX + PLAYERANDNPC_OFFSET_X,
+        girlY + PLAYERANDNPC_OFFSET_Y,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    capgirlSprite = SPR_addSprite(
+        &capgirlSpriteDef,
+        capgirlX + PLAYERANDNPC_OFFSET_X,
+        capgirlY + PLAYERANDNPC_OFFSET_Y,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    redheadboySprite = SPR_addSprite(
+        &redheadboySpriteDef,
+        redheadboyX + PLAYERANDNPC_OFFSET_X,
+        redheadboyY + PLAYERANDNPC_OFFSET_Y,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // -----------------------------------------------------
+    // Main room loop
+    // -----------------------------------------------------
     while (1)
     {
-        // Player movement + collision + SFX
         playerHandleInput();
+        updateDepth();
 
-        // Switch rooms with START
         if (JOY_readJoypad(JOY_1) & BUTTON_START)
             return STATE_SLEEPINGQUARTERS;
 
-        // Debug + sprite update
         drawDebugInfo();
         playerUpdateSprite();
 

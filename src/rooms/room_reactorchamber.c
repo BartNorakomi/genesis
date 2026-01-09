@@ -47,7 +47,7 @@ GameState runReactorChamber(void)
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;
-            playerY = 0x5A;
+            playerY = 0x5A - 16;
             return STATE_HOLODECK;   // change when you add the next room
         }
 

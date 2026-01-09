@@ -39,7 +39,7 @@ GameState runHangarBay(void)
         if (playerX < EdgeRoomLeft + 1)
         {
             playerX = EnterRoomRight;
-            playerY = 0x5A;
+            playerY = 0x5A +20;
             return STATE_SCIENCELAB;
         }
 
@@ -47,7 +47,7 @@ GameState runHangarBay(void)
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;
-            playerY = 0x5A;
+            playerY = 0x5A -20;
             return STATE_TRAININGDECK;   // change when next room is ready
         }
 

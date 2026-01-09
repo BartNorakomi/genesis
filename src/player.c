@@ -9,10 +9,12 @@ extern const u8* currentColMap;
 extern u8 tileContent;
 
 // ---------------------------------------------------------
-// 2. Internal constants (module‑only)
+// 2. Shared sprite offsets (player + NPCs)
 // ---------------------------------------------------------
-#define ADDXTOPLAYERSPRITE   -40
-#define ADDYTOPLAYERSPRITE   22
+// These are REAL GLOBAL VARIABLES so other modules can use them.
+// Declared as extern in player.h
+int PLAYERANDNPC_OFFSET_X = -40;
+int PLAYERANDNPC_OFFSET_Y = 22;
 
 // ---------------------------------------------------------
 // 3. Player globals (owned by this module)
@@ -62,7 +64,13 @@ void getTileContentPlayer(void)
 void playerUpdateSprite(void)
 {
     SPR_setAnim(playerSprite, playerSpritePose);
-    SPR_setPosition(playerSprite, playerX + ADDXTOPLAYERSPRITE, playerY + ADDYTOPLAYERSPRITE);
+
+    SPR_setPosition(
+        playerSprite,
+        playerX + PLAYERANDNPC_OFFSET_X,
+        playerY + PLAYERANDNPC_OFFSET_Y
+    );
+
     SPR_setHFlip(playerSprite, !playerFacingRight);
 }
 

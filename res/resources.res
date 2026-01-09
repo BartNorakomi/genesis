@@ -27,6 +27,9 @@ BIN level_col_sleepingquarters "collisionmaps/tilemapsleepingquarters.bin"
 BIN level_col_trainingdeck "collisionmaps/tilemaptrainingdeck.bin"
 
 SPRITE playerSpriteDef "sprites/player/playersprite.bmp" 10 10 FAST 3
+SPRITE girlSpriteDef "sprites/npcs/girl.bmp" 10 10 FAST 30
+SPRITE capgirlSpriteDef "sprites/npcs/capgirl.bmp" 10 10 FAST 30
+SPRITE redheadboySpriteDef "sprites/npcs/redheadboy.bmp" 10 10 FAST 30
 SPRITE titlescreenpressbuttonSpriteDef "sprites/titlescreen/titlescreenpressbuttonsprite.bmp" 10 2 FAST 26
 
 #option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"

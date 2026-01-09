@@ -34,20 +34,20 @@ GameState runTrainingDeck(void)
 
         // ---- Room transition logic ----
 
-        // Right exit → Medical Bay
-        if (playerX >= EdgeRoomRight)
-        {
-            playerX = EnterRoomLeft;
-            playerY = 0x5A;
-            return STATE_SLEEPINGQUARTERS;
-        }
-
         // Left exit → Arcade1 (placeholder)
         if (playerX < EdgeRoomLeft + 1)
         {
             playerX = EnterRoomRight;
             playerY = 0x5A;
             return STATE_HANGARBAY;
+        }
+
+        // Right exit → Medical Bay
+        if (playerX >= EdgeRoomRight)
+        {
+            playerX = EnterRoomLeft;
+            playerY = 0x5A +10;
+            return STATE_SLEEPINGQUARTERS;
         }
 
         // Debug + sprite update

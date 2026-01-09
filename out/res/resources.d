@@ -7,6 +7,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/graphics/titlescreen/titlescreen.bmp
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/armoryvault.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/arcade1.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/player/playersprite.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/npcs/redheadboy.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/sleepingquarters.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapsleepingquarters.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapArcade1.bin \
@@ -14,6 +15,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/hydroponicsbay.
 C:/Users/bartf/Documents/GitHub/genesis/res/sfx/player_footstep.wav \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/arcade2.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaparmoryvault.bin \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/npcs/girl.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapmedicalbay.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/reactorchamber.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaptrainingdeck.bin \
@@ -27,5 +29,6 @@ C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaphydroponicsbay.
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapsciencelab.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/sciencelab.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapBiopod.bin \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/npcs/capgirl.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/titlescreen/titlescreenpressbuttonsprite.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/trainingdeck.bmp

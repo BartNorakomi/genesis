@@ -31,6 +31,9 @@ extern int playerSpritePose;
 extern Sprite *playerSprite;
 extern u8 playerFacing;   // 0 = right, 1 = left
 
+extern int PLAYERANDNPC_OFFSET_X;
+extern int PLAYERANDNPC_OFFSET_Y;
+
 // ---------------------------------------------------------
 // 5. Function prototypes
 // ---------------------------------------------------------
