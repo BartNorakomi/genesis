@@ -26,6 +26,7 @@ extern const Image biopod;
 extern const Image hangarbay;
 extern const Image holodeck;
 extern const Image hydroponicsbay;
+extern const Image hydroponicsbay_fg;
 extern const Image medicalbay;
 extern const Image reactorchamber;
 extern const Image sciencelab;
@@ -36,6 +37,11 @@ extern const SpriteDefinition playerSpriteDef;
 extern const SpriteDefinition girlSpriteDef;
 extern const SpriteDefinition capgirlSpriteDef;
 extern const SpriteDefinition redheadboySpriteDef;
+extern const SpriteDefinition reactorSpriteDef;
+extern const SpriteDefinition armoryVaultPanelSpriteDef;
+extern const SpriteDefinition medicalBayChairSpriteDef;
+extern const SpriteDefinition medicalBayLightsSpriteDef;
+extern const SpriteDefinition sleepingQuartersLightsSpriteDef;
 extern const SpriteDefinition titlescreenpressbuttonSpriteDef;
 
 #endif // _RES_RESOURCES_H_

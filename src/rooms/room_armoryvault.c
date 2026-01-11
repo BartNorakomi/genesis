@@ -6,7 +6,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "room_sleepingquarters.h"     // for STATE_SLEEPING
-#include "room_medicalbay.h"   // for STATE_MEDICALBAY (or whatever is next)
+#include "room_medicalbay.h"           // for STATE_MEDICALBAY (or whatever is next)
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -18,7 +18,18 @@ extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
 // ---------------------------------------------------------
-// 2. Room logic
+// 2. Local sprite pointers
+// ---------------------------------------------------------
+static Sprite* armoryVaultPanelSprite;
+
+// ---------------------------------------------------------
+// 3. Panel position
+// ---------------------------------------------------------
+static int panelX = 170;
+static int panelY = 97;
+
+// ---------------------------------------------------------
+// 4. Room logic
 // ---------------------------------------------------------
 GameState runArmoryVault(void)
 {
@@ -26,8 +37,22 @@ GameState runArmoryVault(void)
     playMusic(tune_ship);
 
     SPR_reset();
-    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
-                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    // Player sprite
+    playerSprite = SPR_addSprite(
+        &playerSpriteDef,
+        playerX,
+        playerY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // Armory vault panel sprite
+    armoryVaultPanelSprite = SPR_addSprite(
+        &armoryVaultPanelSpriteDef,
+        panelX,
+        panelY,
+        TILE_ATTR(PAL0, FALSE, FALSE, FALSE)
+    );
 
     while (1)
     {

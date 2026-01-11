@@ -9,6 +9,10 @@
 #include "room_titlescreen.h"
 #include "room_medicalbay.h"
 
+// ---------------------------------------------------------
+// 1. Shared global tile index (used by ALL rooms)
+// ---------------------------------------------------------
+u16 globalTileIndex = TILE_USER_INDEX;
 
 // ---------------------------------------------------------
 // 2. Global engine state
@@ -17,8 +21,6 @@ u16 our_level_palette[64];
 u8 tileContent = 0;
 const u8* currentColMap;        // Active collision map
 u32 currentMusic = 0xFFFFFFFF;   // invalid pointer
-
-//order rooms:  science lab, hangar bay, training deck, sleeping quarters,medical bay, hydroponics bay, armory vault, bio pod, reactor chamber, holodeck 
 
 // ---------------------------------------------------------
 // 3. Collision map table
@@ -45,7 +47,9 @@ const u8* const collisionMaps[ROOM_COUNT] =
 // ---------------------------------------------------------
 void drawRoomBackground(u8 room)
 {
-    u16 ind = TILE_USER_INDEX;
+    // Reset tile index for each room load
+    globalTileIndex = TILE_USER_INDEX;
+
     const Image *bg = NULL;
 
     switch (room)
@@ -73,20 +77,32 @@ void drawRoomBackground(u8 room)
     PAL_fadeOut(0, 63, 8, FALSE);
 
     VDP_setEnable(FALSE);
+    VDP_clearPlane(BG_A, TRUE);
     PAL_setPalette(PAL0, bg->palette->data, DMA);
 
+    // Draw background using global tile index
     VDP_drawImageEx(
         BG_B,
         bg,
-        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind),
+        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, globalTileIndex),
         0, 0,
         FALSE,
         TRUE
     );
 
-    memcpy(&our_level_palette[0], bg->palette->data, 16 * 2);
-    memcpy(&our_level_palette[32], playerSpriteDef.palette->data, 16 * 2);
+    // Advance tile index by background tileset size
+    globalTileIndex += bg->tileset->numTile;
 
+    // Build palette 0
+    memcpy(&our_level_palette[0], bg->palette->data, 16 * 2);
+    // Build palette 1
+    if (room == ROOM_HYDROPONICSBAY) memcpy(&our_level_palette[16], hydroponicsbay_fg.palette->data, 16 * 2);
+    // Build palette 2
+    memcpy(&our_level_palette[32], playerSpriteDef.palette->data, 16 * 2);
+    // Build palette 3
+    if (room == ROOM_REACTORCHAMBER) memcpy(&our_level_palette[48], reactorSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_MEDICALBAY) memcpy(&our_level_palette[48], medicalBayChairSpriteDef.palette->data, 16 * 2);
+     
     PAL_setColors(0, palette_black, 64, DMA);
 
     VDP_setEnable(TRUE);
@@ -110,86 +126,46 @@ void drawDebugInfo(void)
     VDP_drawTextBG(BG_A, buf, 9, 27);
 }
 
+// ---------------------------------------------------------
+// 6. Music
+// ---------------------------------------------------------
 void playMusic(const u8* track)
 {
     if (currentMusic != (u32)track)
     {
-        //XGM_startPlay(track); // old
-        XGM2_play(track); // new
+        XGM2_play(track);
         currentMusic = (u32)track;
     }
 }
 
 // ---------------------------------------------------------
-// 6. Main entry point
+// 7. Main entry point
 // ---------------------------------------------------------
 int main(bool hardReset)
 {
     VDP_setScreenWidth256();
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
-//    XGM_setPCM(SFX_HADOKEN,    sfx_hadoken,    sizeof(sfx_hadoken));
- //   XGM_setPCM(SFX_KENVOICE2,  sfx_kenvoice2,  sizeof(sfx_kenvoice2));
-  //  XGM_setPCM(SFX_SHORYUKEN,  sfx_shoryuken,  sizeof(sfx_shoryuken));
 
-    GameState state = STATE_ARCADE1;
+    GameState state = STATE_TRAININGDECK;
 
     while (state != STATE_QUIT)
     {
         switch (state)
         {
-            case STATE_TITLE:
-                state = runTitleScreen();
-                break;
-
-            case STATE_ARCADE1:
-                state = runArcade1();
-                break;
-
-            case STATE_ARCADE2:
-                state = runArcade2();
-                break;
-
-            case STATE_BIOPOD:
-                state = runBioPod(); 
-                break;
-
-            case STATE_HYDROPONICSBAY:
-                state = runHydroponicsBay(); 
-                break;
-
-            case STATE_HANGARBAY:
-                state = runHangarBay(); 
-                break;
-
-            case STATE_TRAININGDECK:
-                state = runTrainingDeck(); 
-                break;
-                
-            case STATE_REACTORCHAMBER:
-                state = runReactorChamber(); 
-                break;
-
-            case STATE_SLEEPINGQUARTERS:
-                state = runSleepingQuarters();
-                break;
-
-            case STATE_ARMORYVAULT:
-                state = runArmoryVault(); 
-                break;
-                
-            case STATE_HOLODECK:
-                state = runHoloDeck(); 
-                break;
-
-            case STATE_MEDICALBAY:
-                state = runMedicalBay(); 
-                break;
-
-            case STATE_SCIENCELAB:
-                state = runScienceLab(); 
-                break;
-
+            case STATE_TITLE:            state = runTitleScreen(); break;
+            case STATE_ARCADE1:          state = runArcade1(); break;
+            case STATE_ARCADE2:          state = runArcade2(); break;
+            case STATE_BIOPOD:           state = runBioPod(); break;
+            case STATE_HYDROPONICSBAY:   state = runHydroponicsBay(); break;
+            case STATE_HANGARBAY:        state = runHangarBay(); break;
+            case STATE_TRAININGDECK:     state = runTrainingDeck(); break;
+            case STATE_REACTORCHAMBER:   state = runReactorChamber(); break;
+            case STATE_SLEEPINGQUARTERS: state = runSleepingQuarters(); break;
+            case STATE_ARMORYVAULT:      state = runArmoryVault(); break;
+            case STATE_HOLODECK:         state = runHoloDeck(); break;
+            case STATE_MEDICALBAY:       state = runMedicalBay(); break;
+            case STATE_SCIENCELAB:       state = runScienceLab(); break;
         }
     }
 

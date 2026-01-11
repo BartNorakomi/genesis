@@ -5,11 +5,11 @@
 #include "room_reactorchamber.h"
 #include "player.h"
 #include "game_state.h"
-#include "room_biopod.h"      // for STATE_BIOPOD
-#include "room_arcade1.h"     // placeholder for next room
+#include "room_biopod.h"
+#include "room_arcade1.h"
 
 // ---------------------------------------------------------
-// 1. Externs from other modules
+// 1. Externs
 // ---------------------------------------------------------
 extern const u8* currentColMap;
 extern u8 tileContent;
@@ -18,7 +18,27 @@ extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
 // ---------------------------------------------------------
-// 2. Room logic
+// 2. Local sprite pointers
+// ---------------------------------------------------------
+static Sprite* reactorSprite;
+
+// ---------------------------------------------------------
+// 3. Reactor position (feet position for depth sorting)
+// ---------------------------------------------------------
+static int reactorX = 66;
+static int reactorY = 32;
+
+// ---------------------------------------------------------
+// 4. Unified depth sorting
+// ---------------------------------------------------------
+static void updateDepth(void)
+{
+    SPR_setDepth(playerSprite,  -playerY);
+    SPR_setDepth(reactorSprite, -reactorY - 50);
+}
+
+// ---------------------------------------------------------
+// 5. Room logic
 // ---------------------------------------------------------
 GameState runReactorChamber(void)
 {
@@ -26,16 +46,32 @@ GameState runReactorChamber(void)
     playMusic(tune_ship);
 
     SPR_reset();
-    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
-                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    // Player sprite
+    playerSprite = SPR_addSprite(
+        &playerSpriteDef,
+        playerX,
+        playerY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // Load reactor palette into PAL3
+    PAL_setPalette(PAL3, reactorSpriteDef.palette->data, CPU);
+
+    // Reactor sprite
+    reactorSprite = SPR_addSprite(
+        &reactorSpriteDef,
+        reactorX,
+        reactorY,
+        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
+    );
 
     while (1)
     {
         playerHandleInput();
+        updateDepth();
 
         // ---- Room transition logic ----
-
-        // Left exit → Biopod
         if (playerX < EdgeRoomLeft + 1)
         {
             playerX = EnterRoomRight;
@@ -43,15 +79,13 @@ GameState runReactorChamber(void)
             return STATE_BIOPOD;
         }
 
-        // Right exit → Next room (placeholder)
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;
             playerY = 0x5A - 16;
-            return STATE_HOLODECK;   // change when you add the next room
+            return STATE_HOLODECK;
         }
 
-        // Debug + sprite update
         drawDebugInfo();
         playerUpdateSprite();
 
