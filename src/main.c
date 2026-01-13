@@ -102,6 +102,12 @@ void drawRoomBackground(u8 room)
     // Build palette 3
     if (room == ROOM_REACTORCHAMBER) memcpy(&our_level_palette[48], reactorSpriteDef.palette->data, 16 * 2);
     if (room == ROOM_MEDICALBAY) memcpy(&our_level_palette[48], medicalBayChairSpriteDef.palette->data, 16 * 2);
+    if (room == STATE_TRAININGDECK) memcpy(&our_level_palette[48], trainingDeckTreadmillSpriteDef.palette->data, 16 * 2);
+    if (room == STATE_HANGARBAY) memcpy(&our_level_palette[48], hangarBayDrillingMachineSpriteDef.palette->data, 16 * 2);
+    if (room == STATE_SCIENCELAB) memcpy(&our_level_palette[48], scienceLabHelixSpriteDef.palette->data, 16 * 2);
+    if (room == STATE_BIOPOD) memcpy(&our_level_palette[48], biopodRightPodSpriteDef.palette->data, 16 * 2);
+    if (room == STATE_HYDROPONICSBAY) memcpy(&our_level_palette[48], hydroponicsBayFoodLeftSpriteDef.palette->data, 16 * 2);
+    if (room == STATE_HOLODECK) memcpy(&our_level_palette[48], holodeckDoorSpriteDef.palette->data, 16 * 2);
      
     PAL_setColors(0, palette_black, 64, DMA);
 
@@ -147,7 +153,7 @@ int main(bool hardReset)
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
 
-    GameState state = STATE_TRAININGDECK;
+    GameState state = STATE_ARCADE1;
 
     while (state != STATE_QUIT)
     {

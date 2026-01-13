@@ -17,11 +17,14 @@ extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
 // ---------------------------------------------------------
-// 2. Local sprite pointers (player + NPCs)
+// 2. Local sprite pointers (player + NPCs + props)
 // ---------------------------------------------------------
 static Sprite* girlSprite;
 static Sprite* capgirlSprite;
 static Sprite* redheadboySprite;
+
+static Sprite* arcade1WallSprite;      // NEW
+static Sprite* arcade1OpenDoorSprite;  // NEW
 
 // ---------------------------------------------------------
 // 3. NPC positions (easy to adjust)
@@ -36,21 +39,32 @@ static int redheadboyX = 240;
 static int redheadboyY = 78;
 
 // ---------------------------------------------------------
-// 4. Unified depth sorting (correct top‑down behavior)
+// 4. Prop positions (NEW)
 // ---------------------------------------------------------
-// Using negative Y gives:
-//   - player BELOW NPC (higher Y) → deeper → in front
-//   - player ABOVE NPC (lower Y) → shallower → behind
+static int wallX       = 156;     // adjust as needed
+static int wallY       = 76;
+
+static int openDoorX   = 108;   // adjust as needed
+static int openDoorY   = 57;
+
+// ---------------------------------------------------------
+// 5. Unified depth sorting (correct top‑down behavior)
+// ---------------------------------------------------------
 static void updateDepth(void)
 {
-    SPR_setDepth(playerSprite, -playerY);
-    SPR_setDepth(girlSprite,       -girlY);
-    SPR_setDepth(capgirlSprite,    -capgirlY);
-    SPR_setDepth(redheadboySprite, -redheadboyY);
+    // Props behind everything
+    SPR_setDepth(arcade1WallSprite,     900);
+    SPR_setDepth(arcade1OpenDoorSprite, 850);
+
+    // Player + NPCs
+    SPR_setDepth(playerSprite,      -playerY);
+    SPR_setDepth(girlSprite,        -girlY);
+    SPR_setDepth(capgirlSprite,     -capgirlY);
+    SPR_setDepth(redheadboySprite,  -redheadboyY);
 }
 
 // ---------------------------------------------------------
-// 5. Room logic
+// 6. Room logic
 // ---------------------------------------------------------
 GameState runArcade1(void)
 {
@@ -68,7 +82,24 @@ GameState runArcade1(void)
     );
 
     // -----------------------------------------------------
-    // NPCs (static sprites with adjustable X/Y)
+    // Props (NEW)
+    // -----------------------------------------------------
+    arcade1WallSprite = SPR_addSprite(
+        &arcade1WallSpriteDef,
+        wallX,
+        wallY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    arcade1OpenDoorSprite = SPR_addSprite(
+        &arcade1OpenDoorSpriteDef,
+        openDoorX,
+        openDoorY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // -----------------------------------------------------
+    // NPCs
     // -----------------------------------------------------
     girlSprite = SPR_addSprite(
         &girlSpriteDef,

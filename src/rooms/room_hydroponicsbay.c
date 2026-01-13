@@ -5,7 +5,7 @@
 #include "room_hydroponicsbay.h"
 #include "player.h"
 #include "game_state.h"
-#include "room_sleepingquarters.h"    // for STATE_SLEEPING
+#include "room_sleepingquarters.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -20,7 +20,34 @@ extern void drawDebugInfo(void);
 extern u16 globalTileIndex;
 
 // ---------------------------------------------------------
-// 2. Room logic
+// 2. Local sprite pointers
+// ---------------------------------------------------------
+static Sprite* hydroponicsBayFoodLeftSprite;
+static Sprite* hydroponicsBayFoodRightSprite;
+
+// ---------------------------------------------------------
+// 3. Feet positions for depth sorting
+// ---------------------------------------------------------
+static int foodLeftX  =  0;
+static int foodLeftY  = 96;
+
+static int foodRightX = 160;
+static int foodRightY = 136;
+
+// ---------------------------------------------------------
+// 4. Unified depth sorting
+// ---------------------------------------------------------
+static void updateDepth(void)
+{
+    SPR_setDepth(playerSprite, -playerY);
+
+    // Adjust offsets as needed for correct layering
+    SPR_setDepth(hydroponicsBayFoodLeftSprite,  -foodLeftY  - 2);
+    SPR_setDepth(hydroponicsBayFoodRightSprite, -foodRightY + 30);
+}
+
+// ---------------------------------------------------------
+// 5. Room logic
 // ---------------------------------------------------------
 GameState runHydroponicsBay(void)
 {
@@ -28,32 +55,49 @@ GameState runHydroponicsBay(void)
     drawRoomBackground(ROOM_HYDROPONICSBAY);
     playMusic(tune_ship);
 
-    // Load FG tileset using the shared global index
-    VDP_loadTileSet(hydroponicsbay_fg.tileset, globalTileIndex, DMA);
+    // // Load FG tileset using the shared global index
+    // VDP_loadTileSet(hydroponicsbay_fg.tileset, globalTileIndex, DMA);
 
-    // Draw FG image on BG_A using the shared tile index
-    VDP_drawImageEx(
-        BG_A,
-        &hydroponicsbay_fg,
-        TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, globalTileIndex),
-        0, 0,
-        FALSE,
-        TRUE
-    );
+    // // Draw FG image on BG_A using the shared tile index
+    // VDP_drawImageEx(
+    //     BG_A,
+    //     &hydroponicsbay_fg,
+    //     TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, globalTileIndex),
+    //     0, 0,
+    //     FALSE,
+    //     TRUE
+    // );
 
-    // Advance global tile index for next room assets
-    globalTileIndex += hydroponicsbay_fg.tileset->numTile;
+    // // Advance global tile index for next room assets
+    // globalTileIndex += hydroponicsbay_fg.tileset->numTile;
 
     // -----------------------------------------------------
     // Sprite setup
     // -----------------------------------------------------
     SPR_reset();
 
+    // Player
     playerSprite = SPR_addSprite(
         &playerSpriteDef,
         playerX,
         playerY,
         TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // Food Left
+    hydroponicsBayFoodLeftSprite = SPR_addSprite(
+        &hydroponicsBayFoodLeftSpriteDef,
+        foodLeftX,
+        foodLeftY,
+        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
+    );
+
+    // Food Right
+    hydroponicsBayFoodRightSprite = SPR_addSprite(
+        &hydroponicsBayFoodRightSpriteDef,
+        foodRightX,
+        foodRightY,
+        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
     );
 
     // -----------------------------------------------------
@@ -62,6 +106,7 @@ GameState runHydroponicsBay(void)
     while (1)
     {
         playerHandleInput();
+        updateDepth();
 
         // ---- Room transition logic ----
 

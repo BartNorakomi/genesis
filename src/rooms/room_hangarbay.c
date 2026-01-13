@@ -5,8 +5,8 @@
 #include "room_hangarbay.h"
 #include "player.h"
 #include "game_state.h"
-#include "room_sciencelab.h"   // for STATE_SCIENCELAB
-#include "room_arcade1.h"      // placeholder for next room
+#include "room_sciencelab.h"
+#include "room_arcade1.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -18,7 +18,27 @@ extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
 // ---------------------------------------------------------
-// 2. Room logic
+// 2. Local sprite pointers
+// ---------------------------------------------------------
+static Sprite* drillingMachineSprite;
+
+// ---------------------------------------------------------
+// 3. Drilling machine position (feet position for depth sorting)
+// ---------------------------------------------------------
+static int drillingMachineX = 118;
+static int drillingMachineY = 85;
+
+// ---------------------------------------------------------
+// 4. Unified depth sorting
+// ---------------------------------------------------------
+static void updateDepth(void)
+{
+    SPR_setDepth(playerSprite,  -playerY);
+    SPR_setDepth(drillingMachineSprite, - drillingMachineY - 00);
+}
+
+// ---------------------------------------------------------
+// 5. Room logic
 // ---------------------------------------------------------
 GameState runHangarBay(void)
 {
@@ -26,12 +46,26 @@ GameState runHangarBay(void)
     playMusic(tune_ship);
 
     SPR_reset();
-    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
-                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    // Player sprite
+    playerSprite = SPR_addSprite(
+        &playerSpriteDef,
+        playerX, playerY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // Drilling machine sprite
+    drillingMachineSprite = SPR_addSprite(
+        &hangarBayDrillingMachineSpriteDef,
+        drillingMachineX,
+        drillingMachineY,
+        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
+    );
 
     while (1)
     {
         playerHandleInput();
+        updateDepth();
 
         // ---- Room transition logic ----
 
@@ -39,7 +73,7 @@ GameState runHangarBay(void)
         if (playerX < EdgeRoomLeft + 1)
         {
             playerX = EnterRoomRight;
-            playerY = 0x5A +20;
+            playerY = 0x5A + 20;
             return STATE_SCIENCELAB;
         }
 
@@ -47,8 +81,8 @@ GameState runHangarBay(void)
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;
-            playerY = 0x5A -20;
-            return STATE_TRAININGDECK;   // change when next room is ready
+            playerY = 0x5A - 20;
+            return STATE_TRAININGDECK;
         }
 
         // Debug + sprite update

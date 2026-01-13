@@ -5,8 +5,8 @@
 #include "room_biopod.h"
 #include "player.h"
 #include "game_state.h"
-#include "room_sleepingquarters.h"       // if Biopod connects to Sleeping
-#include "room_medicalbay.h"     // or whatever rooms you want
+#include "room_sleepingquarters.h"
+#include "room_medicalbay.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -18,7 +18,36 @@ extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
 // ---------------------------------------------------------
-// 2. Room logic
+// 2. Local sprite pointers
+// ---------------------------------------------------------
+static Sprite* biopodRightPodSprite;
+static Sprite* biopodLeftPodSprite;
+static Sprite* biopodLightSprite;
+
+// ---------------------------------------------------------
+// 3. Feet positions for depth sorting
+// ---------------------------------------------------------
+static int biopodRightPodX = 156;
+static int biopodRightPodY = 86;
+
+static int biopodLeftPodX  = 68;
+static int biopodLeftPodY  = 114;
+
+static int biopodLightX    = 126;
+static int biopodLightY    = 113;   // light is higher, so feet are higher
+
+// ---------------------------------------------------------
+// 4. Unified depth sorting
+// ---------------------------------------------------------
+static void updateDepth(void)
+{
+    SPR_setDepth(playerSprite, -playerY);
+    SPR_setDepth(biopodRightPodSprite, -biopodRightPodY + 30);
+    SPR_setDepth(biopodLeftPodSprite,  -biopodLeftPodY + 60);
+}
+
+// ---------------------------------------------------------
+// 5. Room logic
 // ---------------------------------------------------------
 GameState runBioPod(void)
 {
@@ -26,12 +55,42 @@ GameState runBioPod(void)
     playMusic(tune_ship);
 
     SPR_reset();
-    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
-                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    // Player sprite
+    playerSprite = SPR_addSprite(
+        &playerSpriteDef,
+        playerX, playerY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // Right pod
+    biopodRightPodSprite = SPR_addSprite(
+        &biopodRightPodSpriteDef,
+        biopodRightPodX,
+        biopodRightPodY,
+        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
+    );
+
+    // Left pod
+    biopodLeftPodSprite = SPR_addSprite(
+        &biopodLeftPodSpriteDef,
+        biopodLeftPodX,
+        biopodLeftPodY,
+        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
+    );
+
+    // Light (animated)
+    biopodLightSprite = SPR_addSprite(
+        &biopodLightSpriteDef,
+        biopodLightX,
+        biopodLightY,
+        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
+    );
 
     while (1)
     {
         playerHandleInput();
+        updateDepth();
 
         // ---- Room transition logic ----
 
@@ -43,7 +102,7 @@ GameState runBioPod(void)
             return STATE_ARMORYVAULT;
         }
 
-        // Right exit → Reactor Chamber (or next room)
+        // Right exit → Reactor Chamber
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;

@@ -18,7 +18,27 @@ extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
 // ---------------------------------------------------------
-// 2. Room logic
+// 2. Local sprite pointers
+// ---------------------------------------------------------
+static Sprite* scienceLabHelixSprite;
+
+// ---------------------------------------------------------
+// 3. Helix position (feet position for depth sorting)
+// ---------------------------------------------------------
+static int scienceLabHelixX = 212;   // adjust as needed
+static int scienceLabHelixY = 49;    // adjust as needed
+
+// ---------------------------------------------------------
+// 4. Unified depth sorting
+// ---------------------------------------------------------
+static void updateDepth(void)
+{
+    SPR_setDepth(playerSprite, -playerY);
+    SPR_setDepth(scienceLabHelixSprite, -scienceLabHelixY);
+}
+
+// ---------------------------------------------------------
+// 5. Room logic
 // ---------------------------------------------------------
 GameState runScienceLab(void)
 {
@@ -26,12 +46,26 @@ GameState runScienceLab(void)
     playMusic(tune_ship);
 
     SPR_reset();
-    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
-                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    // Player sprite
+    playerSprite = SPR_addSprite(
+        &playerSpriteDef,
+        playerX, playerY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // Helix sprite
+    scienceLabHelixSprite = SPR_addSprite(
+        &scienceLabHelixSpriteDef,
+        scienceLabHelixX,
+        scienceLabHelixY,
+        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
+    );
 
     while (1)
     {
         playerHandleInput();
+        updateDepth();
 
         // ---- Room transition logic ----
 
@@ -43,12 +77,12 @@ GameState runScienceLab(void)
             return STATE_HOLODECK;
         }
 
-        // Right exit → Next room (placeholder)
+        // Right exit → Hangar Bay
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;
             playerY = 0x5A;
-            return STATE_HANGARBAY;   // change when next room is ready
+            return STATE_HANGARBAY;
         }
 
         // Debug + sprite update

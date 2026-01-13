@@ -42,6 +42,20 @@ extern const SpriteDefinition armoryVaultPanelSpriteDef;
 extern const SpriteDefinition medicalBayChairSpriteDef;
 extern const SpriteDefinition medicalBayLightsSpriteDef;
 extern const SpriteDefinition sleepingQuartersLightsSpriteDef;
+extern const SpriteDefinition trainingDeckTreadmillSpriteDef;
+extern const SpriteDefinition trainingDeckWallLeftSpriteDef;
+extern const SpriteDefinition trainingDeckWallRightSpriteDef;
+extern const SpriteDefinition hangarBayDrillingMachineSpriteDef;
+extern const SpriteDefinition scienceLabHelixSpriteDef;
+extern const SpriteDefinition biopodRightPodSpriteDef;
+extern const SpriteDefinition biopodLeftPodSpriteDef;
+extern const SpriteDefinition biopodLightSpriteDef;
+extern const SpriteDefinition hydroponicsBayFoodLeftSpriteDef;
+extern const SpriteDefinition hydroponicsBayFoodRightSpriteDef;
+extern const SpriteDefinition holodeckDoorSpriteDef;
+extern const SpriteDefinition holodeckFloorSpriteDef;
+extern const SpriteDefinition arcade1WallSpriteDef;
+extern const SpriteDefinition arcade1OpenDoorSpriteDef;
 extern const SpriteDefinition titlescreenpressbuttonSpriteDef;
 
 #endif // _RES_RESOURCES_H_
