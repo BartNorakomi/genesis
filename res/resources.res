@@ -1,3 +1,4 @@
+IMAGE titlescreen "graphics/titlescreen/titlescreen.bmp" BEST ALL
 IMAGE arcade1 "graphics/backgrounds/arcade1.bmp" BEST ALL
 IMAGE arcade2 "graphics/backgrounds/arcade2.bmp" BEST ALL
 IMAGE armoryvault "graphics/backgrounds/armoryvault.bmp" BEST ALL
@@ -11,7 +12,17 @@ IMAGE reactorchamber "graphics/backgrounds/reactorchamber.bmp" BEST ALL
 IMAGE sciencelab "graphics/backgrounds/sciencelab.bmp" BEST ALL
 IMAGE sleepingquarters "graphics/backgrounds/sleepingquarters.bmp" BEST ALL
 IMAGE trainingdeck "graphics/backgrounds/trainingdeck.bmp" BEST ALL
-IMAGE titlescreen "graphics/titlescreen/titlescreen.bmp" BEST ALL
+
+IMAGE jumpquesttitlescreen "graphics/games/jumpquesttitlescreen.bmp" BEST ALL
+
+IMAGE basketball "graphics/backgrounds/trainingdeck.bmp" BEST ALL
+IMAGE blockcannon "graphics/backgrounds/trainingdeck.bmp" BEST ALL
+IMAGE bikerace "graphics/backgrounds/trainingdeck.bmp" BEST ALL
+IMAGE neonhorizon "graphics/backgrounds/trainingdeck.bmp" BEST ALL
+IMAGE trainingdeckgame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
+IMAGE drillinggame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
+IMAGE arcademachine "graphics/backgrounds/arcademachine.bmp" BEST ALL
+
 
 BIN level_col_arcade1 "collisionmaps/tilemapArcade1.bin"
 BIN level_col_arcade2 "collisionmaps/tilemapArcade2.bin"
@@ -49,6 +60,8 @@ SPRITE holodeckDoorSpriteDef "sprites/roomobjects/holodeckdoor.bmp" 6 20 FAST NO
 SPRITE holodeckFloorSpriteDef "sprites/roomobjects/holodeckfloor.bmp" 30 10 FAST 6
 SPRITE arcade1WallSpriteDef "sprites/roomobjects/arcade1Wall.bmp" 8 10 FAST NONE
 SPRITE arcade1OpenDoorSpriteDef "sprites/roomobjects/arcade1opendoor.bmp" 6 14 FAST NONE
+SPRITE arcade2TableSpriteDef "sprites/roomobjects/arcade2table.bmp" 14 6 FAST NONE
+SPRITE arcade2TableWithEntitySpriteDef "sprites/roomobjects/arcade2tablewithentity.bmp" 12 4 FAST NONE
 SPRITE titlescreenpressbuttonSpriteDef "sprites/titlescreen/titlescreenpressbuttonsprite.bmp" 10 2 FAST 26
    
 #option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"

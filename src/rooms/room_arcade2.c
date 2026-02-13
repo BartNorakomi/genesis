@@ -6,7 +6,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "room_arcade1.h"      // for STATE_ARCADE1
-#include "room_sleepingquarters.h"    // placeholder for next room
+#include "room_sleepingquarters.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -18,7 +18,35 @@ extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
 // ---------------------------------------------------------
-// 2. Room logic
+// 2. Local sprite pointers (player + props)
+// ---------------------------------------------------------
+static Sprite* arcade2TableSprite;
+static Sprite* arcade2TableWithEntitySprite;
+
+// ---------------------------------------------------------
+// 3. Prop positions (easy to adjust)
+// ---------------------------------------------------------
+static int tableX  =  70;
+static int tableY  = 157;
+
+static int tableEntityX = 180;
+static int tableEntityY =  96;
+
+// ---------------------------------------------------------
+// 4. Depth sorting
+// ---------------------------------------------------------
+static void updateDepth(void)
+{
+    // Props behind player
+    SPR_setDepth(arcade2TableSprite, -tableY -60);
+//    SPR_setDepth(arcade2TableWithEntitySprite, -tableEntityY -50);
+
+    // Player always sorts by feet
+    SPR_setDepth(playerSprite, -playerY);
+}
+
+// ---------------------------------------------------------
+// 5. Room logic
 // ---------------------------------------------------------
 GameState runArcade2(void)
 {
@@ -26,32 +54,50 @@ GameState runArcade2(void)
     playMusic(tune_ship);
 
     SPR_reset();
-    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
-                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
+    // Player sprite
+    playerSprite = SPR_addSprite(
+        &playerSpriteDef,
+        playerX,
+        playerY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // -----------------------------------------------------
+    // Props (NEW)
+    // -----------------------------------------------------
+    arcade2TableSprite = SPR_addSprite(
+        &arcade2TableSpriteDef,
+        tableX,
+        tableY,
+        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
+    );
+
+    // arcade2TableWithEntitySprite = SPR_addSprite(
+    //     &arcade2TableWithEntitySpriteDef,
+    //     tableEntityX,
+    //     tableEntityY,
+    //     TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
+    // );
+
+    // -----------------------------------------------------
+    // Main room loop
+    // -----------------------------------------------------
     while (1)
     {
         playerHandleInput();
+        updateDepth();
 
         // ---- Room transition logic ----
 
-        // Left exit → Arcade 1
-        if (playerX < EdgeRoomLeft + 1)
+        // Bottom exit → Arcade 1
+        if (playerY == 125)
         {
-            playerX = EnterRoomRight;
-            playerY = 0x5A;
+            playerX = 138;   // becomes 182 when entering screen
+            playerY = 55;    // becomes 54, triggers entering screen
             return STATE_ARCADE1;
         }
 
-        // Right exit → Next room (placeholder)
-        if (playerX >= EdgeRoomRight)
-        {
-            playerX = EnterRoomLeft;
-            playerY = 0x5A;
-            return STATE_SLEEPINGQUARTERS;   // change when next room is ready
-        }
-
-        // Debug + sprite update
         drawDebugInfo();
         playerUpdateSprite();
 

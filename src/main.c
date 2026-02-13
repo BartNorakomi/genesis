@@ -8,6 +8,16 @@
 #include "room_arcade1.h"
 #include "room_titlescreen.h"
 #include "room_medicalbay.h"
+#include "room_jumpquest.h"
+
+// #include "room_jumpquest.h"
+// #include "room_basketball.h"
+// #include "room_blockcannon.h"
+// #include "room_bikerace.h"
+// #include "room_neonhorizon.h"
+// #include "room_trainingdeckgame.h"
+// #include "room_drillinggame.h"
+
 
 // ---------------------------------------------------------
 // 1. Shared global tile index (used by ALL rooms)
@@ -39,8 +49,18 @@ const u8* const collisionMaps[ROOM_COUNT] =
     level_col_armoryvault,
     level_col_holodeck,
     level_col_medicalbay,
-    level_col_sciencelab
+    level_col_sciencelab,
+
+    // New rooms
+    NULL,   // ROOM_JUMPQUEST
+    NULL,   // ROOM_BASKETBALL
+    NULL,   // ROOM_BLOCKCANNON
+    NULL,   // ROOM_BIKERACE
+    NULL,   // ROOM_NEONHORIZON
+    NULL,   // ROOM_TRAININGDECKGAME
+    NULL    // ROOM_DRILLINGGAME
 };
+
 
 // ---------------------------------------------------------
 // 4. Background rendering
@@ -67,7 +87,18 @@ void drawRoomBackground(u8 room)
         case ROOM_HOLODECK:         bg = &holodeck; break;
         case ROOM_MEDICALBAY:       bg = &medicalbay; break;
         case ROOM_SCIENCELAB:       bg = &sciencelab; break;
-        default: return;
+
+        // --- New rooms ---
+        case ROOM_JUMPQUEST:        bg = &jumpquesttitlescreen; break;
+        case ROOM_BASKETBALL:       bg = &basketball; break;
+        case ROOM_BLOCKCANNON:      bg = &blockcannon; break;
+        case ROOM_BIKERACE:         bg = &bikerace; break;
+        case ROOM_NEONHORIZON:      bg = &neonhorizon; break;
+        case ROOM_TRAININGDECKGAME: bg = &trainingdeckgame; break;
+        case ROOM_DRILLINGGAME:     bg = &drillinggame; break;
+
+        default:
+            return;
     }
 
     // Update active collision map
@@ -97,17 +128,19 @@ void drawRoomBackground(u8 room)
     memcpy(&our_level_palette[0], bg->palette->data, 16 * 2);
     // Build palette 1
     if (room == ROOM_HYDROPONICSBAY) memcpy(&our_level_palette[16], hydroponicsbay_fg.palette->data, 16 * 2);
+    if (room == ROOM_JUMPQUEST) memcpy(&our_level_palette[16], arcademachine.palette->data, 16 * 2);
     // Build palette 2
     memcpy(&our_level_palette[32], playerSpriteDef.palette->data, 16 * 2);
     // Build palette 3
     if (room == ROOM_REACTORCHAMBER) memcpy(&our_level_palette[48], reactorSpriteDef.palette->data, 16 * 2);
     if (room == ROOM_MEDICALBAY) memcpy(&our_level_palette[48], medicalBayChairSpriteDef.palette->data, 16 * 2);
-    if (room == STATE_TRAININGDECK) memcpy(&our_level_palette[48], trainingDeckTreadmillSpriteDef.palette->data, 16 * 2);
-    if (room == STATE_HANGARBAY) memcpy(&our_level_palette[48], hangarBayDrillingMachineSpriteDef.palette->data, 16 * 2);
-    if (room == STATE_SCIENCELAB) memcpy(&our_level_palette[48], scienceLabHelixSpriteDef.palette->data, 16 * 2);
-    if (room == STATE_BIOPOD) memcpy(&our_level_palette[48], biopodRightPodSpriteDef.palette->data, 16 * 2);
-    if (room == STATE_HYDROPONICSBAY) memcpy(&our_level_palette[48], hydroponicsBayFoodLeftSpriteDef.palette->data, 16 * 2);
-    if (room == STATE_HOLODECK) memcpy(&our_level_palette[48], holodeckDoorSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_TRAININGDECK) memcpy(&our_level_palette[48], trainingDeckTreadmillSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_HANGARBAY) memcpy(&our_level_palette[48], hangarBayDrillingMachineSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_SCIENCELAB) memcpy(&our_level_palette[48], scienceLabHelixSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_BIOPOD) memcpy(&our_level_palette[48], biopodRightPodSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_HYDROPONICSBAY) memcpy(&our_level_palette[48], hydroponicsBayFoodLeftSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_HOLODECK) memcpy(&our_level_palette[48], holodeckDoorSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_ARCADE2) memcpy(&our_level_palette[48], arcade2TableSpriteDef.palette->data, 16 * 2);
      
     PAL_setColors(0, palette_black, 64, DMA);
 
@@ -153,7 +186,7 @@ int main(bool hardReset)
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
 
-    GameState state = STATE_ARCADE1;
+    GameState state = STATE_JUMPQUEST;
 
     while (state != STATE_QUIT)
     {
@@ -172,6 +205,19 @@ int main(bool hardReset)
             case STATE_HOLODECK:         state = runHoloDeck(); break;
             case STATE_MEDICALBAY:       state = runMedicalBay(); break;
             case STATE_SCIENCELAB:       state = runScienceLab(); break;
+
+            // --- New rooms below ---
+            case STATE_JUMPQUEST:        state = runJumpQuest(); break;
+            case STATE_BASKETBALL:       state = runBasketball(); break;
+            case STATE_BLOCKCANNON:      state = runBlockCannon(); break;
+            case STATE_BIKERACE:         state = runBikeRace(); break;
+            case STATE_NEONHORIZON:      state = runNeonHorizon(); break;
+            case STATE_TRAININGDECKGAME: state = runTrainingDeckGame(); break;
+            case STATE_DRILLINGGAME:     state = runDrillingGame(); break;
+
+            default:
+                state = STATE_QUIT;
+                break;
         }
     }
 

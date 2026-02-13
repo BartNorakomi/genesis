@@ -130,6 +130,25 @@ GameState runArcade1(void)
         playerHandleInput();
         updateDepth();
 
+        // ---- Room transitions ----
+
+        // Left exit → Reactor Chamber
+        if (playerY == 54)
+        {
+            playerX = 206;
+            playerY = 118;
+            return STATE_ARCADE2;
+        }
+
+        // Left exit → Reactor Chamber
+        if (playerY == 125 || playerX == 0 || playerX == 254)
+        {
+            playerX = 144;
+            playerY = 69;
+            return STATE_HOLODECK;
+        }
+
+
         if (JOY_readJoypad(JOY_1) & BUTTON_START)
             return STATE_SLEEPINGQUARTERS;
 
