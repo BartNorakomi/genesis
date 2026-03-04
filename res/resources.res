@@ -14,15 +14,20 @@ IMAGE sleepingquarters "graphics/backgrounds/sleepingquarters.bmp" BEST ALL
 IMAGE trainingdeck "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 
 IMAGE jumpquesttitlescreen "graphics/games/jumpquesttitlescreen.bmp" BEST ALL
+IMAGE jumpquestingameexample "graphics/games/jumpquestingameexample.bmp" BEST ALL
+IMAGE basketballtitlescreen "graphics/games/basketballtitlescreen.bmp" BEST ALL
+IMAGE basketballingameexample "graphics/games/basketballingameexample.bmp" BEST ALL
+IMAGE blockcannontitlescreen "graphics/games/blockcannontitlescreen.bmp" BEST ALL
+IMAGE blockcannoningameexample "graphics/games/blockcannoningameexample.bmp" BEST ALL
+IMAGE bikeracetitlescreen "graphics/games/bikeracetitlescreen.bmp" BEST ALL
+IMAGE bikeraceingameexample "graphics/games/bikeraceingameexample.bmp" BEST ALL
 
-IMAGE basketball "graphics/backgrounds/trainingdeck.bmp" BEST ALL
-IMAGE blockcannon "graphics/backgrounds/trainingdeck.bmp" BEST ALL
-IMAGE bikerace "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE neonhorizon "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE trainingdeckgame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE drillinggame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE arcademachine "graphics/backgrounds/arcademachine.bmp" BEST ALL
 
+IMAGE NPCBlackRectangle "graphics/npcdialogue/blackractangle.bmp" BEST ALL
 
 BIN level_col_arcade1 "collisionmaps/tilemapArcade1.bin"
 BIN level_col_arcade2 "collisionmaps/tilemapArcade2.bin"
@@ -63,7 +68,11 @@ SPRITE arcade1OpenDoorSpriteDef "sprites/roomobjects/arcade1opendoor.bmp" 6 14 F
 SPRITE arcade2TableSpriteDef "sprites/roomobjects/arcade2table.bmp" 14 6 FAST NONE
 SPRITE arcade2TableWithEntitySpriteDef "sprites/roomobjects/arcade2tablewithentity.bmp" 12 4 FAST NONE
 SPRITE titlescreenpressbuttonSpriteDef "sprites/titlescreen/titlescreenpressbuttonsprite.bmp" 10 2 FAST 26
-   
+
+SPRITE fingerSpriteDef "sprites/roomicons/finger.bmp" 2 2 FAST NONE
+SPRITE triggerASpriteDef "sprites/roomicons/triggerA.bmp" 2 2 FAST NONE
+SPRITE textCloudSpriteDef "sprites/roomicons/textCloud.bmp" 3 2 FAST NONE
+
 #option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"
 #option 2: export audio in audacity: 7500 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=TRUE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_7.5khz.raw"
 #the lower the khz the higher the pitch

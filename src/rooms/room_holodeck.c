@@ -160,6 +160,9 @@ GameState runHoloDeck(void)
         // Left exit → Reactor Chamber
         if (playerX < EdgeRoomLeft + 1)
         {
+            SPR_setVisibility(holodeckFloorSprite, HIDDEN);
+            SPR_update();
+            
             playerX = EnterRoomRight;
             playerY = 0x5A - 36;
             return STATE_REACTORCHAMBER;

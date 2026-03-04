@@ -4,8 +4,10 @@ C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapholodeck.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/titlescreen/titlescreen.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/hydroponicsbayforeground.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/medicalbay.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/npcdialogue/blackractangle.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/arcade1Wall.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/arcade1.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/bikeracetitlescreen.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/player/playersprite.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/sleepingquarters.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/jumpquesttitlescreen.bmp \
@@ -14,15 +16,21 @@ C:/Users/bartf/Documents/GitHub/genesis/res/sfx/player_footstep.wav \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/medicalbaylights.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/arcade2.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/reactor.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomicons/finger.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/npcs/girl.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapmedicalbay.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/trainingdecktreadmill.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/reactorchamber.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/holodeck.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomicons/triggerA.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sfx/startgame.wav \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/blockcannontitlescreen.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sfx/Large\ Crowd\ Applause\ 04.wav \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/hangarbay.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/basketballingameexample.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/bikeraceingameexample.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/biopodrightpod.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomicons/textCloud.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapsciencelab.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/sciencelabhelix.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/sciencelab.bmp \
@@ -41,7 +49,9 @@ C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapArcade1.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/hydroponicsbay.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaparmoryvault.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/holodeckdoor.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/blockcannoningameexample.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/arcade1opendoor.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/jumpquestingameexample.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaptrainingdeck.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/hydroponicsbayfoodright.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/trainingdeckwallright.bmp \
@@ -50,6 +60,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapreactorchamber.
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/arcade2tablewithentity.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaphydroponicsbay.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/armoryvaultpanel.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/basketballtitlescreen.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/arcademachine.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/medicalbaychair.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapBiopod.bin \

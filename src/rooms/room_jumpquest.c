@@ -3,9 +3,7 @@
 #include "music.h"
 #include "rooms.h"
 #include "room_jumpquest.h"
-#include "player.h"
 #include "game_state.h"
-#include "room_sciencelab.h"
 #include "room_arcade1.h"
 
 // ---------------------------------------------------------
@@ -21,19 +19,24 @@ extern void drawDebugInfo(void);
 extern u16 globalTileIndex;
 
 // ---------------------------------------------------------
-// 5. Room logic
+// 2. Internal JumpQuest states
+// ---------------------------------------------------------
+typedef enum
+{
+    JQ_STATE_TITLE,
+    JQ_STATE_GAME
+} JumpQuestState;
+
+// ---------------------------------------------------------
+// 3. Room logic (JumpQuest minigame)
 // ---------------------------------------------------------
 GameState runJumpQuest(void)
 {
-    // Draw BG first (sets globalTileIndex to the next free slot)
     drawRoomBackground(ROOM_JUMPQUEST);
     playMusic(tune_ship);
 
-    // -----------------------------------------------------
-    // Foreground layer (arcade machine)
-    // -----------------------------------------------------
+    // Foreground arcade cabinet
     VDP_loadTileSet(arcademachine.tileset, globalTileIndex, DMA);
-
     VDP_drawImageEx(
         BG_A,
         &arcademachine,
@@ -42,26 +45,88 @@ GameState runJumpQuest(void)
         FALSE,
         TRUE
     );
+    globalTileIndex += arcademachine.tileset->numTile;
 
-    // Advance global tile index for next room assets
-    //globalTileIndex += arcademachine.tileset->numTile;
-
-    // -----------------------------------------------------
-    // Sprite setup
-    // -----------------------------------------------------
     SPR_reset();
+
+    JumpQuestState jqState = JQ_STATE_TITLE;
 
     while (1)
     {
-        playerHandleInput();
+        u16 joy = JOY_readJoypad(JOY_1);
 
-        // Debug + sprite update
-        drawDebugInfo();
-        playerUpdateSprite();
+        switch (jqState)
+        {
+            // -------------------------------------------------
+            // TITLE SCREEN
+            // -------------------------------------------------
+            case JQ_STATE_TITLE:
+
+                // NEW: Press B to exit back to arcade room
+                if (joy & BUTTON_B)
+                {
+                    return STATE_ARCADE1;
+                }
+
+                if (joy & BUTTON_A)
+                {
+                    // Fade out only PAL0 (monitor)
+                    PAL_fadeOut(0, 15, 8, FALSE);
+
+                    // Draw game screen
+                    VDP_drawImageEx(
+                        BG_B,
+                        &jumpquestingameexample,
+                        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+                        0, 0,
+                        FALSE,
+                        TRUE
+                    );
+
+                    // Fade in using game palette
+                    PAL_fadeIn(0, 15, jumpquestingameexample.palette->data, 8, FALSE);
+
+                    jqState = JQ_STATE_GAME;
+                }
+                break;
+
+            // -------------------------------------------------
+            // GAME SCREEN
+            // -------------------------------------------------
+            case JQ_STATE_GAME:
+
+                if (joy & BUTTON_B)
+                {
+                    // Fade out only PAL0 (monitor)
+                    PAL_fadeOut(0, 15, 8, FALSE);
+
+                    // Draw title screen
+                    VDP_drawImageEx(
+                        BG_B,
+                        &jumpquesttitlescreen,
+                        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+                        0, 0,
+                        FALSE,
+                        TRUE
+                    );
+
+                    // Fade in using title palette
+                    PAL_fadeIn(0, 15, jumpquesttitlescreen.palette->data, 8, FALSE);
+
+                    jqState = JQ_STATE_TITLE;
+                }
+
+                if (joy & BUTTON_START)
+                {
+                    return STATE_ARCADE1;
+                }
+
+                break;
+        }
 
         SPR_update();
         SYS_doVBlankProcess();
     }
 
-    return STATE_QUIT;
+    return STATE_ARCADE1;
 }

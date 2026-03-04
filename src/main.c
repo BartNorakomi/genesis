@@ -90,9 +90,9 @@ void drawRoomBackground(u8 room)
 
         // --- New rooms ---
         case ROOM_JUMPQUEST:        bg = &jumpquesttitlescreen; break;
-        case ROOM_BASKETBALL:       bg = &basketball; break;
-        case ROOM_BLOCKCANNON:      bg = &blockcannon; break;
-        case ROOM_BIKERACE:         bg = &bikerace; break;
+        case ROOM_BASKETBALL:       bg = &basketballtitlescreen; break;
+        case ROOM_BLOCKCANNON:      bg = &blockcannontitlescreen; break;
+        case ROOM_BIKERACE:         bg = &bikeracetitlescreen; break;
         case ROOM_NEONHORIZON:      bg = &neonhorizon; break;
         case ROOM_TRAININGDECKGAME: bg = &trainingdeckgame; break;
         case ROOM_DRILLINGGAME:     bg = &drillinggame; break;
@@ -106,7 +106,7 @@ void drawRoomBackground(u8 room)
 
     // Fade out current room
     PAL_fadeOut(0, 63, 8, FALSE);
-
+    
     VDP_setEnable(FALSE);
     VDP_clearPlane(BG_A, TRUE);
     PAL_setPalette(PAL0, bg->palette->data, DMA);
@@ -129,6 +129,9 @@ void drawRoomBackground(u8 room)
     // Build palette 1
     if (room == ROOM_HYDROPONICSBAY) memcpy(&our_level_palette[16], hydroponicsbay_fg.palette->data, 16 * 2);
     if (room == ROOM_JUMPQUEST) memcpy(&our_level_palette[16], arcademachine.palette->data, 16 * 2);
+    if (room == ROOM_BASKETBALL) memcpy(&our_level_palette[16], arcademachine.palette->data, 16 * 2);
+    if (room == ROOM_BLOCKCANNON) memcpy(&our_level_palette[16], arcademachine.palette->data, 16 * 2);
+    if (room == ROOM_BIKERACE) memcpy(&our_level_palette[16], arcademachine.palette->data, 16 * 2);
     // Build palette 2
     memcpy(&our_level_palette[32], playerSpriteDef.palette->data, 16 * 2);
     // Build palette 3
@@ -186,7 +189,7 @@ int main(bool hardReset)
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
 
-    GameState state = STATE_JUMPQUEST;
+    GameState state = STATE_BIOPOD;
 
     while (state != STATE_QUIT)
     {

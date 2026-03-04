@@ -21,5 +21,4 @@ out/src/rooms/room_basketball.o: src/rooms/room_basketball.c \
  C:/sgdk211/inc/ext/console.h C:/sgdk211/inc/config.h \
  C:/sgdk211/inc/string.h C:/sgdk211/inc/maths.h C:/sgdk211/inc/dma.h \
  res/resources.h res/music.h inc/rooms.h inc/room_basketball.h \
- inc/game_state.h inc/player.h inc/game_state.h inc/room_sciencelab.h \
- inc/room_arcade1.h inc/rooms.h
+ inc/game_state.h inc/game_state.h inc/room_arcade1.h inc/rooms.h

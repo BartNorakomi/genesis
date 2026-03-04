@@ -23,11 +23,14 @@ static Sprite* girlSprite;
 static Sprite* capgirlSprite;
 static Sprite* redheadboySprite;
 
-static Sprite* arcade1WallSprite;      // NEW
-static Sprite* arcade1OpenDoorSprite;  // NEW
+static Sprite* arcade1WallSprite;
+static Sprite* arcade1OpenDoorSprite;
+
+static Sprite* fingerSprite;       // Trigger A hand
+static Sprite* triggerASprite;     // Trigger A button
 
 // ---------------------------------------------------------
-// 3. NPC positions (easy to adjust)
+// 3. NPC positions
 // ---------------------------------------------------------
 static int girlX       = 50;
 static int girlY       = 98;
@@ -39,24 +42,46 @@ static int redheadboyX = 240;
 static int redheadboyY = 78;
 
 // ---------------------------------------------------------
-// 4. Prop positions (NEW)
+// 4. Prop positions
 // ---------------------------------------------------------
-static int wallX       = 156;     // adjust as needed
+static int wallX       = 156;
 static int wallY       = 76;
 
-static int openDoorX   = 108;   // adjust as needed
+static int openDoorX   = 108;
 static int openDoorY   = 57;
 
+// Trigger icon positions (updated dynamically)
+static int triggerAX   = 210;
+static int triggerAY   = 110;
+
 // ---------------------------------------------------------
-// 5. Unified depth sorting (correct top‑down behavior)
+// 5. Arcade machine positions (converted from MSX)
+// ---------------------------------------------------------
+static const int arcadeMachineY[4] = { 63, 63, 64, 64 };
+static const int arcadeMachineX[4] = {
+    0x16 - 10 + 8,
+    0x42 - 10 + 6 + 6,
+    0xC6 - 10 - 10 + 2,
+    0xF6 - 10 - 16 + 8
+};
+
+// ---------------------------------------------------------
+// 6. Trigger icon state
+// ---------------------------------------------------------
+static int showPressAIcon = 0;   // 0 = none, 1–4 = machine index
+static u16 iconFrameCounter = 0; // bobbing animation
+
+// ---------------------------------------------------------
+// 7. Depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
-    // Props behind everything
     SPR_setDepth(arcade1WallSprite,     900);
     SPR_setDepth(arcade1OpenDoorSprite, 850);
 
-    // Player + NPCs
+    SPR_setDepth(fingerSprite,          780);
+    SPR_setDepth(triggerASprite,        760);
+
     SPR_setDepth(playerSprite,      -playerY);
     SPR_setDepth(girlSprite,        -girlY);
     SPR_setDepth(capgirlSprite,     -capgirlY);
@@ -64,7 +89,64 @@ static void updateDepth(void)
 }
 
 // ---------------------------------------------------------
-// 6. Room logic
+// 8. Check if player is near a machine
+// ---------------------------------------------------------
+static bool isPlayerNearMachine(int mx, int my)
+{
+    int dx = abs(playerX - mx);
+    int dy = abs(playerY - my);
+
+    return (dx < 16 && dy < 16);
+}
+
+// ---------------------------------------------------------
+// 9. MSX routine: CheckShowPressTrigAIconArcadeHall1 (ported)
+// ---------------------------------------------------------
+static void checkShowPressAIcon(void)
+{
+    // Sitting check removed (not implemented yet on Genesis)
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (isPlayerNearMachine(arcadeMachineX[i], arcadeMachineY[i]))
+        {
+            showPressAIcon = i + 1;
+            triggerAX = arcadeMachineX[i];
+            triggerAY = arcadeMachineY[i];
+            return;
+        }
+    }
+
+    showPressAIcon = 0;
+}
+
+// ---------------------------------------------------------
+// 10. MSX routine: PutPressTrigAIcon (ported)
+// ---------------------------------------------------------
+static void updatePressAIconSprites(void)
+{
+    if (showPressAIcon == 0)
+    {
+        SPR_setVisibility(fingerSprite, HIDDEN);
+        SPR_setVisibility(triggerASprite, HIDDEN);
+        return;
+    }
+
+    SPR_setVisibility(fingerSprite, VISIBLE);
+    SPR_setVisibility(triggerASprite, VISIBLE);
+
+    // Hand bobbing animation (frameCounter & 31)
+    int bob = (iconFrameCounter & 31) < 16 ? 1 : -1;
+
+    // Finger (hand)
+    SPR_setPosition(fingerSprite, triggerAX - 2, triggerAY - 29 + bob);
+
+    // Trigger A button
+    SPR_setPosition(triggerASprite, triggerAX, triggerAY - 14);
+}
+
+// ---------------------------------------------------------
+// 11. Room logic
 // ---------------------------------------------------------
 GameState runArcade1(void)
 {
@@ -81,9 +163,7 @@ GameState runArcade1(void)
         TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
     );
 
-    // -----------------------------------------------------
-    // Props (NEW)
-    // -----------------------------------------------------
+    // Props
     arcade1WallSprite = SPR_addSprite(
         &arcade1WallSpriteDef,
         wallX,
@@ -98,9 +178,26 @@ GameState runArcade1(void)
         TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
     );
 
-    // -----------------------------------------------------
+    // Trigger icons
+    fingerSprite = SPR_addSprite(
+        &fingerSpriteDef,
+        triggerAX,
+        triggerAY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    triggerASprite = SPR_addSprite(
+        &triggerASpriteDef,
+        triggerAX,
+        triggerAY,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    // Hide initially
+    SPR_setVisibility(fingerSprite, HIDDEN);
+    SPR_setVisibility(triggerASprite, HIDDEN);
+
     // NPCs
-    // -----------------------------------------------------
     girlSprite = SPR_addSprite(
         &girlSpriteDef,
         girlX + PLAYERANDNPC_OFFSET_X,
@@ -130,9 +227,23 @@ GameState runArcade1(void)
         playerHandleInput();
         updateDepth();
 
-        // ---- Room transitions ----
+        // MSX logic: check & update icons
+        checkShowPressAIcon();
+        updatePressAIconSprites();
 
-        // Left exit → Reactor Chamber
+        // Press A to start the correct arcade game
+        if ((JOY_readJoypad(JOY_1) & BUTTON_A) && showPressAIcon != 0)
+        {
+            switch (showPressAIcon)
+            {
+                case 1: return STATE_JUMPQUEST;
+                case 2: return STATE_BASKETBALL;
+                case 3: return STATE_BLOCKCANNON;
+                case 4: return STATE_BIKERACE;
+            }
+        }
+
+        // Left exit → Arcade2
         if (playerY == 54)
         {
             playerX = 206;
@@ -140,7 +251,7 @@ GameState runArcade1(void)
             return STATE_ARCADE2;
         }
 
-        // Left exit → Reactor Chamber
+        // Holodeck exit
         if (playerY == 125 || playerX == 0 || playerX == 254)
         {
             playerX = 144;
@@ -148,7 +259,7 @@ GameState runArcade1(void)
             return STATE_HOLODECK;
         }
 
-
+        // Start → Sleeping Quarters
         if (JOY_readJoypad(JOY_1) & BUTTON_START)
             return STATE_SLEEPINGQUARTERS;
 
@@ -157,6 +268,8 @@ GameState runArcade1(void)
 
         SPR_update();
         SYS_doVBlankProcess();
+
+        iconFrameCounter++;
     }
 
     return STATE_QUIT;

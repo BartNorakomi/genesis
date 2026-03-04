@@ -7,6 +7,7 @@
 #include "game_state.h"
 #include "room_sleepingquarters.h"
 #include "room_medicalbay.h"
+#include "npc_dialogue.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -34,7 +35,7 @@ static int biopodLeftPodX  = 68;
 static int biopodLeftPodY  = 114;
 
 static int biopodLightX    = 126;
-static int biopodLightY    = 113;   // light is higher, so feet are higher
+static int biopodLightY    = 113;
 
 // ---------------------------------------------------------
 // 4. Unified depth sorting
@@ -89,10 +90,23 @@ GameState runBioPod(void)
 
     while (1)
     {
+        u16 joy = JOY_readJoypad(JOY_1);
+
+        // -------------------------------------------------
+        // Press A → open NPC dialogue window (black rectangle)
+        // -------------------------------------------------
+        if (joy & BUTTON_A)
+        {
+            runDialogue();
+        }
+
+        // -------------------------------------------------
+        // Normal gameplay
+        // -------------------------------------------------
         playerHandleInput();
         updateDepth();
 
-        // ---- Room transition logic ----
+        // ---- Room transitions ----
 
         // Left exit → Armory Vault
         if (playerX < EdgeRoomLeft + 1)
@@ -110,7 +124,6 @@ GameState runBioPod(void)
             return STATE_REACTORCHAMBER;
         }
 
-        // Debug + sprite update
         drawDebugInfo();
         playerUpdateSprite();
 

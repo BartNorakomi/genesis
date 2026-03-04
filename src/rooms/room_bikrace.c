@@ -3,9 +3,7 @@
 #include "music.h"
 #include "rooms.h"
 #include "room_bikerace.h"
-#include "player.h"
 #include "game_state.h"
-#include "room_sciencelab.h"
 #include "room_arcade1.h"
 
 // ---------------------------------------------------------
@@ -17,26 +15,121 @@ extern u8 tileContent;
 extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
+// Shared global tile index from main.c
+extern u16 globalTileIndex;
+
 // ---------------------------------------------------------
-// 5. Room logic
+// 2. Internal Bike Race states
+// ---------------------------------------------------------
+typedef enum
+{
+    BR_STATE_TITLE,
+    BR_STATE_GAME
+} BikeRaceState;
+
+// ---------------------------------------------------------
+// 3. Room logic (Bike Race minigame)
 // ---------------------------------------------------------
 GameState runBikeRace(void)
 {
     drawRoomBackground(ROOM_BIKERACE);
     playMusic(tune_ship);
+
+    // Foreground arcade cabinet
+    VDP_loadTileSet(arcademachine.tileset, globalTileIndex, DMA);
+    VDP_drawImageEx(
+        BG_A,
+        &arcademachine,
+        TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, globalTileIndex),
+        0, 0,
+        FALSE,
+        TRUE
+    );
+    globalTileIndex += arcademachine.tileset->numTile;
+
     SPR_reset();
+
+    BikeRaceState brState = BR_STATE_TITLE;
 
     while (1)
     {
-        playerHandleInput();
+        u16 joy = JOY_readJoypad(JOY_1);
 
-        // Debug + sprite update
-        drawDebugInfo();
-        playerUpdateSprite();
+        switch (brState)
+        {
+            // -------------------------------------------------
+            // TITLE SCREEN
+            // -------------------------------------------------
+            case BR_STATE_TITLE:
+
+                // Press B → exit back to arcade hall
+                if (joy & BUTTON_B)
+                {
+                    return STATE_ARCADE1;
+                }
+
+                // Press A → start game
+                if (joy & BUTTON_A)
+                {
+                    // Fade out only PAL0 (monitor)
+                    PAL_fadeOut(0, 15, 8, FALSE);
+
+                    // Draw game screen
+                    VDP_drawImageEx(
+                        BG_B,
+                        &bikeraceingameexample,
+                        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+                        0, 0,
+                        FALSE,
+                        TRUE
+                    );
+
+                    // Fade in using game palette
+                    PAL_fadeIn(0, 15, bikeraceingameexample.palette->data, 8, FALSE);
+
+                    brState = BR_STATE_GAME;
+                }
+                break;
+
+            // -------------------------------------------------
+            // GAME SCREEN
+            // -------------------------------------------------
+            case BR_STATE_GAME:
+
+                // Press B → return to title screen
+                if (joy & BUTTON_B)
+                {
+                    // Fade out only PAL0
+                    PAL_fadeOut(0, 15, 8, FALSE);
+
+                    // Draw title screen
+                    VDP_drawImageEx(
+                        BG_B,
+                        &bikeracetitlescreen,
+                        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+                        0, 0,
+                        FALSE,
+                        TRUE
+                    );
+
+                    // Fade in using title palette
+                    PAL_fadeIn(0, 15, bikeracetitlescreen.palette->data, 8, FALSE);
+
+                    brState = BR_STATE_TITLE;
+                }
+
+                // Press START → exit to arcade hall
+                if (joy & BUTTON_START)
+                {
+                    return STATE_ARCADE1;
+                }
+
+                break;
+        }
 
         SPR_update();
         SYS_doVBlankProcess();
     }
 
-    return STATE_QUIT;
+    return STATE_ARCADE1;
 }
