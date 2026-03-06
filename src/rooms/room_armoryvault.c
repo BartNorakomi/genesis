@@ -5,8 +5,9 @@
 #include "room_armoryvault.h"
 #include "player.h"
 #include "game_state.h"
-#include "room_sleepingquarters.h"     // for STATE_SLEEPING
-#include "room_medicalbay.h"           // for STATE_MEDICALBAY (or whatever is next)
+#include "room_sleepingquarters.h"
+#include "room_medicalbay.h"
+#include "npc_dialogue.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -56,6 +57,20 @@ GameState runArmoryVault(void)
 
     while (1)
     {
+        u16 joy = JOY_readJoypad(JOY_1);
+
+        // -------------------------------------------------
+        // Press A → open NPC dialogue window
+        // -------------------------------------------------
+        if (joy & BUTTON_A)
+        {
+ //           runDialogue(&portrait_ai, 2);
+//            runDialogue(&portrait_soldier, 3);
+        }
+
+        // -------------------------------------------------
+        // Normal gameplay
+        // -------------------------------------------------
         playerHandleInput();
 
         // ---- Room transition logic ----
@@ -68,7 +83,7 @@ GameState runArmoryVault(void)
             return STATE_HYDROPONICSBAY;
         }
 
-        // Right exit → Medical Bay (or next room)
+        // Right exit → BioPod
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;

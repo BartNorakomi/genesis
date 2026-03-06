@@ -27,8 +27,17 @@ IMAGE trainingdeckgame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE drillinggame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE arcademachine "graphics/backgrounds/arcademachine.bmp" BEST ALL
 
-IMAGE NPCBlackRectangle "graphics/npcdialogue/blackractangle.bmp" BEST ALL
+IMAGE portrait_ai "graphics/npcdialogue/portraitAI.bmp" BEST ALL
+IMAGE portrait_capgirl "graphics/npcdialogue/portraitCapgirl.bmp" BEST ALL
+IMAGE portrait_vessel "graphics/npcdialogue/portraitVessel.bmp" BEST ALL
+IMAGE portrait_soldier "graphics/npcdialogue/portraitSoldier.bmp" BEST ALL
+IMAGE portrait_girl "graphics/npcdialogue/portraitGirl.bmp" BEST ALL
+IMAGE portrait_didyouknow "graphics/npcdialogue/portraitDidYouKnow.bmp" BEST ALL
+IMAGE portrait_host "graphics/npcdialogue/portraitHost.bmp" BEST ALL
+IMAGE portrait_redheadboy "graphics/npcdialogue/portraitRedHeadBoy.bmp" BEST ALL
 
+IMAGE myFont "graphics/font/font.bmp" BEST NONE
+ 
 BIN level_col_arcade1 "collisionmaps/tilemapArcade1.bin"
 BIN level_col_arcade2 "collisionmaps/tilemapArcade2.bin"
 BIN level_col_armoryvault "collisionmaps/tilemaparmoryvault.bin"

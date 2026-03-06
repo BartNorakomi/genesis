@@ -97,7 +97,9 @@ GameState runBioPod(void)
         // -------------------------------------------------
         if (joy & BUTTON_A)
         {
-            runDialogue();
+            runDialogue(&portrait_soldier, 3);
+ //           runDialogue(&portrait_capgirl, 1);
+ //           runDialogue(&portrait_ai, 2);
         }
 
         // -------------------------------------------------

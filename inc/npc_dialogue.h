@@ -1,10 +1,8 @@
 #ifndef NPC_DIALOGUE_H
 #define NPC_DIALOGUE_H
 
-#include "game_state.h"
-
-void npcDialogueOpenWindow(void);
+void npcDialogueOpenWindow(const Image* portrait);
 void npcDialogueCloseWindow(void);
-GameState runDialogue(void);
+void runDialogue(const Image* portrait, u8 whichText);
 
 #endif

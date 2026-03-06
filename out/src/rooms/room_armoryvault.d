@@ -22,4 +22,4 @@ out/src/rooms/room_armoryvault.o: src/rooms/room_armoryvault.c \
  C:/sgdk211/inc/string.h C:/sgdk211/inc/maths.h C:/sgdk211/inc/dma.h \
  res/resources.h res/music.h inc/rooms.h inc/room_armoryvault.h \
  inc/game_state.h inc/player.h inc/game_state.h \
- inc/room_sleepingquarters.h inc/room_medicalbay.h
+ inc/room_sleepingquarters.h inc/room_medicalbay.h inc/npc_dialogue.h
