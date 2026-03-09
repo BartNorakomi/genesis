@@ -27,6 +27,7 @@ IMAGE trainingdeckgame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE drillinggame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE arcademachine "graphics/backgrounds/arcademachine.bmp" BEST ALL
 
+IMAGE portrait_emptywindow "graphics/npcdialogue/portraitEmptyWindow.bmp" BEST ALL
 IMAGE portrait_ai "graphics/npcdialogue/portraitAI.bmp" BEST ALL
 IMAGE portrait_capgirl "graphics/npcdialogue/portraitCapgirl.bmp" BEST ALL
 IMAGE portrait_vessel "graphics/npcdialogue/portraitVessel.bmp" BEST ALL

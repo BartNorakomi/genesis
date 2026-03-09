@@ -50,6 +50,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/hangarbaydrillin
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/sleepingquarterslights.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/npcdialogue/portraitCapgirl.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/npcs/redheadboy.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/npcdialogue/portraitEmptyWindow.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/biopodlight.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapArcade1.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/hydroponicsbay.bmp \

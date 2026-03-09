@@ -45,6 +45,7 @@ extern const Image neonhorizon;
 extern const Image trainingdeckgame;
 extern const Image drillinggame;
 extern const Image arcademachine;
+extern const Image portrait_emptywindow;
 extern const Image portrait_ai;
 extern const Image portrait_capgirl;
 extern const Image portrait_vessel;

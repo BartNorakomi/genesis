@@ -1,8 +1,12 @@
 #ifndef NPC_DIALOGUE_H
 #define NPC_DIALOGUE_H
 
-void npcDialogueOpenWindow(const Image* portrait);
+#include <genesis.h>
+
+void npcDialogueOpenWindow(void);
 void npcDialogueCloseWindow(void);
-void runDialogue(const Image* portrait, u8 whichText);
+void runDialogue(u8 whichText);
 
 #endif
+
+

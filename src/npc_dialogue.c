@@ -11,72 +11,83 @@
 #define TEXT_W 17
 #define TEXT_H 12
 
-// Helper: palette index range for PAL1
+// Palette range for PAL1
 #define PAL1_FIRST   (PAL1 * 16)
 #define PAL1_LAST    (PAL1_FIRST + 15)
 
-// Input state for new-press detection
 static u16 prevJoy = 0;
+static bool EndConversation = FALSE;   // <-- NEW FLAG
+
+static const u16 blackPalette[16] = { 0 };
 
 // ---------------------------------------------------------
-// Dialogue texts
+// Dialogue script system
 // ---------------------------------------------------------
-const char* DIALOGUE_1 =
-    "Hello there, traveler! Welcome to the world of SGDK. "
-    "This ancient land is filled with secrets, forgotten ruins, "
-    "and strange creatures that wander beneath the moonlit sky. "
-    "Your journey is only beginning.";
+typedef struct {
+    const Image* portrait;
+    const char* text;
+} DialogueEntry;
 
-const char* DIALOGUE_2 =
-    "You feel it too, don't you? The air is heavy tonight. "
-    "Something ancient stirs beneath the soil, whispering through "
-    "the cracks of forgotten temples. "
-    "Tread carefully, traveler... not all shadows are empty.";
+static const DialogueEntry conversation100[] = {
+    { &portrait_soldier, "Hello there, traveler! Welcome to the world of SGDK." },
+    { &portrait_ai, "Hi, I'm AI! Nice to meet you." },
+    { &portrait_soldier, "Nice to meet you too." },
+};
 
-const char* DIALOGUE_3 =
-    "Ah, there you are! I was hoping you'd arrive soon. "
-    "The others have already begun their preparations. "
-    "If you wish to stand among them, you'll need courage, "
-    "a sharp mind, and a heart that refuses to yield.";
+static const DialogueEntry conversation1[] = {
+    { &portrait_girl, 
+      "Well, well, look who's back! Haven't seen your gears spinning in ages, mate!" },
+    { &portrait_vessel, 
+      "Oh, you know, been tangled up in life's cogs and wheels!" },
+    { &portrait_girl, 
+      "Hold onto your hat. Some ginger whirlwind's been smashing your records lately, leaving a trail of sparks!" },
+    { &portrait_vessel, 
+      "Seriously?!" },
+    { &portrait_girl, 
+      "Oh, absolutely! You've got a fiery challenger on your hands. Bet he'll strut in later to stir the pot!" },
+};
 
-
-// ---------------------------------------------------------
-// Clear only the text area by writing spaces
-// ---------------------------------------------------------
-static void clearTextArea()
-{
-    for (u16 ty = TEXT_Y; ty < TEXT_Y + TEXT_H; ty++)
-    {
-        for (u16 tx = TEXT_X; tx < TEXT_X + TEXT_W; tx++)
-        {
-            VDP_drawTextEx(
-                BG_A,
-                " ",
-                TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 0),
-                tx,
-                ty,
-                FALSE
-            );
-        }
-    }
-}
+static const u8 conversation1Count =
+    sizeof(conversation1) / sizeof(DialogueEntry);
 
 // ---------------------------------------------------------
-// Wait for a NEW press of A
+// Wait for NEW press of A or B
+// If B is pressed → EndConversation = TRUE
 // ---------------------------------------------------------
-static void waitForNewPressA()
+static void waitForNewPressAorB()
 {
     while (1)
     {
         u16 joy = JOY_readJoypad(JOY_1);
-        bool newPressA = (joy & BUTTON_A) && !(prevJoy & BUTTON_A);
+
+        bool newA = (joy & BUTTON_A) && !(prevJoy & BUTTON_A);
+        bool newB = (joy & BUTTON_B) && !(prevJoy & BUTTON_B);
+
         prevJoy = joy;
 
-        if (newPressA)
-            break;
+        if (newA)
+            return;
+
+        if (newB)
+        {
+            EndConversation = TRUE;   // <-- NEW BEHAVIOR
+            return;
+        }
 
         SYS_doVBlankProcess();
     }
+}
+
+// ---------------------------------------------------------
+// Clear only the text area
+// ---------------------------------------------------------
+static void clearTextArea()
+{
+    for (u16 ty = TEXT_Y; ty < TEXT_Y + TEXT_H; ty++)
+        for (u16 tx = TEXT_X; tx < TEXT_X + TEXT_W; tx++)
+            VDP_drawTextEx(BG_A, " ",
+                TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 0),
+                tx, ty, FALSE);
 }
 
 // ---------------------------------------------------------
@@ -96,24 +107,22 @@ void npcDialogueDrawText(const char* text)
 
     while (i < len)
     {
-        // Skip leading spaces
+        if (EndConversation) return;   // <-- NEW SAFETY CHECK
+
         if (text[i] == ' ')
         {
             i++;
             continue;
         }
 
-        // Extract next word
         char word[64];
         u16 w = 0;
 
         while (i < len && text[i] != ' ' && text[i] != '\n')
-        {
             word[w++] = text[i++];
-        }
+
         word[w] = '\0';
 
-        // Handle newline
         if (text[i] == '\n')
         {
             i++;
@@ -122,7 +131,9 @@ void npcDialogueDrawText(const char* text)
 
             if (y >= TEXT_Y + TEXT_H)
             {
-                waitForNewPressA();
+                waitForNewPressAorB();
+                if (EndConversation) return;
+
                 clearTextArea();
                 x = TEXT_X;
                 y = TEXT_Y;
@@ -130,7 +141,6 @@ void npcDialogueDrawText(const char* text)
             }
         }
 
-        // Check if word fits
         if (x + w > TEXT_X + TEXT_W)
         {
             x = TEXT_X;
@@ -138,7 +148,9 @@ void npcDialogueDrawText(const char* text)
 
             if (y >= TEXT_Y + TEXT_H)
             {
-                waitForNewPressA();
+                waitForNewPressAorB();
+                if (EndConversation) return;
+
                 clearTextArea();
                 x = TEXT_X;
                 y = TEXT_Y;
@@ -146,26 +158,29 @@ void npcDialogueDrawText(const char* text)
             }
         }
 
-        // Draw letters
         for (u16 k = 0; k < w; k++)
         {
+            if (EndConversation) return;
+
             u16 joy = JOY_readJoypad(JOY_1);
-            bool newPressA = (joy & BUTTON_A) && !(prevJoy & BUTTON_A);
+            bool newA = (joy & BUTTON_A) && !(prevJoy & BUTTON_A);
+            bool newB = (joy & BUTTON_B) && !(prevJoy & BUTTON_B);
             prevJoy = joy;
 
-            if (newPressA)
+            if (newA)
                 skip = TRUE;
+
+            if (newB)
+            {
+                EndConversation = TRUE;   // <-- NEW BEHAVIOR
+                skip = TRUE;
+            }
 
             char buf[2] = { word[k], 0 };
 
-            VDP_drawTextEx(
-                BG_A,
-                buf,
+            VDP_drawTextEx(BG_A, buf,
                 TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 0),
-                x,
-                y,
-                FALSE
-            );
+                x, y, FALSE);
 
             x++;
 
@@ -173,7 +188,6 @@ void npcDialogueDrawText(const char* text)
                 SYS_doVBlankProcess();
         }
 
-        // Add space
         if (text[i] == ' ')
         {
             if (x + 1 > TEXT_X + TEXT_W)
@@ -183,7 +197,9 @@ void npcDialogueDrawText(const char* text)
 
                 if (y >= TEXT_Y + TEXT_H)
                 {
-                    waitForNewPressA();
+                    waitForNewPressAorB();
+                    if (EndConversation) return;
+
                     clearTextArea();
                     x = TEXT_X;
                     y = TEXT_Y;
@@ -192,14 +208,9 @@ void npcDialogueDrawText(const char* text)
             }
             else
             {
-                VDP_drawTextEx(
-                    BG_A,
-                    " ",
+                VDP_drawTextEx(BG_A, " ",
                     TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 0),
-                    x,
-                    y,
-                    FALSE
-                );
+                    x, y, FALSE);
                 x++;
             }
             i++;
@@ -207,20 +218,33 @@ void npcDialogueDrawText(const char* text)
     }
 }
 
-// ---------------------------------------------------------
-// Open dialogue window
-// ---------------------------------------------------------
-void npcDialogueOpenWindow(const Image* portrait)
+void npcDialogueOpenWindow(void)
 {
-    u16 blackPal[16] = { 0 };
-    PAL_setPalette(PAL1, blackPal, CPU);
+    PAL_setPalette(PAL1, blackPalette, DMA);
 
     VDP_loadTileData(
-        portrait->tileset->tiles,
+        portrait_soldier.tileset->tiles,
         TILE_DIALOGUE_BASE,
-        portrait->tileset->numTile,
+        portrait_soldier.tileset->numTile,
         DMA
     );
+
+    VDP_drawImageEx(
+        BG_A,
+        &portrait_soldier,
+        TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, TILE_DIALOGUE_BASE),
+        0, 1,
+        FALSE,
+        TRUE
+    );
+}
+
+// ---------------------------------------------------------
+// Show portrait
+// ---------------------------------------------------------
+static void npcDialogueShowPortrait(const Image* portrait)
+{
+    if (EndConversation) return;
 
     VDP_drawImageEx(
         BG_A,
@@ -230,10 +254,7 @@ void npcDialogueOpenWindow(const Image* portrait)
         FALSE,
         TRUE
     );
-
-    for (u16 i = 0; i < 10; i++)
-        SYS_doVBlankProcess();
-
+    
     PAL_fadeIn(
         PAL1_FIRST,
         PAL1_LAST,
@@ -248,43 +269,28 @@ void npcDialogueOpenWindow(const Image* portrait)
 // ---------------------------------------------------------
 void npcDialogueCloseWindow(void)
 {
-    PAL_fadeOut(
-        PAL1_FIRST,
-        PAL1_LAST,
-        20,
-        FALSE
-    );
-
     VDP_clearTileMapRect(BG_A, 0, 1, 40, 28);
 }
 
 // ---------------------------------------------------------
 // Main dialogue runner
 // ---------------------------------------------------------
-void runDialogue(const Image* portrait, u8 whichText)
+void runDialogue(u8 whichText)
 {
-    npcDialogueOpenWindow(portrait);
+    (void)whichText;
 
-    switch (whichText)
+    EndConversation = FALSE;   // <-- RESET FLAG
+
+    npcDialogueOpenWindow();
+
+    for (u8 i = 0; i < conversation1Count; i++)
     {
-        case 1: npcDialogueDrawText(DIALOGUE_1); break;
-        case 2: npcDialogueDrawText(DIALOGUE_2); break;
-        case 3: npcDialogueDrawText(DIALOGUE_3); break;
-        default: npcDialogueDrawText("Invalid dialogue ID."); break;
+        npcDialogueShowPortrait(conversation1[i].portrait);
+        npcDialogueDrawText(conversation1[i].text);
+        if (!EndConversation) waitForNewPressAorB();
+        PAL_fadeOut(PAL1_FIRST, PAL1_LAST, 10, FALSE);
+        if (EndConversation) break;
     }
 
-    // Wait for B to close
-    while (1)
-    {
-        u16 joy = JOY_readJoypad(JOY_1);
-        prevJoy = joy;
-
-        if (joy & BUTTON_B)
-        {
-            npcDialogueCloseWindow();
-            return;
-        }
-
-        SYS_doVBlankProcess();
-    }
+    npcDialogueCloseWindow();
 }
