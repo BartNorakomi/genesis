@@ -8,7 +8,7 @@
 #include "room_sleepingquarters.h"
 
 // ---------------------------------------------------------
-// 1. Externs from other modules
+// 1. Externs
 // ---------------------------------------------------------
 extern const u8* currentColMap;
 extern u8 tileContent;
@@ -17,7 +17,7 @@ extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
 // ---------------------------------------------------------
-// 2. Local sprite pointers (player + NPCs + props)
+// 2. Local sprite pointers
 // ---------------------------------------------------------
 static Sprite* girlSprite;
 static Sprite* capgirlSprite;
@@ -26,8 +26,10 @@ static Sprite* redheadboySprite;
 static Sprite* arcade1WallSprite;
 static Sprite* arcade1OpenDoorSprite;
 
-static Sprite* fingerSprite;       // Trigger A hand
-static Sprite* triggerASprite;     // Trigger A button
+static Sprite* fingerSprite;
+static Sprite* triggerASprite;
+
+static Sprite* convoCloudSprite;   // conversation cloud
 
 // ---------------------------------------------------------
 // 3. NPC positions
@@ -50,12 +52,12 @@ static int wallY       = 76;
 static int openDoorX   = 108;
 static int openDoorY   = 57;
 
-// Trigger icon positions (updated dynamically)
+// Trigger icon positions
 static int triggerAX   = 210;
 static int triggerAY   = 110;
 
 // ---------------------------------------------------------
-// 5. Arcade machine positions (converted from MSX)
+// 5. Arcade machine positions
 // ---------------------------------------------------------
 static const int arcadeMachineY[4] = { 63, 63, 64, 64 };
 static const int arcadeMachineX[4] = {
@@ -68,8 +70,8 @@ static const int arcadeMachineX[4] = {
 // ---------------------------------------------------------
 // 6. Trigger icon state
 // ---------------------------------------------------------
-static int showPressAIcon = 0;   // 0 = none, 1–4 = machine index
-static u16 iconFrameCounter = 0; // bobbing animation
+static int showPressAIcon = 0;
+static u16 iconFrameCounter = 0;
 
 // ---------------------------------------------------------
 // 7. Depth sorting
@@ -86,6 +88,8 @@ static void updateDepth(void)
     SPR_setDepth(girlSprite,        -girlY);
     SPR_setDepth(capgirlSprite,     -capgirlY);
     SPR_setDepth(redheadboySprite,  -redheadboyY);
+
+    SPR_setDepth(convoCloudSprite,      0);
 }
 
 // ---------------------------------------------------------
@@ -95,17 +99,14 @@ static bool isPlayerNearMachine(int mx, int my)
 {
     int dx = abs(playerX - mx);
     int dy = abs(playerY - my);
-
     return (dx < 16 && dy < 16);
 }
 
 // ---------------------------------------------------------
-// 9. MSX routine: CheckShowPressTrigAIconArcadeHall1 (ported)
+// 9. Check & show arcade machine A‑icon
 // ---------------------------------------------------------
 static void checkShowPressAIcon(void)
 {
-    // Sitting check removed (not implemented yet on Genesis)
-
     for (int i = 0; i < 4; i++)
     {
         if (isPlayerNearMachine(arcadeMachineX[i], arcadeMachineY[i]))
@@ -121,7 +122,7 @@ static void checkShowPressAIcon(void)
 }
 
 // ---------------------------------------------------------
-// 10. MSX routine: PutPressTrigAIcon (ported)
+// 10. Update A‑icon sprites
 // ---------------------------------------------------------
 static void updatePressAIconSprites(void)
 {
@@ -135,18 +136,73 @@ static void updatePressAIconSprites(void)
     SPR_setVisibility(fingerSprite, VISIBLE);
     SPR_setVisibility(triggerASprite, VISIBLE);
 
-    // Hand bobbing animation (frameCounter & 31)
     int bob = (iconFrameCounter & 31) < 16 ? 1 : -1;
 
-    // Finger (hand)
     SPR_setPosition(fingerSprite, triggerAX - 2, triggerAY - 29 + bob);
-
-    // Trigger A button
     SPR_setPosition(triggerASprite, triggerAX, triggerAY - 14);
 }
 
 // ---------------------------------------------------------
-// 11. Room logic
+// 11. NPC proximity check
+// ---------------------------------------------------------
+static bool isPlayerNearNPC(int npcX, int npcY)
+{
+    int dx = abs(playerX - npcX);
+    int dy = abs(playerY - npcY);
+    return (dx < 20 && dy < 20);
+}
+
+// ---------------------------------------------------------
+// 12. Unique NPC routines
+// ---------------------------------------------------------
+
+// GIRL NPC
+static void updateGirlNPC(void)
+{
+    if (isPlayerNearNPC(girlX, girlY))
+    {
+        SPR_setVisibility(convoCloudSprite, VISIBLE);
+        SPR_setPosition(convoCloudSprite, girlX, girlY);
+
+        if (JOY_readJoypad(JOY_1) & BUTTON_A)
+        {
+            runDialogue(001);
+        }
+    }
+}
+
+// CAPGIRL NPC
+static void updateCapGirlNPC(void)
+{
+    if (isPlayerNearNPC(capgirlX, capgirlY))
+    {
+        SPR_setVisibility(convoCloudSprite, VISIBLE);
+        SPR_setPosition(convoCloudSprite, capgirlX, capgirlY);
+
+        if (JOY_readJoypad(JOY_1) & BUTTON_A)
+        {
+            runDialogue(002);
+        }
+    }
+}
+
+// REDHEAD BOY NPC
+static void updateRedBoyNPC(void)
+{
+    if (isPlayerNearNPC(redheadboyX, redheadboyY))
+    {
+        SPR_setVisibility(convoCloudSprite, VISIBLE);
+        SPR_setPosition(convoCloudSprite, redheadboyX, redheadboyY);
+
+        if (JOY_readJoypad(JOY_1) & BUTTON_A)
+        {
+            runDialogue(003);
+        }
+    }
+}
+
+// ---------------------------------------------------------
+// 13. Main room logic
 // ---------------------------------------------------------
 GameState runArcade1(void)
 {
@@ -156,82 +212,47 @@ GameState runArcade1(void)
     SPR_reset();
 
     // Player sprite
-    playerSprite = SPR_addSprite(
-        &playerSpriteDef,
-        playerX,
-        playerY,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
+    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
     // Props
-    arcade1WallSprite = SPR_addSprite(
-        &arcade1WallSpriteDef,
-        wallX,
-        wallY,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
-
-    arcade1OpenDoorSprite = SPR_addSprite(
-        &arcade1OpenDoorSpriteDef,
-        openDoorX,
-        openDoorY,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
+    arcade1WallSprite = SPR_addSprite(&arcade1WallSpriteDef, wallX, wallY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    arcade1OpenDoorSprite = SPR_addSprite(&arcade1OpenDoorSpriteDef, openDoorX, openDoorY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
     // Trigger icons
-    fingerSprite = SPR_addSprite(
-        &fingerSpriteDef,
-        triggerAX,
-        triggerAY,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
+    fingerSprite = SPR_addSprite(&fingerSpriteDef, triggerAX, triggerAY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    triggerASprite = SPR_addSprite(&triggerASpriteDef, triggerAX, triggerAY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
-    triggerASprite = SPR_addSprite(
-        &triggerASpriteDef,
-        triggerAX,
-        triggerAY,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
-
-    // Hide initially
     SPR_setVisibility(fingerSprite, HIDDEN);
     SPR_setVisibility(triggerASprite, HIDDEN);
 
     // NPCs
-    girlSprite = SPR_addSprite(
-        &girlSpriteDef,
-        girlX + PLAYERANDNPC_OFFSET_X,
-        girlY + PLAYERANDNPC_OFFSET_Y,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
+    girlSprite = SPR_addSprite(&girlSpriteDef, girlX + PLAYERANDNPC_OFFSET_X, girlY + PLAYERANDNPC_OFFSET_Y, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    capgirlSprite = SPR_addSprite(&capgirlSpriteDef, capgirlX + PLAYERANDNPC_OFFSET_X, capgirlY + PLAYERANDNPC_OFFSET_Y, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    redheadboySprite = SPR_addSprite(&redheadboySpriteDef, redheadboyX + PLAYERANDNPC_OFFSET_X, redheadboyY + PLAYERANDNPC_OFFSET_Y, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
-    capgirlSprite = SPR_addSprite(
-        &capgirlSpriteDef,
-        capgirlX + PLAYERANDNPC_OFFSET_X,
-        capgirlY + PLAYERANDNPC_OFFSET_Y,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
-
-    redheadboySprite = SPR_addSprite(
-        &redheadboySpriteDef,
-        redheadboyX + PLAYERANDNPC_OFFSET_X,
-        redheadboyY + PLAYERANDNPC_OFFSET_Y,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
+    // Conversation cloud
+    convoCloudSprite = SPR_addSprite(&textCloudSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    SPR_setVisibility(convoCloudSprite, HIDDEN);
 
     // -----------------------------------------------------
-    // Main room loop
+    // Main loop
     // -----------------------------------------------------
     while (1)
     {
         playerHandleInput();
         updateDepth();
 
-        // MSX logic: check & update icons
+        // Arcade machine logic
         checkShowPressAIcon();
         updatePressAIconSprites();
 
-        // Press A to start the correct arcade game
+        // NPC logic (unique per character)
+        SPR_setVisibility(convoCloudSprite, HIDDEN);
+        updateGirlNPC();
+        updateCapGirlNPC();
+        updateRedBoyNPC();
+
+        // Arcade machine A‑press
         if ((JOY_readJoypad(JOY_1) & BUTTON_A) && showPressAIcon != 0)
         {
             switch (showPressAIcon)

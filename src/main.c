@@ -189,7 +189,7 @@ int main(bool hardReset)
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
 
-    GameState state = STATE_BIOPOD;
+    GameState state = STATE_ARCADE1;
 
     while (state != STATE_QUIT)
     {

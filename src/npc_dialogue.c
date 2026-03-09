@@ -16,7 +16,7 @@
 #define PAL1_LAST    (PAL1_FIRST + 15)
 
 static u16 prevJoy = 0;
-static bool EndConversation = FALSE;   // <-- NEW FLAG
+static bool EndConversation = FALSE;
 
 static const u16 blackPalette[16] = { 0 };
 
@@ -28,31 +28,79 @@ typedef struct {
     const char* text;
 } DialogueEntry;
 
+static const DialogueEntry conversation001[] = {
+    { &portrait_girl, "Well, well, look who's back! Haven't seen your gears spinning in ages, mate!" },
+    { &portrait_vessel, "Oh, you know, been tangled up in life's cogs and wheels!" },
+    { &portrait_girl, "Hold onto your hat. Some ginger whirlwind's been smashing your records lately, leaving a trail of sparks!" },
+    { &portrait_vessel, "Seriously?!" },
+    { &portrait_girl, "Oh, absolutely! You've got a fiery challenger on your hands. Bet he'll strut in later to stir the pot!" },
+};
+
+static const DialogueEntry conversation002[] = {
+    { &portrait_girl, "Get out there and crank those record-breaking engines, you legend!" },
+};
+
+static const DialogueEntry conversation003[] = {
+    { &portrait_capgirl, "Well, hotshot, what's the word on the street with you today?" },
+    { &portrait_vessel, "I'm doing alright, I guess." },
+    { &portrait_capgirl, "Just alright? C'mon, you've gotta bring more energy than that!" },
+    { &portrait_vessel, "Heh, maybe I'm still waking up." },
+    { &portrait_capgirl, "Then consider this your official hype-up call! Big plays only, got it?" },
+    { &portrait_vessel, "Alright, alright, I'll try to keep up." },
+    { &portrait_capgirl, "That's the spirit! Now let's see what you've got today!" },
+};
+
+static const DialogueEntry conversation004[] = {
+    { &portrait_capgirl, "You're absolutely obliterating it out there, superstar!" },
+    { &portrait_vessel, "Oh, thanks, that's cool!" },
+    { &portrait_capgirl, "Hold the phone—I spotted a recruiter prowling around this morning!" },
+    { &portrait_vessel, "A recruiter? What's the deal?" },
+    { &portrait_capgirl, "Yeah, some ginger guy's been shattering records, and it's drawn some big-shot attention. Watch out!" },
+};
+
+static const DialogueEntry conversation005[] = {
+    { &portrait_capgirl, "Rumor has it there's a hidden backroom with a mind-blowing game! Nail an average score above 80% across all games, and you're in. Exclusive access, baby!" },
+};
+
+static const DialogueEntry conversation006[] = {
+    { &portrait_redheadboy, "Check this out—my average score's a slick 75%! Pretty epic, huh?" },
+    { &portrait_vessel, "Whoa, that's insane!" },
+    { &portrait_redheadboy, "You bet! Snagged a recruiter's eye, and he's hyping this backroom game—beat it, and it's a ticket to some top-secret government gig. I'm on fire!" },
+};
+
 static const DialogueEntry conversation100[] = {
     { &portrait_soldier, "Hello there, traveler! Welcome to the world of SGDK." },
     { &portrait_ai, "Hi, I'm AI! Nice to meet you." },
     { &portrait_soldier, "Nice to meet you too." },
 };
 
-static const DialogueEntry conversation1[] = {
-    { &portrait_girl, 
-      "Well, well, look who's back! Haven't seen your gears spinning in ages, mate!" },
-    { &portrait_vessel, 
-      "Oh, you know, been tangled up in life's cogs and wheels!" },
-    { &portrait_girl, 
-      "Hold onto your hat. Some ginger whirlwind's been smashing your records lately, leaving a trail of sparks!" },
-    { &portrait_vessel, 
-      "Seriously?!" },
-    { &portrait_girl, 
-      "Oh, absolutely! You've got a fiery challenger on your hands. Bet he'll strut in later to stir the pot!" },
+// ---------------------------------------------------------
+// Conversation lookup tables
+// ---------------------------------------------------------
+static const DialogueEntry* conversations[] = {
+    NULL,              // 0 unused
+    conversation001,   // 1
+    conversation002,   // 2
+    conversation003,   // 3
+    conversation004,   // 4
+    conversation005,   // 5
+    conversation006,   // 6
+    conversation100,   // 7
 };
 
-static const u8 conversation1Count =
-    sizeof(conversation1) / sizeof(DialogueEntry);
+static const u8 conversationCounts[] = {
+    0,
+    sizeof(conversation001) / sizeof(DialogueEntry),
+    sizeof(conversation002) / sizeof(DialogueEntry),
+    sizeof(conversation003) / sizeof(DialogueEntry),
+    sizeof(conversation004) / sizeof(DialogueEntry),
+    sizeof(conversation005) / sizeof(DialogueEntry),
+    sizeof(conversation006) / sizeof(DialogueEntry),
+    sizeof(conversation100) / sizeof(DialogueEntry),
+};
 
 // ---------------------------------------------------------
 // Wait for NEW press of A or B
-// If B is pressed → EndConversation = TRUE
 // ---------------------------------------------------------
 static void waitForNewPressAorB()
 {
@@ -70,7 +118,7 @@ static void waitForNewPressAorB()
 
         if (newB)
         {
-            EndConversation = TRUE;   // <-- NEW BEHAVIOR
+            EndConversation = TRUE;
             return;
         }
 
@@ -107,7 +155,7 @@ void npcDialogueDrawText(const char* text)
 
     while (i < len)
     {
-        if (EndConversation) return;   // <-- NEW SAFETY CHECK
+        if (EndConversation) return;
 
         if (text[i] == ' ')
         {
@@ -167,12 +215,9 @@ void npcDialogueDrawText(const char* text)
             bool newB = (joy & BUTTON_B) && !(prevJoy & BUTTON_B);
             prevJoy = joy;
 
-            if (newA)
-                skip = TRUE;
-
-            if (newB)
+            if (newA || newB)
             {
-                EndConversation = TRUE;   // <-- NEW BEHAVIOR
+                if (newB) EndConversation = TRUE;
                 skip = TRUE;
             }
 
@@ -218,6 +263,9 @@ void npcDialogueDrawText(const char* text)
     }
 }
 
+// ---------------------------------------------------------
+// Open dialogue window
+// ---------------------------------------------------------
 void npcDialogueOpenWindow(void)
 {
     PAL_setPalette(PAL1, blackPalette, DMA);
@@ -277,19 +325,25 @@ void npcDialogueCloseWindow(void)
 // ---------------------------------------------------------
 void runDialogue(u8 whichText)
 {
-    (void)whichText;
+    EndConversation = FALSE;
 
-    EndConversation = FALSE;   // <-- RESET FLAG
+    const DialogueEntry* convo = conversations[whichText];
+    u8 count = conversationCounts[whichText];
 
     npcDialogueOpenWindow();
 
-    for (u8 i = 0; i < conversation1Count; i++)
+    for (u8 i = 0; i < count; i++)
     {
-        npcDialogueShowPortrait(conversation1[i].portrait);
-        npcDialogueDrawText(conversation1[i].text);
-        if (!EndConversation) waitForNewPressAorB();
+        npcDialogueShowPortrait(convo[i].portrait);
+        npcDialogueDrawText(convo[i].text);
+
+        if (!EndConversation)
+            waitForNewPressAorB();
+
         PAL_fadeOut(PAL1_FIRST, PAL1_LAST, 10, FALSE);
-        if (EndConversation) break;
+
+        if (EndConversation)
+            break;
     }
 
     npcDialogueCloseWindow();
