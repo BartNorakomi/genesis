@@ -8,11 +8,13 @@
 extern const u8* currentColMap;
 extern u8 tileContent;
 
+// From main.c
+extern u16 our_level_palette[64];
+extern const u16* const palette_black;
+
 // ---------------------------------------------------------
 // 2. Shared sprite offsets (player + NPCs)
 // ---------------------------------------------------------
-// These are REAL GLOBAL VARIABLES so other modules can use them.
-// Declared as extern in player.h
 int PLAYERANDNPC_OFFSET_X = -40;
 int PLAYERANDNPC_OFFSET_Y = 22;
 
@@ -26,6 +28,11 @@ bool playerFacingRight = true;
 int playerSpritePose = POSE_SITTING;
 Sprite *playerSprite;
 
+// Healing state machine
+static bool playerIsHealing = false;
+static u8   healingPhase = 0;     // 0..3
+static u16  healingTimer = 0;     // generic timer
+
 // ---------------------------------------------------------
 // 4. Footstep SFX helper
 // ---------------------------------------------------------
@@ -35,7 +42,6 @@ static void playerHandleFootsteps(void)
 
     int f = playerSprite->frameInd;
 
-    // Trigger only when entering frame 0 or 5
     if ((f == 0 || f == 5) && prevFrame != f)
     {
         XGM2_playPCM(playerfootstep, sizeof(playerfootstep), SOUND_PCM_CH1);
@@ -75,12 +81,101 @@ void playerUpdateSprite(void)
 }
 
 // ---------------------------------------------------------
-// 7. Public API: input + movement + collision + SFX
+// 7. NEW: Healing API (entry point)
+// ---------------------------------------------------------
+void playerStartHealing(void)
+{
+    if (playerIsHealing) return;
+
+    playerIsHealing = true;
+    healingPhase = 0;
+    healingTimer = 0;
+}
+
+// ---------------------------------------------------------
+// 8. Internal: Healing state machine
+// ---------------------------------------------------------
+static void playerUpdateHealing(void)
+{
+    healingTimer++;
+
+    switch (healingPhase)
+    {
+        case 0: // move into bed, show healing frame 0
+        {
+            playerX = 66;
+            playerY = 74;
+
+            // Advance animation every 8 frames
+            u8 frame = healingTimer >> 3;   // divide by 8
+            if (frame > 6) frame = 6;       // clamp to last frame
+
+            SPR_setAnimAndFrame(playerSprite, POSE_HEALING, frame);
+
+            if (healingTimer >= 80)
+            {
+                healingPhase = 1;
+                healingTimer = 0;
+            }
+            break;
+        }
+
+        case 1: // fade out (same style as main.c)
+        {
+            PAL_fadeOut(0, 63, 8, FALSE);
+
+            if (healingTimer >= 10)
+            {
+                PAL_setColors(0, palette_black, 64, DMA);
+                healingPhase = 2;
+                healingTimer = 0;
+            }
+            break;
+        }
+
+        case 2: // fade in (same style as main.c)
+        {
+            PAL_fadeIn(0, 63, our_level_palette, 8, TRUE);
+
+            if (healingTimer >= 10)
+            {
+                healingPhase = 3;
+                healingTimer = 0;
+            }
+            break;
+        }
+
+        case 3: // climb out of bed, restore control
+        {
+            playerX = 60;
+            playerY = 90;
+            playerSpritePose = POSE_IDLE;
+
+            if (healingTimer >= 10)
+            {
+                playerIsHealing = false;
+                healingPhase = 0;
+                healingTimer = 0;
+                playerSpritePose = POSE_IDLE;
+            }
+            break;
+        }
+    }
+}
+
+// ---------------------------------------------------------
+// 9. Public API: input + movement + collision + SFX
 // ---------------------------------------------------------
 void playerHandleInput(void)
 {
-    static u16 prevJoy = 0;
     u16 joy = JOY_readJoypad(JOY_1);
+
+    // If healing, ignore movement and run healing logic
+    if (playerIsHealing)
+    {
+        playerUpdateHealing();
+        return;
+    }
 
     playerSpritePose = POSE_IDLE;
 
@@ -171,6 +266,4 @@ void playerHandleInput(void)
     if (playerX > 255) playerX = 255;
     if (playerY < 0) playerY = 0;
     if (playerY > 125) playerY = 125;
-
-    prevJoy = joy;
 }

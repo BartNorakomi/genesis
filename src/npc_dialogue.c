@@ -68,10 +68,17 @@ static const DialogueEntry conversation006[] = {
     { &portrait_redheadboy, "You bet! Snagged a recruiter's eye, and he's hyping this backroom game—beat it, and it's a ticket to some top-secret government gig. I'm on fire!" },
 };
 
-static const DialogueEntry conversation100[] = {
-    { &portrait_soldier, "Hello there, traveler! Welcome to the world of SGDK." },
-    { &portrait_ai, "Hi, I'm AI! Nice to meet you." },
-    { &portrait_soldier, "Nice to meet you too." },
+static const DialogueEntry conversation041[] = {
+    { &portrait_vessel, "How are they doing?" },
+    { &portrait_ai, "Embryonic life signs are stable. Nutrient intake and metabolic activity remain within optimal thresholds." },
+    { &portrait_vessel, "How much time is left?" },
+    { &portrait_ai, "  years, " },
+    { &portrait_ai, "   months, " },
+    { &portrait_ai, "   days." },
+    { &portrait_vessel, "Feels faster every time I check..." },
+    { &portrait_ai, "Temporal perception under duress often accelerates. But the count remains absolute." },
+    { &portrait_vessel, "Right. No margin for error." },
+    { &portrait_ai, "Correct. When the timer reaches zero, survival must be sustainable-or it will not be." },
 };
 
 // ---------------------------------------------------------
@@ -85,8 +92,10 @@ static const DialogueEntry* conversations[] = {
     conversation004,   // 4
     conversation005,   // 5
     conversation006,   // 6
-    conversation100,   // 7
+    // add 7–40 later
+    conversation041,   // 41
 };
+
 
 static const u8 conversationCounts[] = {
     0,
@@ -96,7 +105,7 @@ static const u8 conversationCounts[] = {
     sizeof(conversation004) / sizeof(DialogueEntry),
     sizeof(conversation005) / sizeof(DialogueEntry),
     sizeof(conversation006) / sizeof(DialogueEntry),
-    sizeof(conversation100) / sizeof(DialogueEntry),
+    sizeof(conversation041) / sizeof(DialogueEntry),
 };
 
 // ---------------------------------------------------------
@@ -327,8 +336,13 @@ void runDialogue(u8 whichText)
 {
     EndConversation = FALSE;
 
-    const DialogueEntry* convo = conversations[whichText];
-    u8 count = conversationCounts[whichText];
+    // Remap MSX-style 041 to our internal index 7
+    u8 idx = whichText;
+    if (whichText == 041)   // octal 041 literal in C
+        idx = 7;
+
+    const DialogueEntry* convo = conversations[idx];
+    u8 count = conversationCounts[idx];
 
     npcDialogueOpenWindow();
 

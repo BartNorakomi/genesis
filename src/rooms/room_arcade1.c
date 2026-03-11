@@ -181,7 +181,7 @@ static void updateCapGirlNPC(void)
 
         if (JOY_readJoypad(JOY_1) & BUTTON_A)
         {
-            runDialogue(002);
+            runDialogue(003);
         }
     }
 }
@@ -196,7 +196,7 @@ static void updateRedBoyNPC(void)
 
         if (JOY_readJoypad(JOY_1) & BUTTON_A)
         {
-            runDialogue(003);
+            runDialogue(006);
         }
     }
 }

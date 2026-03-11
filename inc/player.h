@@ -2,7 +2,7 @@
 #define PLAYER_H
 
 // ---------------------------------------------------------
-// 1. Includes (must come before anything that uses them)
+// 1. Includes
 // ---------------------------------------------------------
 #include <genesis.h>
 
@@ -19,7 +19,8 @@ typedef enum
 {
     POSE_IDLE,
     POSE_SITTING,
-    POSE_RUNNING
+    POSE_RUNNING,
+    POSE_HEALING      // NEW pose for Medical Bay healing
 } PlayerPose;
 
 // ---------------------------------------------------------
@@ -29,7 +30,6 @@ extern int playerX;
 extern int playerY;
 extern int playerSpritePose;
 extern Sprite *playerSprite;
-extern u8 playerFacing;   // 0 = right, 1 = left
 
 extern int PLAYERANDNPC_OFFSET_X;
 extern int PLAYERANDNPC_OFFSET_Y;
@@ -40,5 +40,8 @@ extern int PLAYERANDNPC_OFFSET_Y;
 void playerUpdateSprite(void);
 void playerHandleInput(void);
 void getTileContentPlayer(void);
+
+// NEW: healing trigger
+void playerStartHealing(void);
 
 #endif

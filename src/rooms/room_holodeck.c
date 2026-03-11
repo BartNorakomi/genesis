@@ -17,11 +17,20 @@ extern u8 tileContent;
 extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
+// Player globals
+extern Sprite* playerSprite;
+extern int playerX;
+extern int playerY;
+
 // ---------------------------------------------------------
 // 2. Local sprite pointers
 // ---------------------------------------------------------
 static Sprite* holodeckDoorSprite;
-static Sprite* holodeckFloorSprite;   // NEW SPRITE
+static Sprite* holodeckFloorSprite;
+
+// Trigger A icon sprites
+static Sprite* fingerSprite;
+static Sprite* triggerASprite;
 
 // ---------------------------------------------------------
 // 3. Door animation state
@@ -29,19 +38,32 @@ static Sprite* holodeckFloorSprite;   // NEW SPRITE
 static int holodeckDoorX = 0;
 static int holodeckDoorY = 20;
 
-static u8 doorAction = 0;   // 0 = idle, 1 = opening, 2 = closing
-static u8 doorFrame  = 0;   // 0–10
+static u8 doorAction = 0;
+static u8 doorFrame  = 0;
 
-static u32 frameCounter = 0;   // SGDK does not provide this
-
-// ---------------------------------------------------------
-// 4. Door animation tables (11 frames)
-// ---------------------------------------------------------
-static const u8 holodeckOpenFrames[11]  = { 0,1,2,3,4,5,6,7,8,9,10 };
-static const u8 holodeckCloseFrames[11] = { 10,9,8,7,6,5,4,3,2,1,0 };
+static u32 frameCounter = 0;
 
 // ---------------------------------------------------------
-// 5. Apply animation frame
+// 4. Door animation tables
+// ---------------------------------------------------------
+static const u8 holodeckOpenFrames[11]  = {0,1,2,3,4,5,6,7,8,9,10};
+static const u8 holodeckCloseFrames[11] = {10,9,8,7,6,5,4,3,2,1,0};
+
+// ---------------------------------------------------------
+// 5. Trigger A icon state
+// ---------------------------------------------------------
+static const int holodeckTriggerX = 150;
+static const int holodeckTriggerY = 58;
+
+static int showPressAIcon = 0;
+static int triggerAX = 0;
+static int triggerAY = 0;
+
+// NEW: custom new‑press detector
+static u16 prevJoy = 0;
+
+// ---------------------------------------------------------
+// 6. Door animation helpers
 // ---------------------------------------------------------
 static void holodeckDoorSetFrame(void)
 {
@@ -51,13 +73,9 @@ static void holodeckDoorSetFrame(void)
         SPR_setFrame(holodeckDoorSprite, holodeckCloseFrames[doorFrame]);
 }
 
-// ---------------------------------------------------------
-// 6. Animate door (every 3 frames)
-// ---------------------------------------------------------
 static void holodeckDoorAnimate(void)
 {
     if (doorAction == 0) return;
-
     if ((frameCounter % 3) != 0) return;
 
     holodeckDoorSetFrame();
@@ -66,18 +84,14 @@ static void holodeckDoorAnimate(void)
     if (doorFrame >= 11)
     {
         doorFrame = 0;
-        doorAction = 0;   // finished
+        doorAction = 0;
     }
 }
 
-// ---------------------------------------------------------
-// 7. Decide whether to open or close
-// ---------------------------------------------------------
 static void holodeckDoorCheck(void)
 {
     if (doorAction != 0) return;
 
-    // Player left side → open
     if (playerX < 110)
     {
         if (holodeckDoorSprite->frameInd != 10)
@@ -88,7 +102,6 @@ static void holodeckDoorCheck(void)
         return;
     }
 
-    // Player right side → close
     if (holodeckDoorSprite->frameInd != 0)
     {
         doorAction = 2;
@@ -97,21 +110,60 @@ static void holodeckDoorCheck(void)
 }
 
 // ---------------------------------------------------------
+// 7. Trigger A icon logic
+// ---------------------------------------------------------
+static bool isPlayerNearHolodeckTrigger(void)
+{
+    int dx = abs(playerX - holodeckTriggerX);
+    int dy = abs(playerY - holodeckTriggerY);
+    return (dx < 32 && dy < 16);
+}
+
+static void checkShowPressAIconHolodeck(void)
+{
+    if (isPlayerNearHolodeckTrigger())
+    {
+        showPressAIcon = 1;
+        triggerAX = holodeckTriggerX;
+        triggerAY = holodeckTriggerY;
+    }
+    else
+    {
+        showPressAIcon = 0;
+    }
+}
+
+static void updatePressAIconSpritesHolodeck(void)
+{
+    if (showPressAIcon == 0)
+    {
+        SPR_setVisibility(fingerSprite, HIDDEN);
+        SPR_setVisibility(triggerASprite, HIDDEN);
+        return;
+    }
+
+    SPR_setVisibility(fingerSprite, VISIBLE);
+    SPR_setVisibility(triggerASprite, VISIBLE);
+
+    int bob = (frameCounter & 31) < 16 ? 1 : -1;
+
+    SPR_setPosition(fingerSprite,  triggerAX - 2, triggerAY - 29 + bob);
+    SPR_setPosition(triggerASprite, triggerAX,     triggerAY - 14);
+}
+
+// ---------------------------------------------------------
 // 8. Depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
     SPR_setDepth(playerSprite, -playerY);
-
-    // Floor should always be behind everything
-//    SPR_setDepth(holodeckFloorSprite, 1000);   // very far back
-
-    // Door sits above floor but behind player
     SPR_setDepth(holodeckDoorSprite, -holodeckDoorY - 80);
+    SPR_setDepth(fingerSprite,     780);
+    SPR_setDepth(triggerASprite,   760);
 }
 
 // ---------------------------------------------------------
-// 9. Room logic
+// 9. Main room logic
 // ---------------------------------------------------------
 GameState runHoloDeck(void)
 {
@@ -120,49 +172,62 @@ GameState runHoloDeck(void)
 
     SPR_reset();
 
-    // Player
-    playerSprite = SPR_addSprite(
-        &playerSpriteDef,
-        playerX,
-        playerY,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
+    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
+                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
-    // NEW: Floor sprite
-    holodeckFloorSprite = SPR_addSprite(
-        &holodeckFloorSpriteDef,
-        0,      // X
-        137,    // Y (adjust as needed)
-        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
-    );
+    holodeckFloorSprite = SPR_addSprite(&holodeckFloorSpriteDef,
+                                        0, 137,
+                                        TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
 
-    // Door sprite (11 frames)
-    holodeckDoorSprite = SPR_addSprite(
-        &holodeckDoorSpriteDef,
-        holodeckDoorX,
-        holodeckDoorY,
-        TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
-    );
+    holodeckDoorSprite = SPR_addSprite(&holodeckDoorSpriteDef,
+                                       holodeckDoorX, holodeckDoorY,
+                                       TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+
+    fingerSprite = SPR_addSprite(&fingerSpriteDef,
+                                 holodeckTriggerX, holodeckTriggerY,
+                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    triggerASprite = SPR_addSprite(&triggerASpriteDef,
+                                   holodeckTriggerX, holodeckTriggerY,
+                                   TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    SPR_setVisibility(fingerSprite,   HIDDEN);
+    SPR_setVisibility(triggerASprite, HIDDEN);
+
+    showPressAIcon = 0;
 
     while (1)
     {
         frameCounter++;
 
+        // NEW‑PRESS DETECTOR
+        u16 joy = JOY_readJoypad(JOY_1);
+        u16 joyNew = joy & ~prevJoy;
+        prevJoy = joy;
+
         playerHandleInput();
         updateDepth();
 
-        // Door logic
         holodeckDoorCheck();
         holodeckDoorAnimate();
 
-        // ---- Room transitions ----
+        checkShowPressAIconHolodeck();
+        updatePressAIconSpritesHolodeck();
+
+        // NEW PRESS A → return to Arcade Hall 1
+        if (showPressAIcon != 0 && (joyNew & BUTTON_A))
+        {
+            playerX = 130;
+            playerY = 102;
+            return STATE_ARCADE1;
+        }
 
         // Left exit → Reactor Chamber
         if (playerX < EdgeRoomLeft + 1)
         {
             SPR_setVisibility(holodeckFloorSprite, HIDDEN);
             SPR_update();
-            
+
             playerX = EnterRoomRight;
             playerY = 0x5A - 36;
             return STATE_REACTORCHAMBER;
