@@ -1,4 +1,4 @@
-out/src/main.o: src/main.c C:/sgdk211/inc/genesis.h \
+out/src/save_data.o: src/save_data.c C:/sgdk211/inc/genesis.h \
  C:/sgdk211/inc/types.h C:/sgdk211/inc/config.h C:/sgdk211/inc/asm.h \
  C:/sgdk211/inc/sys.h C:/sgdk211/inc/sram.h C:/sgdk211/inc/mapper.h \
  C:/sgdk211/inc/memory.h C:/sgdk211/inc/memory_base.h \
@@ -20,7 +20,4 @@ out/src/main.o: src/main.c C:/sgdk211/inc/genesis.h \
  C:/sgdk211/inc/types.h C:/sgdk211/inc/ext/flash-save/saveman.h \
  C:/sgdk211/inc/ext/console.h C:/sgdk211/inc/config.h \
  C:/sgdk211/inc/string.h C:/sgdk211/inc/maths.h C:/sgdk211/inc/dma.h \
- res/resources.h res/music.h inc/rooms.h inc/game_state.h inc/player.h \
- inc/room_sleepingquarters.h inc/game_state.h inc/room_arcade1.h \
- inc/rooms.h inc/room_titlescreen.h inc/room_medicalbay.h \
- inc/room_jumpquest.h inc/save_data.h
+ inc/save_data.h

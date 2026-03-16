@@ -9,6 +9,7 @@
 #include "room_titlescreen.h"
 #include "room_medicalbay.h"
 #include "room_jumpquest.h"
+#include "save_data.h"
 
 // #include "room_jumpquest.h"
 // #include "room_basketball.h"
@@ -156,17 +157,25 @@ void drawRoomBackground(u8 room)
 // ---------------------------------------------------------
 void drawDebugInfo(void)
 {
-    char buf[4];
+    char buf[6];
 
+    // Tile number
     sprintf(buf, "%u", tileContent);
     VDP_drawTextBG(BG_A, buf, 19, 27);
 
+    // Player X
     sprintf(buf, "%3i", playerX);
     VDP_drawTextBG(BG_A, buf, 2, 27);
 
+    // Player Y
     sprintf(buf, "%3i", playerY);
     VDP_drawTextBG(BG_A, buf, 9, 27);
+
+    // NEW: gamesPlayed
+    sprintf(buf, "%u", gSave.gamesPlayed);
+    VDP_drawTextBG(BG_A, buf, 25, 27);
 }
+
 
 // ---------------------------------------------------------
 // 6. Music
@@ -185,11 +194,16 @@ void playMusic(const u8* track)
 // ---------------------------------------------------------
 int main(bool hardReset)
 {
+    // Reserve top 64 KB of ROM for FlashSave
+    sm_init(1, 0x3F0000);
+
+    loadSaveData();
+
     VDP_setScreenWidth256();
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
 
-    GameState state = STATE_MEDICALBAY;
+    GameState state = STATE_ARCADE1;
 
     while (state != STATE_QUIT)
     {

@@ -28,6 +28,14 @@ typedef struct {
     const char* text;
 } DialogueEntry;
 
+typedef struct {
+    const DialogueEntry* entries;
+    u8 count;
+} ConversationDef;
+
+// ---------------------------------------------------------
+// Conversations
+// ---------------------------------------------------------
 static const DialogueEntry conversation001[] = {
     { &portrait_girl, "Well, well, look who's back! Haven't seen your gears spinning in ages, mate!" },
     { &portrait_vessel, "Oh, you know, been tangled up in life's cogs and wheels!" },
@@ -68,6 +76,14 @@ static const DialogueEntry conversation006[] = {
     { &portrait_redheadboy, "You bet! Snagged a recruiter's eye, and he's hyping this backroom game—beat it, and it's a ticket to some top-secret government gig. I'm on fire!" },
 };
 
+// NEW: Conversation 014
+static const DialogueEntry conversation014[] = {
+    { &portrait_ai, "Welcome to your new world, traveler. This vessel is now your home. The seed of something greater. A beginning. You are the first colonist of Proxima Centauri b. Your task: awaken the future. Shape the colony. Make it endure." },
+    { &portrait_vessel, "A new beginning... Okay. What's first?" },
+    { &portrait_ai, "Begin by exploring the ship. Familiarize yourself with its systems, quarters, and decks. I am integrated into every corridor, every console. I will speak through the intercom - always watching, always listening. When you need guidance, ask. When you're lost, I will find you." },
+    { &portrait_vessel, "Okay. That's... reassuring, I think." },
+};
+
 static const DialogueEntry conversation041[] = {
     { &portrait_vessel, "How are they doing?" },
     { &portrait_ai, "Embryonic life signs are stable. Nutrient intake and metabolic activity remain within optimal thresholds." },
@@ -82,31 +98,76 @@ static const DialogueEntry conversation041[] = {
 };
 
 // ---------------------------------------------------------
-// Conversation lookup tables
+// Unified conversation table (IDs 0–50)
 // ---------------------------------------------------------
-static const DialogueEntry* conversations[] = {
-    NULL,              // 0 unused
-    conversation001,   // 1
-    conversation002,   // 2
-    conversation003,   // 3
-    conversation004,   // 4
-    conversation005,   // 5
-    conversation006,   // 6
-    // add 7–40 later
-    conversation041,   // 41
+static const ConversationDef conversations[51] = {
+
+    // 0 unused
+    { NULL, 0 },
+
+    // 1–6 existing
+    { conversation001, sizeof(conversation001) / sizeof(DialogueEntry) }, // 1
+    { conversation002, sizeof(conversation002) / sizeof(DialogueEntry) }, // 2
+    { conversation003, sizeof(conversation003) / sizeof(DialogueEntry) }, // 3
+    { conversation004, sizeof(conversation004) / sizeof(DialogueEntry) }, // 4
+    { conversation005, sizeof(conversation005) / sizeof(DialogueEntry) }, // 5
+    { conversation006, sizeof(conversation006) / sizeof(DialogueEntry) }, // 6
+
+    // 7–13 empty for now
+    { NULL, 0 }, // 7
+    { NULL, 0 }, // 8
+    { NULL, 0 }, // 9
+    { NULL, 0 }, // 10
+    { NULL, 0 }, // 11
+    { NULL, 0 }, // 12
+    { NULL, 0 }, // 13
+
+    // 14 = conversation014 (your intro)
+    { conversation014, sizeof(conversation014) / sizeof(DialogueEntry) }, // 14
+
+    // 15–40 empty
+    { NULL, 0 }, // 15
+    { NULL, 0 }, // 16
+    { NULL, 0 }, // 17
+    { NULL, 0 }, // 18
+    { NULL, 0 }, // 19
+    { NULL, 0 }, // 20
+    { NULL, 0 }, // 21
+    { NULL, 0 }, // 22
+    { NULL, 0 }, // 23
+    { NULL, 0 }, // 24
+    { NULL, 0 }, // 25
+    { NULL, 0 }, // 26
+    { NULL, 0 }, // 27
+    { NULL, 0 }, // 28
+    { NULL, 0 }, // 29
+    { NULL, 0 }, // 30
+    { NULL, 0 }, // 31
+    { NULL, 0 }, // 32
+    { NULL, 0 }, // 33
+    { NULL, 0 }, // 34
+    { NULL, 0 }, // 35
+    { NULL, 0 }, // 36
+    { NULL, 0 }, // 37
+    { NULL, 0 }, // 38
+    { NULL, 0 }, // 39
+    { NULL, 0 }, // 40
+
+    // 41 = conversation041 (embryo dialogue)
+    { conversation041, sizeof(conversation041) / sizeof(DialogueEntry) }, // 41
+
+    // 42–50 empty
+    { NULL, 0 }, // 42
+    { NULL, 0 }, // 43
+    { NULL, 0 }, // 44
+    { NULL, 0 }, // 45
+    { NULL, 0 }, // 46
+    { NULL, 0 }, // 47
+    { NULL, 0 }, // 48
+    { NULL, 0 }, // 49
+    { NULL, 0 }, // 50
 };
 
-
-static const u8 conversationCounts[] = {
-    0,
-    sizeof(conversation001) / sizeof(DialogueEntry),
-    sizeof(conversation002) / sizeof(DialogueEntry),
-    sizeof(conversation003) / sizeof(DialogueEntry),
-    sizeof(conversation004) / sizeof(DialogueEntry),
-    sizeof(conversation005) / sizeof(DialogueEntry),
-    sizeof(conversation006) / sizeof(DialogueEntry),
-    sizeof(conversation041) / sizeof(DialogueEntry),
-};
 
 // ---------------------------------------------------------
 // Wait for NEW press of A or B
@@ -122,14 +183,8 @@ static void waitForNewPressAorB()
 
         prevJoy = joy;
 
-        if (newA)
-            return;
-
-        if (newB)
-        {
-            EndConversation = TRUE;
-            return;
-        }
+        if (newA) return;
+        if (newB) { EndConversation = TRUE; return; }
 
         SYS_doVBlankProcess();
     }
@@ -336,20 +391,19 @@ void runDialogue(u8 whichText)
 {
     EndConversation = FALSE;
 
-    // Remap MSX-style 041 to our internal index 7
+    // Remap MSX-style 041 to index 8
     u8 idx = whichText;
-    if (whichText == 041)   // octal 041 literal in C
-        idx = 7;
+    if (whichText == 041)
+        idx = 8;
 
-    const DialogueEntry* convo = conversations[idx];
-    u8 count = conversationCounts[idx];
+    const ConversationDef* c = &conversations[idx];
 
     npcDialogueOpenWindow();
 
-    for (u8 i = 0; i < count; i++)
+    for (u8 i = 0; i < c->count; i++)
     {
-        npcDialogueShowPortrait(convo[i].portrait);
-        npcDialogueDrawText(convo[i].text);
+        npcDialogueShowPortrait(c->entries[i].portrait);
+        npcDialogueDrawText(c->entries[i].text);
 
         if (!EndConversation)
             waitForNewPressAorB();

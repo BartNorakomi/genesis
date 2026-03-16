@@ -6,6 +6,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "room_sleepingquarters.h"
+#include "save_data.h"
 
 // ---------------------------------------------------------
 // 1. Externs
@@ -85,11 +86,17 @@ static void updateDepth(void)
     SPR_setDepth(triggerASprite,        760);
 
     SPR_setDepth(playerSprite,      -playerY);
-    SPR_setDepth(girlSprite,        -girlY);
-    SPR_setDepth(capgirlSprite,     -capgirlY);
-    SPR_setDepth(redheadboySprite,  -redheadboyY);
 
-    SPR_setDepth(convoCloudSprite,      0);
+    if (gSave.gamesPlayed > 1)
+        SPR_setDepth(girlSprite, -girlY);
+
+    if (gSave.gamesPlayed > 3)
+        SPR_setDepth(capgirlSprite, -capgirlY);
+
+    if (gSave.gamesPlayed > 8)
+        SPR_setDepth(redheadboySprite, -redheadboyY);
+
+    SPR_setDepth(convoCloudSprite, 0);
 }
 
 // ---------------------------------------------------------
@@ -156,9 +163,12 @@ static bool isPlayerNearNPC(int npcX, int npcY)
 // 12. Unique NPC routines
 // ---------------------------------------------------------
 
-// GIRL NPC
+// GIRL NPC — 2‑stage conversation via bit 0 of convGirl
 static void updateGirlNPC(void)
 {
+    if (gSave.gamesPlayed <= 1)
+        return;
+
     if (isPlayerNearNPC(girlX, girlY))
     {
         SPR_setVisibility(convoCloudSprite, VISIBLE);
@@ -166,14 +176,27 @@ static void updateGirlNPC(void)
 
         if (JOY_readJoypad(JOY_1) & BUTTON_A)
         {
-            runDialogue(001);
+            if (gSave.convGirl & 0b00000001)
+            {
+                // bit 0 set → second conversation
+                runDialogue(002);
+            }
+            else
+            {
+                // bit 0 not set → set it and run first conversation
+                gSave.convGirl |= 0b00000001;
+                runDialogue(001);
+            }
         }
     }
 }
 
-// CAPGIRL NPC
+// CAPGIRL NPC — multi‑stage conversation using bits 0 and 1 of convCapGirl
 static void updateCapGirlNPC(void)
 {
+    if (gSave.gamesPlayed <= 3)
+        return;
+
     if (isPlayerNearNPC(capgirlX, capgirlY))
     {
         SPR_setVisibility(convoCloudSprite, VISIBLE);
@@ -181,23 +204,50 @@ static void updateCapGirlNPC(void)
 
         if (JOY_readJoypad(JOY_1) & BUTTON_A)
         {
-            runDialogue(003);
+            u8* flags = &gSave.convCapGirl;
+
+            // Case 1: bit 0 not set → first conversation, set bit 0
+            if ((*flags & 0b00000001) == 0)
+            {
+                *flags |= 0b00000001;
+                runDialogue(003);   // NPCConv003
+                return;
+            }
+
+            // Case 2: bit 0 set, but gamesPlayed <= 6 → still NPCConv003
+            if (gSave.gamesPlayed <= 6)
+            {
+                runDialogue(003);
+                return;
+            }
+
+            // Case 3: gamesPlayed > 6 and bit 1 not set → set bit 1, NPCConv004
+            if ((*flags & 0b00000010) == 0)
+            {
+                *flags |= 0b00000010;
+                runDialogue(004);   // NPCConv004
+                return;
+            }
+
+            // Case 4: bit 1 set → NPCConv005
+            runDialogue(005);       // NPCConv005
         }
     }
 }
 
-// REDHEAD BOY NPC
+// REDHEAD BOY NPC — currently single‑stage
 static void updateRedBoyNPC(void)
 {
+    if (gSave.gamesPlayed <= 8)
+        return;
+
     if (isPlayerNearNPC(redheadboyX, redheadboyY))
     {
         SPR_setVisibility(convoCloudSprite, VISIBLE);
         SPR_setPosition(convoCloudSprite, redheadboyX, redheadboyY);
 
         if (JOY_readJoypad(JOY_1) & BUTTON_A)
-        {
             runDialogue(006);
-        }
     }
 }
 
@@ -212,26 +262,53 @@ GameState runArcade1(void)
     SPR_reset();
 
     // Player sprite
-    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    playerSprite = SPR_addSprite(&playerSpriteDef, playerX, playerY,
+                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
     // Props
-    arcade1WallSprite = SPR_addSprite(&arcade1WallSpriteDef, wallX, wallY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-    arcade1OpenDoorSprite = SPR_addSprite(&arcade1OpenDoorSpriteDef, openDoorX, openDoorY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    arcade1WallSprite = SPR_addSprite(&arcade1WallSpriteDef, wallX, wallY,
+                                      TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    arcade1OpenDoorSprite = SPR_addSprite(&arcade1OpenDoorSpriteDef, openDoorX, openDoorY,
+                                          TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
     // Trigger icons
-    fingerSprite = SPR_addSprite(&fingerSpriteDef, triggerAX, triggerAY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-    triggerASprite = SPR_addSprite(&triggerASpriteDef, triggerAX, triggerAY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    fingerSprite = SPR_addSprite(&fingerSpriteDef, triggerAX, triggerAY,
+                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    triggerASprite = SPR_addSprite(&triggerASpriteDef, triggerAX, triggerAY,
+                                   TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
     SPR_setVisibility(fingerSprite, HIDDEN);
     SPR_setVisibility(triggerASprite, HIDDEN);
 
     // NPCs
-    girlSprite = SPR_addSprite(&girlSpriteDef, girlX + PLAYERANDNPC_OFFSET_X, girlY + PLAYERANDNPC_OFFSET_Y, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-    capgirlSprite = SPR_addSprite(&capgirlSpriteDef, capgirlX + PLAYERANDNPC_OFFSET_X, capgirlY + PLAYERANDNPC_OFFSET_Y, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-    redheadboySprite = SPR_addSprite(&redheadboySpriteDef, redheadboyX + PLAYERANDNPC_OFFSET_X, redheadboyY + PLAYERANDNPC_OFFSET_Y, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    girlSprite = SPR_addSprite(&girlSpriteDef,
+                               girlX + PLAYERANDNPC_OFFSET_X,
+                               girlY + PLAYERANDNPC_OFFSET_Y,
+                               TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    capgirlSprite = SPR_addSprite(&capgirlSpriteDef,
+                                  capgirlX + PLAYERANDNPC_OFFSET_X,
+                                  capgirlY + PLAYERANDNPC_OFFSET_Y,
+                                  TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    redheadboySprite = SPR_addSprite(&redheadboySpriteDef,
+                                     redheadboyX + PLAYERANDNPC_OFFSET_X,
+                                     redheadboyY + PLAYERANDNPC_OFFSET_Y,
+                                     TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    // Hide NPCs based on gamesPlayed
+    if (gSave.gamesPlayed <= 1)
+        SPR_setVisibility(girlSprite, HIDDEN);
+
+    if (gSave.gamesPlayed <= 3)
+        SPR_setVisibility(capgirlSprite, HIDDEN);
+
+    if (gSave.gamesPlayed <= 8)
+        SPR_setVisibility(redheadboySprite, HIDDEN);
 
     // Conversation cloud
-    convoCloudSprite = SPR_addSprite(&textCloudSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    convoCloudSprite = SPR_addSprite(&textCloudSpriteDef, 0, 0,
+                                     TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
     SPR_setVisibility(convoCloudSprite, HIDDEN);
 
     // -----------------------------------------------------
@@ -246,7 +323,7 @@ GameState runArcade1(void)
         checkShowPressAIcon();
         updatePressAIconSprites();
 
-        // NPC logic (unique per character)
+        // NPC logic
         SPR_setVisibility(convoCloudSprite, HIDDEN);
         updateGirlNPC();
         updateCapGirlNPC();

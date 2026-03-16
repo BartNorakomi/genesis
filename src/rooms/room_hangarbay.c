@@ -9,7 +9,7 @@
 #include "room_arcade1.h"
 
 // ---------------------------------------------------------
-// 1. Externs from other modules
+// 1. Externs
 // ---------------------------------------------------------
 extern const u8* currentColMap;
 extern u8 tileContent;
@@ -17,28 +17,93 @@ extern u8 tileContent;
 extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
 
+extern Sprite* playerSprite;
+extern int playerX;
+extern int playerY;
+
 // ---------------------------------------------------------
 // 2. Local sprite pointers
 // ---------------------------------------------------------
 static Sprite* drillingMachineSprite;
+static Sprite* fingerSprite;
+static Sprite* triggerASprite;
 
 // ---------------------------------------------------------
-// 3. Drilling machine position (feet position for depth sorting)
+// 3. Object positions
 // ---------------------------------------------------------
 static int drillingMachineX = 118;
 static int drillingMachineY = 85;
 
+// MSX → SGDK conversion:
+// HangarBayDrillMachiney = $54 + 4 = 84 + 4 = 88
+// HangarBayDrillMachinex = 128
+static const int hangarDrillX = 140;
+static const int hangarDrillY = 88;
+
 // ---------------------------------------------------------
-// 4. Unified depth sorting
+// 4. Trigger A icon state
+// ---------------------------------------------------------
+static int showPressAIcon = 0;
+static int triggerAX = 0;
+static int triggerAY = 0;
+
+static u32 frameCounter = 0;
+
+// ---------------------------------------------------------
+// 5. Depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
-    SPR_setDepth(playerSprite,  -playerY);
-    SPR_setDepth(drillingMachineSprite, - drillingMachineY - 00);
+    SPR_setDepth(playerSprite, -playerY);
+    SPR_setDepth(drillingMachineSprite, -drillingMachineY);
+
+    SPR_setDepth(fingerSprite, 780);
+    SPR_setDepth(triggerASprite, 760);
 }
 
 // ---------------------------------------------------------
-// 5. Room logic
+// 6. Trigger helpers
+// ---------------------------------------------------------
+static bool isPlayerNear(int tx, int ty)
+{
+    int dx = abs(playerX - tx);
+    int dy = abs(playerY - ty);
+    return (dx < 32 && dy < 16);
+}
+
+static void checkShowPressAIconHangar(void)
+{
+    if (isPlayerNear(hangarDrillX, hangarDrillY))
+    {
+        showPressAIcon = 1;
+        triggerAX = hangarDrillX;
+        triggerAY = hangarDrillY;
+        return;
+    }
+
+    showPressAIcon = 0;
+}
+
+static void updatePressAIconSpritesHangar(void)
+{
+    if (!showPressAIcon)
+    {
+        SPR_setVisibility(fingerSprite, HIDDEN);
+        SPR_setVisibility(triggerASprite, HIDDEN);
+        return;
+    }
+
+    SPR_setVisibility(fingerSprite, VISIBLE);
+    SPR_setVisibility(triggerASprite, VISIBLE);
+
+    int bob = (frameCounter & 31) < 16 ? 1 : -1;
+
+    SPR_setPosition(fingerSprite,  triggerAX - 2, triggerAY - 29 + bob);
+    SPR_setPosition(triggerASprite, triggerAX,     triggerAY - 14);
+}
+
+// ---------------------------------------------------------
+// 7. Room logic
 // ---------------------------------------------------------
 GameState runHangarBay(void)
 {
@@ -62,12 +127,32 @@ GameState runHangarBay(void)
         TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
     );
 
+    // Trigger-A sprites
+    fingerSprite = SPR_addSprite(&fingerSpriteDef, 0, 0,
+                                 TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    triggerASprite = SPR_addSprite(&triggerASpriteDef, 0, 0,
+                                   TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    SPR_setVisibility(fingerSprite, HIDDEN);
+    SPR_setVisibility(triggerASprite, HIDDEN);
+
+    showPressAIcon = 0;
+
     while (1)
     {
-        playerHandleInput();
-        updateDepth();
+        frameCounter++;
 
-        // ---- Room transition logic ----
+        // 1. Room logic FIRST
+        checkShowPressAIconHangar();
+
+        // 2. THEN player movement
+        playerHandleInput();
+
+        // 3. Continue as normal
+        updateDepth();
+        updatePressAIconSpritesHangar();
+
+        // ---- Room transitions ----
 
         // Left exit → Science Lab
         if (playerX < EdgeRoomLeft + 1)
@@ -77,7 +162,7 @@ GameState runHangarBay(void)
             return STATE_SCIENCELAB;
         }
 
-        // Right exit → Next room (placeholder)
+        // Right exit → Training Deck
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;
@@ -85,10 +170,8 @@ GameState runHangarBay(void)
             return STATE_TRAININGDECK;
         }
 
-        // Debug + sprite update
         drawDebugInfo();
         playerUpdateSprite();
-
         SPR_update();
         SYS_doVBlankProcess();
     }

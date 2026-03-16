@@ -5,6 +5,7 @@
 #include "room_jumpquest.h"
 #include "game_state.h"
 #include "room_arcade1.h"
+#include "save_data.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -65,6 +66,8 @@ GameState runJumpQuest(void)
                 // NEW: Press B to exit back to arcade room
                 if (joy & BUTTON_B)
                 {
+                    gSave.gamesPlayed++;   // <-- increment here
+                    saveSaveData();
                     return STATE_ARCADE1;
                 }
 
@@ -118,6 +121,8 @@ GameState runJumpQuest(void)
 
                 if (joy & BUTTON_START)
                 {
+                    gSave.gamesPlayed++;   // <-- increment here
+                    saveSaveData();
                     return STATE_ARCADE1;
                 }
 

@@ -104,7 +104,8 @@ static void playerUpdateHealing(void)
         case 0: // move into bed, show healing frame 0
         {
             playerX = 66;
-            playerY = 74;
+            playerY = 84;
+            playerFacingRight = true;
 
             // Advance animation every 8 frames
             u8 frame = healingTimer >> 3;   // divide by 8
@@ -145,21 +146,27 @@ static void playerUpdateHealing(void)
             break;
         }
 
-        case 3: // climb out of bed, restore control
+        case 3: // climb out of bed, reverse healing animation
         {
-            playerX = 60;
-            playerY = 90;
-            playerSpritePose = POSE_IDLE;
+            // Reverse animation every 8 frames
+            u8 frame = 6 - (healingTimer >> 3);  // reverse from frame 6 to 0
+            if (frame > 6) frame = 0;            // clamp to first frame
 
-            if (healingTimer >= 10)
+            SPR_setAnimAndFrame(playerSprite, POSE_HEALING, frame);
+
+            if (healingTimer >= 80)
             {
+                playerX = 60;
+                playerY = 90;
+                playerSpritePose = POSE_IDLE;
+
                 playerIsHealing = false;
                 healingPhase = 0;
                 healingTimer = 0;
-                playerSpritePose = POSE_IDLE;
             }
             break;
         }
+
     }
 }
 
