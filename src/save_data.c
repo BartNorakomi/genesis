@@ -2,6 +2,12 @@
 #include <string.h>
 #include "save_data.h"
 
+// I had a quick look at GPGX, it's not a standalone emulator ? What do I need to run/install it ?
+// doragasu: Yup, as far as I know, it currently works only on Genesis Plus GX. You need a version more recent than Jan 14th or it will not work. I wrote a lengthy README file, I would recommend you give it a read (emulator support and many other things are explained there). Also make sure you are using latest version integrated into SGDK.
+// https://github.com/Stephane-D/SGDK/blob/master/src/ext/flash-save/README.md
+// I think they were now asking how to get GPGX running in the first place (since again it's only an emulation core without its own frontend)
+// Most people use it along with Retroarch Install Retroarch, then deploy the up-to-date GPGX libretro core
+
 // ---------------------------------------------------------
 // DEFAULT VALUES (converted from your ASM block)
 // ---------------------------------------------------------
@@ -155,7 +161,9 @@ void resetSaveData(void)
 
     gSave.convHost = 0;
     gSave.convEntity = 0b00000000; //bit 7=science lab ship explainer
+//    gSave.convEntity = 0b10000000; //bit 7=science lab ship explainer
     gSave.convEntityShipExplanations = 0b00000000; //b7=medical bay , b6=holodeck, b5=armory vault, b4=sleeping quarters, b3=reactor chamber, b2=training deck, b1=hangar bay, b0=hydroponics
+//    gSave.convEntityShipExplanations = 0b11111111; //b7=medical bay , b6=holodeck, b5=armory vault, b4=sleeping quarters, b3=reactor chamber, b2=training deck, b1=hangar bay, b0=hydroponics
 
     gSave.startWakeUpEvent = 1;
 

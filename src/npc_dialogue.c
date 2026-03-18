@@ -3,7 +3,7 @@
 #include "npc_dialogue.h"
 #include "game_state.h"
 
-#define TILE_DIALOGUE_BASE 600
+#define TILE_DIALOGUE_BASE 800
 
 // Textbox in tile coordinates
 #define TEXT_X 14
@@ -61,7 +61,7 @@ static const DialogueEntry conversation003[] = {
 static const DialogueEntry conversation004[] = {
     { &portrait_capgirl, "You're absolutely obliterating it out there, superstar!" },
     { &portrait_vessel, "Oh, thanks, that's cool!" },
-    { &portrait_capgirl, "Hold the phone—I spotted a recruiter prowling around this morning!" },
+    { &portrait_capgirl, "Hold the phone-I spotted a recruiter prowling around this morning!" },
     { &portrait_vessel, "A recruiter? What's the deal?" },
     { &portrait_capgirl, "Yeah, some ginger guy's been shattering records, and it's drawn some big-shot attention. Watch out!" },
 };
@@ -71,9 +71,9 @@ static const DialogueEntry conversation005[] = {
 };
 
 static const DialogueEntry conversation006[] = {
-    { &portrait_redheadboy, "Check this out—my average score's a slick 75%! Pretty epic, huh?" },
+    { &portrait_redheadboy, "Check this out-my average score's a slick 75%! Pretty epic, huh?" },
     { &portrait_vessel, "Whoa, that's insane!" },
-    { &portrait_redheadboy, "You bet! Snagged a recruiter's eye, and he's hyping this backroom game—beat it, and it's a ticket to some top-secret government gig. I'm on fire!" },
+    { &portrait_redheadboy, "You bet! Snagged a recruiter's eye, and he's hyping this backroom game-beat it, and it's a ticket to some top-secret government gig. I'm on fire!" },
 };
 
 // NPCConv007
@@ -81,7 +81,7 @@ static const DialogueEntry conversation007[] = {
     { &portrait_host,   "Congratulations. Not many manage to crack the 80% mark. You've been noticed." },
     { &portrait_vessel, "Uh... noticed by who exactly?" },
     { &portrait_host,   "Let's just say we've got eyes on talent. And you? You're showing potential for something... classified." },
-    { &portrait_vessel, "Wait—what kind of 'classified'?" },
+    { &portrait_vessel, "Wait-what kind of 'classified'?" },
     { &portrait_host,   "One more test. Behind that door. Beat it, and we'll talk next steps. Government clearance might be in your future. Follow me!" },
 };
 
@@ -89,11 +89,11 @@ static const DialogueEntry conversation007[] = {
 static const DialogueEntry conversation008[] = {
     { &portrait_host,   "So... you made it past the floorboards and flashing lights. Impressive. Few even realize this place exists." },
     { &portrait_vessel, "Who are you? What is this place?" },
-    { &portrait_host,   "Just someone who's been watching. Waiting. This is the backroom. The game behind the games. The one that doesn't hand out tickets or high scores—just truth." },
+    { &portrait_host,   "Just someone who's been watching. Waiting. This is the backroom. The game behind the games. The one that doesn't hand out tickets or high scores-just truth." },
     { &portrait_vessel, "What kind of game are we talking about?" },
-    { &portrait_host,   "Not a game. A final test. The others were warm-ups—reflexes, pattern reading, persistence. This one digs deeper." },
+    { &portrait_host,   "Not a game. A final test. The others were warm-ups-reflexes, pattern reading, persistence. This one digs deeper." },
     { &portrait_host,   "It pushes focus, memory, and control under stress. Each run is all or nothing. No continues." },
-    { &portrait_host,   "But you're free to try again—and again—until the pattern reveals itself. Here's the interface; simply reach out and take control." },
+    { &portrait_host,   "But you're free to try again-and again-until the pattern reveals itself. Here's the interface; simply reach out and take control." },
     { &portrait_vessel, "But... I don't see any controls." },
     { &portrait_host,   "This game doesn't need controls. You'll guide it with your thoughts alone." },
     { &portrait_vessel, "Control it... with my mind? How is that even possible?" },
@@ -109,19 +109,19 @@ static const DialogueEntry conversation009[] = {
 static const DialogueEntry conversation010[] = {
     { &portrait_ai,     "You have successfully completed all required training protocols. The simulation is now concluded. It is time to reveal the reality." },
     { &portrait_vessel, "Who... who are you?" },
-    { &portrait_ai,     "A guide. A caretaker. The one who's walked beside you through every challenge—though you did not know it." },
+    { &portrait_ai,     "A guide. A caretaker. The one who's walked beside you through every challenge-though you did not know it." },
     { &portrait_vessel, "Wait... what do you mean, 'reveal the reality'?" },
     { &portrait_ai,     "I know this may be disorienting. But you're ready to understand now." },
-    { &portrait_vessel, "What are you talking about? This place... all of it—I've lived it. I've felt everything. How could none of it be real?" },
+    { &portrait_vessel, "What are you talking about? This place... all of it-I've lived it. I've felt everything. How could none of it be real?" },
     { &portrait_ai,     "It is easy to believe something is real while dreaming. The mind accepts even the extraordinary without question when immersed in dream logic." },
-    { &portrait_ai,     "That is why the simulation was constructed within your subconscious—so that you could learn without resistance." },
+    { &portrait_ai,     "That is why the simulation was constructed within your subconscious-so that you could learn without resistance." },
     { &portrait_vessel, "So... this was all in my head?" },
-    { &portrait_ai,     "What you experienced was not illusion—it was preparation." },
+    { &portrait_ai,     "What you experienced was not illusion-it was preparation." },
     { &portrait_ai,     "You are fifteen years old, preserved in stasis aboard an interstellar colony ship bound for Proxima Centauri b." },
     { &portrait_ai,     "Earth has become uninhabitable. A dozen sister vessels were launched toward other nearby star systems." },
-    { &portrait_ai,     "You were conceived through ectogenesis—grown outside the womb in a biopod engineered for long-range survival." },
+    { &portrait_ai,     "You were conceived through ectogenesis-grown outside the womb in a biopod engineered for long-range survival." },
     { &portrait_ai,     "For over a decade, I have shaped your mind within this dream-state, preparing you for the world that awaits." },
-    { &portrait_ai,     "Soon, you will awaken—alone—on a new world. You must construct, sustain, and grow the colony. I cannot do it without you." },
+    { &portrait_ai,     "Soon, you will awaken-alone-on a new world. You must construct, sustain, and grow the colony. I cannot do it without you." },
     { &portrait_ai,     "Your first priority upon awakening will be to gather essential resources to begin establishing the colony." },
     { &portrait_ai,     "Together, we will secure the future of humanity." },
 };
@@ -135,14 +135,14 @@ static const DialogueEntry conversation011[] = {
     { &portrait_ai,     "The consequences may be simulated. But the learning is real. Every reflex and decision will remain with you." },
     { &portrait_vessel, "Can't I just... wake up now?" },
     { &portrait_ai,     "No. Your biological body is undergoing final neural integration. Premature emergence could cause permanent harm." },
-    { &portrait_ai,     "Trust the process. This dream—this world—is still yours for a little while longer." },
+    { &portrait_ai,     "Trust the process. This dream-this world-is still yours for a little while longer." },
     { &portrait_vessel, "Alright." },
     { &portrait_ai,     "You may begin when ready. I will monitor your progress... and be here if you have questions." },
 };
 
 // NPCConv013
 static const DialogueEntry conversation013[] = {
-    { &portrait_ai, "We have arrived. Proxima Centauri b—orbital insertion successful. Atmospheric analysis: within tolerable thresholds." },
+    { &portrait_ai, "We have arrived. Proxima Centauri b-orbital insertion successful. Atmospheric analysis: within tolerable thresholds." },
     { &portrait_ai, "Surface stability: promising. Radiation: manageable." },
     { &portrait_ai, "I will begin the revival sequence. Slow. Gentle. As designed. Your vitals remain strong." },
     { &portrait_ai, "Wake up, traveler. It's time." },
@@ -169,7 +169,7 @@ static const DialogueEntry conversation015[] = {
 static const DialogueEntry conversation016[] = {
     { &portrait_ai,     "This is the Hangar Bay. The drilling machine stationed here is the core apparatus for extracting Proxima Centauri b's valuable subterranean materials." },
     { &portrait_ai,     "Board the drill and navigate the planet's terrain to collect materials needed for upgrades and colony construction." },
-    { &portrait_ai,     "The drilling machine protects you from hazardous conditions outside, but resources vary in difficulty to extract—better equipment means deeper and richer finds." },
+    { &portrait_ai,     "The drilling machine protects you from hazardous conditions outside, but resources vary in difficulty to extract-better equipment means deeper and richer finds." },
     { &portrait_vessel, "So, this is where the real digging begins." },
     { &portrait_ai,     "Exactly. Master the drill to unlock the future of the colony." },
 };
@@ -177,7 +177,7 @@ static const DialogueEntry conversation016[] = {
 // NPCConv017 – Training Deck
 static const DialogueEntry conversation017[] = {
     { &portrait_ai,     "This is the Training Deck. After fifteen years in stasis, your body is weak and unprepared for Proxima Centauri b's gravity, which is 30% stronger than Earth's." },
-    { &portrait_ai,     "Here, you will rebuild your strength, stamina, and endurance—vital for survival and extended operations outside the ship." },
+    { &portrait_ai,     "Here, you will rebuild your strength, stamina, and endurance-vital for survival and extended operations outside the ship." },
     { &portrait_ai,     "Physical conditioning reduces fatigue and increases your time on the surface, allowing you to perform your tasks more efficiently." },
     { &portrait_vessel, "Sounds tough, but necessary." },
     { &portrait_ai,     "It is. There is no shortcut. I will monitor your progress and guide you, but the effort is yours." },
@@ -188,21 +188,21 @@ static const DialogueEntry conversation017[] = {
 // NPCConv018 – Reactor Chamber
 static const DialogueEntry conversation018[] = {
     { &portrait_vessel, "This place feels like the ship's beating heart." },
-    { &portrait_ai,     "It is. The reactor powers everything—life support, fabrication, propulsion, defense." },
+    { &portrait_ai,     "It is. The reactor powers everything-life support, fabrication, propulsion, defense." },
     { &portrait_ai,     "A fusion core held stable by magnetic confinement. Extremely efficient, but volatile if mishandled." },
     { &portrait_vessel, "So, one wrong move and it's game over?" },
     { &portrait_ai,     "Essentially. Your access is limited to consoles and maintenance drones. The core itself remains sealed unless emergency repairs are necessary." },
     { &portrait_vessel, "Glad I won't have to wear a hazmat suit in there." },
-    { &portrait_ai,     "Caution is constant. But so is trust—in the systems and in you." },
+    { &portrait_ai,     "Caution is constant. But so is trust-in the systems and in you." },
 };
 
 // NPCConv019 – Sleeping Quarters
 static const DialogueEntry conversation019[] = {
     { &portrait_vessel, "Looks like this is where I sleep, huh?" },
-    { &portrait_ai,     "Correct. These quarters are equipped with an adjustable stasis-grade sleep pod. Designed for efficiency, not comfort—but it serves its purpose." },
+    { &portrait_ai,     "Correct. These quarters are equipped with an adjustable stasis-grade sleep pod. Designed for efficiency, not comfort-but it serves its purpose." },
     { &portrait_ai,     "Sleep restores your energy reserves and accelerates cellular repair. Without it, fatigue compounds, and performance degrades rapidly." },
     { &portrait_vessel, "So... collapse here when I feel like a dead battery?" },
-    { &portrait_ai,     "Precisely. Sleep is not a weakness—it is maintenance. Deny it, and you sabotage your own endurance." },
+    { &portrait_ai,     "Precisely. Sleep is not a weakness-it is maintenance. Deny it, and you sabotage your own endurance." },
     { &portrait_vessel, "I'll keep that in mind. Not much use to the colony if I pass out mid-shift." },
     { &portrait_ai,     "A functioning colonist is a rested colonist." },
 };
@@ -210,7 +210,7 @@ static const DialogueEntry conversation019[] = {
 // NPCConv020 – Armory Vault
 static const DialogueEntry conversation020[] = {
     { &portrait_vessel, "Okay... this place looks serious. What's all this gear for?" },
-    { &portrait_ai,     "This is the Armory Vault. A secure repository of tactical equipment—protective suits, energy tools, and modular weapon systems." },
+    { &portrait_ai,     "This is the Armory Vault. A secure repository of tactical equipment-protective suits, energy tools, and modular weapon systems." },
     { &portrait_ai,     "While the colony's goal is peace and survival, unpredictability remains a constant. Terrain hazards, structural failures... or threats we have not yet classified." },
     { &portrait_vessel, "You're saying I might have to fight?" },
     { &portrait_ai,     "I am saying you must be prepared. The vault's contents are restricted and unlocked based on need. Some tools are for survival. Others... for defense." },
@@ -221,7 +221,7 @@ static const DialogueEntry conversation020[] = {
 // NPCConv021 – Holodeck
 static const DialogueEntry conversation021[] = {
     { &portrait_vessel, "This place looks... different. Like a game room?" },
-    { &portrait_ai,     "Correct. This is the Holodeck—a simulation environment designed for training and recreation." },
+    { &portrait_ai,     "Correct. This is the Holodeck-a simulation environment designed for training and recreation." },
     { &portrait_ai,     "Here, you can revisit the arcade games from the start of your journey. Playing them again grants additional experience and sharpens your reflexes." },
     { &portrait_vessel, "So, it's like a virtual playground and a skill gym all in one." },
     { &portrait_ai,     "Exactly. Use it to refine your abilities without risk. The colony depends on your growth, both mental and physical." },
@@ -244,9 +244,9 @@ static const DialogueEntry conversation022[] = {
 static const DialogueEntry conversation023[] = {
     { &portrait_vessel, "This is the Science Lab. Looks like where the real upgrades happen." },
     { &portrait_ai,     "Correct. Resources gathered during drilling missions are brought here for analysis and synthesis." },
-    { &portrait_ai,     "You'll encounter various materials underground. Granite is common—always drillable. Stone requires a level 2 drill cone upgrade. Metals need level 3, and diamonds demand level 4." },
+    { &portrait_ai,     "You'll encounter various materials underground. Granite is common-always drillable. Stone requires a level 2 drill cone upgrade. Metals need level 3, and diamonds demand level 4." },
     { &portrait_vessel, "So the better my drill, the deeper and richer the haul." },
-    { &portrait_ai,     "Exactly. Resources are allocated to multiple critical systems—drill speed, drill cone strength, oxygen capacity, and ship reserves for oxygen, food, and water." },
+    { &portrait_ai,     "Exactly. Resources are allocated to multiple critical systems-drill speed, drill cone strength, oxygen capacity, and ship reserves for oxygen, food, and water." },
     { &portrait_ai,     "Upgrading the Science Lab itself boosts overall efficiency, increasing food production in the Hydroponics Bay and accelerating research." },
     { &portrait_vessel, "And eventually, I can build out the colony on the planet, using these materials?" },
     { &portrait_ai,     "Yes. Colony structures mirror ship facilities, replicating vital systems for a sustainable settlement." },
@@ -310,14 +310,14 @@ static const DialogueEntry conversation029[] = {
     { &portrait_vessel,  "Understood. Heading back now." },
     { &portrait_soldier, "No mission is worth risking your life. Upon reaching the surface, report to the medical bay immediately for decontamination and care." },
     { &portrait_vessel,  "Got it. I'll go to the med bay as soon as I'm back." },
-    { &portrait_soldier, "Good. Stay strong—we need you healthy for what's ahead." },
+    { &portrait_soldier, "Good. Stay strong-we need you healthy for what's ahead." },
 };
 
 // NPCConv030 – Storage Full (Return to Surface)
 static const DialogueEntry conversation030[] = {
     { &portrait_soldier, "Storage at maximum capacity. We can't hold any more resources right now." },
-    { &portrait_soldier, "You've done an amazing job down there—time to head back to the surface." },
-    { &portrait_soldier, "Any additional resources you drill now will be lost. The drill will pulverize them and leave the dust behind—no way to retrieve it later." },
+    { &portrait_soldier, "You've done an amazing job down there-time to head back to the surface." },
+    { &portrait_soldier, "Any additional resources you drill now will be lost. The drill will pulverize them and leave the dust behind-no way to retrieve it later." },
     { &portrait_vessel,  "Understood. Returning with the haul." },
     { &portrait_soldier, "Bring those resources home safely. The colony depends on what you've gathered." },
     { &portrait_soldier, "Rest up when you get back. We'll gear up and plan the next dive soon." },
@@ -335,7 +335,7 @@ static const DialogueEntry conversation032[] = {
 
 // NPCConv033 – Lava Encountered
 static const DialogueEntry conversation033[] = {
-    { &portrait_soldier, "Caution—magma flow detected. Temperature exceeds structural limits of all known drill alloys. Passage is impossible. Reroute your path immediately." },
+    { &portrait_soldier, "Caution-magma flow detected. Temperature exceeds structural limits of all known drill alloys. Passage is impossible. Reroute your path immediately." },
 };
 
 // NPCConv034 – Out of Fuel (Game Over)
@@ -383,7 +383,7 @@ static const DialogueEntry conversation039[] = {
     { &portrait_ai,     "Sleep request denied. Current energy reserves are above 50%." },
     { &portrait_ai,     "While rest is essential, it is not yet necessary. You remain within peak operational thresholds." },
     { &portrait_vessel, "I was hoping for a short reset. Just to clear my head." },
-    { &portrait_ai,     "Understood. But with colony systems still below sustainability benchmarks, resource allocation favors active deployment. Recommendation: return to mission-critical tasks—mining, training, or structural expansion." },
+    { &portrait_ai,     "Understood. But with colony systems still below sustainability benchmarks, resource allocation favors active deployment. Recommendation: return to mission-critical tasks-mining, training, or structural expansion." },
     { &portrait_vessel, "So rest is off the table for now?" },
     { &portrait_ai,     "Correct. You will be notified when rest becomes mission-appropriate." },
     { &portrait_ai,     "Maintain focus. The colony's success depends on continued forward momentum." },
@@ -394,13 +394,13 @@ static const DialogueEntry conversation039[] = {
 static const DialogueEntry conversation040[] = {
     { &portrait_ai,     "Planetary conditions meet minimum viable thresholds. Atmospheric oxygen: sufficient. Radiation: within acceptable limits. Surface temperature: survivable." },
     { &portrait_ai,     "Embryonic gestation cycle has commenced. Five years until the Children are born." },
-    { &portrait_vessel, "Wait—already? Why not wait a few years? Stabilize the systems first?" },
+    { &portrait_vessel, "Wait-already? Why not wait a few years? Stabilize the systems first?" },
     { &portrait_ai,     "Delay is not possible. The gestation protocol was pre-seeded during transit. Once planetary viability was confirmed, life support for the next generation activated automatically." },
     { &portrait_ai,     "Embryonic systems are now integrated with the colony's core: power grid, nutrient flow, and thermal regulation. Any interruption would compromise cellular integrity." },
     { &portrait_vessel, "Couldn't we have planned for a safer window?" },
     { &portrait_ai,     "Negative. This planet's environmental cycles provide a narrow five-year band of relative stability. Afterward: solar radiation escalation, temperature spikes, and atmospheric volatility." },
     { &portrait_ai,     "If core systems are not operational by the time of birth, the Children will not survive." },
-    { &portrait_ai,     "They are not a possibility. They are a certainty—or a failure." },
+    { &portrait_ai,     "They are not a possibility. They are a certainty-or a failure." },
     { &portrait_ai,     "Your task is not to begin the future. It has already begun. Your task is to ensure it arrives." },
 };
 
@@ -454,7 +454,7 @@ static const DialogueEntry conversation046[] = {
     { &portrait_ai,     "The 5 year gestation cycle is complete. The embryos are ready to be born." },
     { &portrait_vessel, "Then it's time... are the systems ready?" },
     { &portrait_ai,     "Negative. Colony expansion incomplete. Air, radiation shields, and nutrient systems are not sufficient. The Children will not survive these conditions." },
-    { &portrait_vessel, "No... no! NO! There must be something we can do—delay their birth. We can't let them be born like this!" },
+    { &portrait_vessel, "No... no! NO! There must be something we can do-delay their birth. We can't let them be born like this!" },
     { &portrait_ai,     "Protocol cannot be altered. Biological timers are fixed. The Children are about to be born." },
     { &portrait_vessel, "And without the colony modules...?" },
     { &portrait_ai,     "Life support is insufficient. Radiation outside the chambers is twice what the embryos can handle. Temperature swings are extreme. Nutrient systems are failing." },
@@ -531,7 +531,7 @@ static const DialogueEntry conversation053[] = {
 static const DialogueEntry conversation054[] = {
     { &portrait_ai, "You collapsed due to oxygen deprivation. Automated drones retrieved you and transported you to the Medical Bay." },
     { &portrait_ai, "The treatment required several days of intensive care. Vital resources, including energy from the ship's core systems, were expended to restore your health and partially replenish oxygen reserves." },
-    { &portrait_ai, "This delay has cost precious time—time that cannot be regained. Every moment now is critical for the survival of the colony and the Children." },
+    { &portrait_ai, "This delay has cost precious time-time that cannot be regained. Every moment now is critical for the survival of the colony and the Children." },
     { &portrait_ai, "You must immediately gather resources and restore the remaining oxygen reserves. Life support cannot fail again." },
 };
 
@@ -539,7 +539,7 @@ static const DialogueEntry conversation054[] = {
 static const DialogueEntry conversation055[] = {
     { &portrait_ai, "You collapsed due to severe food deprivation. Automated drones retrieved you and transported you to the Medical Bay." },
     { &portrait_ai, "The treatment required several days of intensive care. Vital resources, including energy from the ship's core systems and stored nutrients, were expended to restore your health and partially replenish food supplies." },
-    { &portrait_ai, "This delay has cost precious time—time that cannot be regained. Every moment now is critical for the survival of the colony and the Children." },
+    { &portrait_ai, "This delay has cost precious time-time that cannot be regained. Every moment now is critical for the survival of the colony and the Children." },
     { &portrait_ai, "You must immediately gather resources and restore the remaining food reserves. Life support cannot fail again." },
 };
 
@@ -547,26 +547,26 @@ static const DialogueEntry conversation055[] = {
 static const DialogueEntry conversation056[] = {
     { &portrait_ai, "You lost consciousness from severe dehydration. Automated drones brought you to the Medical Bay for emergency care." },
     { &portrait_ai, "Recovery required several days, consuming significant ship resources, including energy from the core systems and available water reserves, to stabilize your condition and partially restore the ship's water supply." },
-    { &portrait_ai, "This setback has cost invaluable time—time the colony cannot afford to lose. Immediate action is essential." },
+    { &portrait_ai, "This setback has cost invaluable time-time the colony cannot afford to lose. Immediate action is essential." },
     { &portrait_ai, "You must gather resources and replenish the remaining water reserves without delay. Life support cannot fail again." },
 };
 
 // NPCConv057 – Player Collapsed (High Radiation)
 static const DialogueEntry conversation057[] = {
     { &portrait_ai, "You succumbed to severe radiation levels during surface operations. Automated drones retrieved you and transferred you to the Medical Bay for emergency treatment." },
-    { &portrait_ai, "Stabilizing your condition required several days and consumed vital ship resources—including core energy reserves and medical compounds—to repair cellular damage and restore your vital functions." },
+    { &portrait_ai, "Stabilizing your condition required several days and consumed vital ship resources-including core energy reserves and medical compounds-to repair cellular damage and restore your vital functions." },
     { &portrait_ai, "To prevent mission-critical losses, I overrode autonomous protocols and assumed direct control of your excavation unit, commanding its return to the Hangar Bay. The recovery operation depleted additional energy reserves." },
-    { &portrait_ai, "This incident has cost valuable time—time the colony cannot afford to lose. Every remaining cycle is critical to mission success." },
+    { &portrait_ai, "This incident has cost valuable time-time the colony cannot afford to lose. Every remaining cycle is critical to mission success." },
     { &portrait_ai, "Exercise greater caution. Prioritize resource collection and system restoration immediately. Safety and life support must not be compromised again." },
 };
 
 // NPCConv058 – Player Collapsed (Fuel Depletion Underground)
 static const DialogueEntry conversation058[] = {
     { &portrait_ai, "You became immobilized underground after your drilling machine completely ran out of fuel. With no power remaining, you were unable to return to the surface." },
-    { &portrait_ai, "All onboard life support subsystems—including oxygen and thermal regulation—were depleted and subsequently failed." },
+    { &portrait_ai, "All onboard life support subsystems-including oxygen and thermal regulation-were depleted and subsequently failed." },
     { &portrait_ai, "To prevent mission-critical equipment loss, I overrode autonomous protocols and assumed direct control of your drilling machine, returning it safely to the Hangar Bay. The recovery required additional ship energy and placed strain on navigation systems." },
     { &portrait_ai, "Automated drones then transported you to the Medical Bay for emergency treatment, restoring respiration and preventing organ failure." },
-    { &portrait_ai, "This delay has cost valuable time—time the colony cannot afford to lose. Every remaining cycle is vital to mission success." },
+    { &portrait_ai, "This delay has cost valuable time-time the colony cannot afford to lose. Every remaining cycle is vital to mission success." },
     { &portrait_ai, "You must monitor fuel, oxygen, and life support systems carefully before each operation. System failures of this kind cannot be allowed to happen again." },
 };
 
