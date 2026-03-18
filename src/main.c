@@ -197,13 +197,14 @@ int main(bool hardReset)
     // Reserve top 64 KB of ROM for FlashSave
     sm_init(1, 0x3F0000);
 
+    resetSaveData();
     loadSaveData();
 
     VDP_setScreenWidth256();
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
 
-    GameState state = STATE_ARCADE1;
+    GameState state = STATE_HYDROPONICSBAY;
 
     while (state != STATE_QUIT)
     {

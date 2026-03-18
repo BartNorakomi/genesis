@@ -6,6 +6,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "room_arcade1.h"
+#include "save_data.h"
 
 // ---------------------------------------------------------
 // 1. Externs
@@ -42,9 +43,6 @@ static int trainingDeckWallLeftY = 90;
 static int trainingDeckWallRightX = 250;
 static int trainingDeckWallRightY = 103;
 
-// MSX → SGDK conversion:
-// trainingdecktreadmilly = 104
-// trainingdecktreadmillx = 60 - 8 = 52
 static const int treadmillTriggerX = 52;
 static const int treadmillTriggerY = 104;
 
@@ -58,7 +56,31 @@ static int triggerAY = 0;
 static u32 frameCounter = 0;
 
 // ---------------------------------------------------------
-// 5. Depth sorting
+// 5. Training Deck Explainer (bit 2, dialogue 17)
+// ---------------------------------------------------------
+static void handleTrainingDeckExplainer(void)
+{
+    // Bit 2 = Training Deck explainer
+    if (gSave.convEntityShipExplanations & 0b00000100)
+        return;
+
+    // Wait 1 second (300 frames)
+    if (!playerHasBeenInRoomFor(300))
+        return;
+
+    // Player must be centered
+    if (!playerIsCenterScreen())
+        return;
+
+    // Mark bit 2 as shown
+    gSave.convEntityShipExplanations |= 0b00000100;
+
+    // Start Training Deck explainer dialogue (NPCConv017)
+    runDialogue(17);
+}
+
+// ---------------------------------------------------------
+// 6. Depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
@@ -73,7 +95,7 @@ static void updateDepth(void)
 }
 
 // ---------------------------------------------------------
-// 6. Trigger helpers
+// 7. Trigger helpers
 // ---------------------------------------------------------
 static bool isPlayerNear(int tx, int ty)
 {
@@ -114,7 +136,7 @@ static void updatePressAIconSpritesTraining(void)
 }
 
 // ---------------------------------------------------------
-// 7. Room logic
+// 8. Room logic
 // ---------------------------------------------------------
 GameState runTrainingDeck(void)
 {
@@ -165,17 +187,22 @@ GameState runTrainingDeck(void)
 
     showPressAIcon = 0;
 
+    // NEW: mark room entry time
+    playerMarkRoomEntry();
+
     while (1)
     {
         frameCounter++;
 
-        // 1. Room logic FIRST
+        // ---- Explainer ----
+        handleTrainingDeckExplainer();
+
+        // ---- Trigger A logic ----
         checkShowPressAIconTraining();
 
-        // 2. THEN player movement
+        // ---- Player movement ----
         playerHandleInput();
 
-        // 3. Continue as normal
         updateDepth();
         updatePressAIconSpritesTraining();
 

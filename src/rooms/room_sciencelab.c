@@ -7,6 +7,7 @@
 #include "game_state.h"
 #include "room_holodeck.h"
 #include "room_arcade1.h"
+#include "save_data.h"
 
 // ---------------------------------------------------------
 // 1. Externs
@@ -34,9 +35,7 @@ static Sprite* triggerASprite;
 static int scienceLabHelixX = 212;
 static int scienceLabHelixY = 49;
 
-// Science computer trigger point (converted from MSX)
-// sciencelabcomputery = $54 + 4 + 4 + 4 = 96
-// sciencelabcomputerx = 128 + 16 - 40 = 104
+// Science computer trigger point
 static const int scienceLabComputerX = 104;
 static const int scienceLabComputerY = 96;
 
@@ -50,7 +49,31 @@ static int triggerAY = 0;
 static u32 frameCounter = 0;
 
 // ---------------------------------------------------------
-// 5. Depth sorting
+// 5. Science Lab Explainer (bit 7, dialogue 23)
+// ---------------------------------------------------------
+static void handleScienceLabExplainer(void)
+{
+    // Bit 7 = Science Lab explainer
+    if (gSave.convEntity & 0b10000000)
+        return;
+
+    // Wait 1 second (300 frames)
+    if (!playerHasBeenInRoomFor(300))
+        return;
+
+    // Player must be centered
+    if (!playerIsCenterScreen())
+        return;
+
+    // Mark bit 7 as shown
+    gSave.convEntity |= 0b10000000;
+
+    // Start Science Lab explainer dialogue (NPCConv023)
+    runDialogue(23);
+}
+
+// ---------------------------------------------------------
+// 6. Depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
@@ -62,7 +85,7 @@ static void updateDepth(void)
 }
 
 // ---------------------------------------------------------
-// 6. Trigger helpers
+// 7. Trigger helpers
 // ---------------------------------------------------------
 static bool isPlayerNear(int tx, int ty)
 {
@@ -103,7 +126,7 @@ static void updatePressAIconSpritesScience(void)
 }
 
 // ---------------------------------------------------------
-// 7. Room logic
+// 8. Room logic
 // ---------------------------------------------------------
 GameState runScienceLab(void)
 {
@@ -138,17 +161,22 @@ GameState runScienceLab(void)
 
     showPressAIcon = 0;
 
+    // NEW: mark room entry time
+    playerMarkRoomEntry();
+
     while (1)
     {
         frameCounter++;
 
-        // 1. Room logic FIRST (so player doesn't walk out of range before check)
+        // ---- Explainer ----
+        handleScienceLabExplainer();
+
+        // ---- Trigger A logic ----
         checkShowPressAIconScience();
 
-        // 2. THEN player movement
+        // ---- Player movement ----
         playerHandleInput();
 
-        // 3. Continue as normal
         updateDepth();
         updatePressAIconSpritesScience();
 

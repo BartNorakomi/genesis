@@ -7,6 +7,7 @@
 #include "game_state.h"
 #include "room_biopod.h"
 #include "room_arcade1.h"
+#include "save_data.h"      // <-- contains gSave
 
 // ---------------------------------------------------------
 // 1. Externs
@@ -29,16 +30,43 @@ static int reactorX = 66;
 static int reactorY = 32;
 
 // ---------------------------------------------------------
-// 4. Unified depth sorting
+// 4. Handle explainer conversation (MSX behavior + 1 sec wait)
+// ---------------------------------------------------------
+static void handleReactorExplainer(void)
+{
+    // Check bit 3 of convEntityShipExplanations
+    if (gSave.convEntityShipExplanations & 0b00001000)
+        return;
+
+    // Wait at least 300 frames after entering the room
+    if (!playerHasBeenInRoomFor(300))
+        return;
+
+    // Only trigger when player is in the center (centralized)
+    if (!playerIsCenterScreen())
+        return;
+
+    // Mark bit 3 as shown
+    gSave.convEntityShipExplanations |= 0b00001000;
+
+    // Start conversation (MSX NPCConv018)
+    runDialogue(18);
+}
+
+// ---------------------------------------------------------
+// 5. Unified depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
-    SPR_setDepth(playerSprite,  -playerY);
+    // Player always sorts by Y
+    SPR_setDepth(playerSprite, -playerY);
+
+    // Reactor depth
     SPR_setDepth(reactorSprite, -reactorY - 50);
 }
 
 // ---------------------------------------------------------
-// 5. Room logic
+// 6. Room logic
 // ---------------------------------------------------------
 GameState runReactorChamber(void)
 {
@@ -66,10 +94,16 @@ GameState runReactorChamber(void)
         TILE_ATTR(PAL3, FALSE, FALSE, FALSE)
     );
 
+    // Mark room entry time (centralized)
+    playerMarkRoomEntry();
+
     while (1)
     {
         playerHandleInput();
         updateDepth();
+
+        // ---- Explainer conversation ----
+        handleReactorExplainer();
 
         // ---- Room transition logic ----
         if (playerX < EdgeRoomLeft + 1)

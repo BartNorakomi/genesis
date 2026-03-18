@@ -8,6 +8,7 @@
 #include "room_sleepingquarters.h"
 #include "room_medicalbay.h"
 #include "npc_dialogue.h"
+#include "save_data.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -17,6 +18,10 @@ extern u8 tileContent;
 
 extern void drawRoomBackground(u8 room);
 extern void drawDebugInfo(void);
+
+extern Sprite* playerSprite;
+extern int playerX;
+extern int playerY;
 
 // ---------------------------------------------------------
 // 2. Local sprite pointers
@@ -30,7 +35,31 @@ static int panelX = 170;
 static int panelY = 97;
 
 // ---------------------------------------------------------
-// 4. Room logic
+// 4. Armory Vault Explainer (bit 5, dialogue 20)
+// ---------------------------------------------------------
+static void handleArmoryExplainer(void)
+{
+    // Bit 5 = Armory Vault explainer
+    if (gSave.convEntityShipExplanations & 0b00100000)
+        return;
+
+    // Wait 1 second (300 frames)
+    if (!playerHasBeenInRoomFor(300))
+        return;
+
+    // Player must be centered
+    if (!playerIsCenterScreen())
+        return;
+
+    // Mark bit 5 as shown
+    gSave.convEntityShipExplanations |= 0b00100000;
+
+    // Start Armory Vault explainer dialogue (NPCConv020)
+    runDialogue(20);
+}
+
+// ---------------------------------------------------------
+// 5. Room logic
 // ---------------------------------------------------------
 GameState runArmoryVault(void)
 {
@@ -55,17 +84,22 @@ GameState runArmoryVault(void)
         TILE_ATTR(PAL0, FALSE, FALSE, FALSE)
     );
 
+    // NEW: mark room entry time
+    playerMarkRoomEntry();
+
     while (1)
     {
+        // ---- Explainer ----
+        handleArmoryExplainer();
+
         u16 joy = JOY_readJoypad(JOY_1);
 
         // -------------------------------------------------
-        // Press A → open NPC dialogue window
+        // Press A → open NPC dialogue window (future use)
         // -------------------------------------------------
         if (joy & BUTTON_A)
         {
- //           runDialogue(&portrait_ai, 2);
-//            runDialogue(&portrait_soldier, 3);
+            // Placeholder for future interactions
         }
 
         // -------------------------------------------------
@@ -75,7 +109,7 @@ GameState runArmoryVault(void)
 
         // ---- Room transition logic ----
 
-        // Left exit → Sleeping Quarters
+        // Left exit → Hydroponics Bay
         if (playerX < EdgeRoomLeft + 1)
         {
             playerX = EnterRoomRight;

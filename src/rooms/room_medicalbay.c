@@ -6,6 +6,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "room_arcade1.h"
+#include "save_data.h"
 
 // ---------------------------------------------------------
 // 1. Externs
@@ -64,7 +65,31 @@ static u32 frameCounter = 0;
 static u16 prevJoy = 0;
 
 // ---------------------------------------------------------
-// 5. Depth sorting
+// 5. Medical Bay Explainer (bit 7, dialogue 22)
+// ---------------------------------------------------------
+static void handleMedicalExplainer(void)
+{
+    // Bit 7 = Medical Bay explainer
+    if (gSave.convEntityShipExplanations & 0b10000000)
+        return;
+
+    // Wait 1 second (300 frames)
+    if (!playerHasBeenInRoomFor(300))
+        return;
+
+    // Player must be centered
+    if (!playerIsCenterScreen())
+        return;
+
+    // Mark bit 7 as shown
+    gSave.convEntityShipExplanations |= 0b10000000;
+
+    // Start Medical Bay explainer dialogue (NPCConv022)
+    runDialogue(22);
+}
+
+// ---------------------------------------------------------
+// 6. Depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
@@ -76,7 +101,7 @@ static void updateDepth(void)
 }
 
 // ---------------------------------------------------------
-// 6. Trigger helpers
+// 7. Trigger helpers
 // ---------------------------------------------------------
 static bool isPlayerNear(int tx, int ty)
 {
@@ -136,44 +161,31 @@ static void updatePressAIconSpritesMedical(void)
 }
 
 // ---------------------------------------------------------
-// 7. Embryo Conversation Trigger
+// 8. Embryo Conversation Trigger
 // ---------------------------------------------------------
 static void checkStartEmbryoConversation(u16 joyNew)
 {
-    // MSX: ld a,(object1+y) / cp $3a / ret nc
-    // Player must be ABOVE a certain Y to be "near embryos"
     if (playerY >= 0x3A) return;
-
-    // Must be showing A‑icon
     if (!showPressAIcon) return;
-
-    // Must be NEW‑PRESS A
     if (!(joyNew & BUTTON_A)) return;
 
-    // Start conversation 41 (decimal)
     runDialogue(41);
 }
 
 // ---------------------------------------------------------
-// 8. Healing Sequence Trigger
+// 9. Healing Sequence Trigger
 // ---------------------------------------------------------
 static void checkStartHealingSequence(u16 joyNew)
 {
-    // Must be BELOW Y = 0x3A (MSX logic)
     if (playerY < 0x3A) return;
-
-    // Must be showing A‑icon
     if (!showPressAIcon) return;
-
-    // Must be NEW‑PRESS A
     if (!(joyNew & BUTTON_A)) return;
 
-    // Start healing animation (new pose)
     playerStartHealing();
 }
 
 // ---------------------------------------------------------
-// 9. Room logic
+// 10. Room logic
 // ---------------------------------------------------------
 GameState runMedicalBay(void)
 {
@@ -205,6 +217,9 @@ GameState runMedicalBay(void)
 
     showPressAIcon = 0;
 
+    // NEW: mark room entry time
+    playerMarkRoomEntry();
+
     while (1)
     {
         frameCounter++;
@@ -214,17 +229,20 @@ GameState runMedicalBay(void)
         u16 joyNew = joy & ~prevJoy;
         prevJoy = joy;
 
-        // 1. Handle player logic FIRST
+        // ---- Explainer ----
+        handleMedicalExplainer();
+
+        // Player logic
         playerHandleInput();
 
-        // 2. Room logic
+        // Room logic
         updateDepth();
         checkShowPressAIconMedical();
         updatePressAIconSpritesMedical();
         checkStartEmbryoConversation(joyNew);
         checkStartHealingSequence(joyNew);
 
-        // 3. Room transitions
+        // Room transitions
         if (playerX >= EdgeRoomRight)
         {
             playerX = EnterRoomLeft;
@@ -241,16 +259,10 @@ GameState runMedicalBay(void)
 
         drawDebugInfo();
 
-        // 4. Let SGDK update animations
         SPR_update();
-
-        // 5. NOW freeze the healing frame
         playerUpdateSprite();
-
-        // 6. Draw
         SYS_doVBlankProcess();
     }
-
 
     return STATE_QUIT;
 }

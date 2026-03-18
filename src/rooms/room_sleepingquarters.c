@@ -6,6 +6,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "room_arcade1.h"
+#include "save_data.h"
 
 // ---------------------------------------------------------
 // 1. Externs
@@ -57,7 +58,32 @@ static u16 prevJoy = 0;
 
 
 // ---------------------------------------------------------
-// 5. Depth sorting
+// 5. Sleeping Quarters Explainer (bit 4, dialogue 19)
+// ---------------------------------------------------------
+static void handleSleepingExplainer(void)
+{
+    // Bit 4 = Sleeping Quarters explainer
+    if (gSave.convEntityShipExplanations & 0b00010000)
+        return;
+
+    // Wait 1 second (300 frames)
+    if (!playerHasBeenInRoomFor(300))
+        return;
+
+    // Player must be centered
+    if (!playerIsCenterScreen())
+        return;
+
+    // Mark bit 4 as shown
+    gSave.convEntityShipExplanations |= 0b00010000;
+
+    // Start Sleeping Quarters explainer dialogue (NPCConv019)
+    runDialogue(19);
+}
+
+
+// ---------------------------------------------------------
+// 6. Depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
@@ -70,7 +96,7 @@ static void updateDepth(void)
 
 
 // ---------------------------------------------------------
-// 6. Trigger helpers
+// 7. Trigger helpers
 // ---------------------------------------------------------
 static bool isPlayerNear(int tx, int ty)
 {
@@ -117,7 +143,7 @@ static void updatePressAIconSpritesSleeping(void)
 
 
 // ---------------------------------------------------------
-// 7. Sleeping / Healing trigger
+// 8. Sleeping / Healing trigger
 // ---------------------------------------------------------
 static void checkStartSleepingSequence(u16 joyNew)
 {
@@ -130,7 +156,7 @@ static void checkStartSleepingSequence(u16 joyNew)
 
 
 // ---------------------------------------------------------
-// 8. MSX-style lights animation table
+// 9. MSX-style lights animation table
 // ---------------------------------------------------------
 static const u8 sleepingLightsAnim[64] =
 {
@@ -152,7 +178,7 @@ static u8 lightSlow = 0;
 
 
 // ---------------------------------------------------------
-// 9. Room logic
+// 10. Room logic
 // ---------------------------------------------------------
 GameState runSleepingQuarters(void)
 {
@@ -200,6 +226,9 @@ GameState runSleepingQuarters(void)
     lightStep = 0;
     lightSlow = 0;
 
+    // NEW: mark room entry time
+    playerMarkRoomEntry();
+
 
     while (1)
     {
@@ -210,6 +239,10 @@ GameState runSleepingQuarters(void)
         u16 joy = JOY_readJoypad(JOY_1);
         u16 joyNew = joy & ~prevJoy;
         prevJoy = joy;
+
+
+        // ---- Explainer ----
+        handleSleepingExplainer();
 
 
         // Player logic

@@ -22,4 +22,4 @@ out/src/rooms/room_hangarbay.o: src/rooms/room_hangarbay.c \
  C:/sgdk211/inc/string.h C:/sgdk211/inc/maths.h C:/sgdk211/inc/dma.h \
  res/resources.h res/music.h inc/rooms.h inc/room_hangarbay.h \
  inc/game_state.h inc/player.h inc/game_state.h inc/room_sciencelab.h \
- inc/room_arcade1.h inc/rooms.h
+ inc/room_arcade1.h inc/rooms.h inc/save_data.h

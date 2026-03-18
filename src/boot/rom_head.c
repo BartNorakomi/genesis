@@ -23,6 +23,24 @@ const ROMHeader rom_header = {
 #endif
     0xE0FF0000,
     0xE0FFFFFF,
+
+
+
+    // // --- FlashSave fields ---
+    // "FL",            // sram_sig (2 chars)
+    // 0xF820,          // sram_flags (ignored by FlashSave)
+    // 0x003F0000,      // sram_start = FlashSave start
+    // 0x003FFFFF,      // sram_end   = FlashSave end (64 KB)
+    // // -------------------------
+
+    // "            ",  // modem_support (12 chars)
+    // "DEMONSTRATION PROGRAM                   ", // memo (40 chars)
+    // "JUE             "  // region (16 chars)
+
+
+
+
+    // standard SRAM save enabled
     "RA",
     0xF820,
     0x00200000,

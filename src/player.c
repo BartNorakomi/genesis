@@ -170,6 +170,23 @@ static void playerUpdateHealing(void)
     }
 }
 
+static u32 roomEnterTick = 0;
+
+void playerMarkRoomEntry(void)
+{
+    roomEnterTick = getTick();
+}
+
+bool playerHasBeenInRoomFor(u32 ticks)
+{
+    return (getTick() - roomEnterTick >= ticks);
+}
+
+bool playerIsCenterScreen(void)
+{
+    return (playerX >= 80 && playerX < 176);
+}
+
 // ---------------------------------------------------------
 // 9. Public API: input + movement + collision + SFX
 // ---------------------------------------------------------

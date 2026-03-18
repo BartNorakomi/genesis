@@ -7,6 +7,7 @@
 #include "game_state.h"
 #include "room_reactorchamber.h"
 #include "room_arcade1.h"
+#include "save_data.h"
 
 // ---------------------------------------------------------
 // 1. Externs
@@ -63,7 +64,31 @@ static int triggerAY = 0;
 static u16 prevJoy = 0;
 
 // ---------------------------------------------------------
-// 6. Door animation helpers
+// 6. Holodeck Explainer (same system as Reactor Chamber)
+// ---------------------------------------------------------
+static void handleHolodeckExplainer(void)
+{
+    // Bit 6 = Holodeck explainer
+    if (gSave.convEntityShipExplanations & 0b01000000)
+        return;
+
+    // Wait 1 second (300 frames)
+    if (!playerHasBeenInRoomFor(300))
+        return;
+
+    // Player must be centered
+    if (!playerIsCenterScreen())
+        return;
+
+    // Mark bit 6 as shown
+    gSave.convEntityShipExplanations |= 0b01000000;
+
+    // Start Holodeck explainer dialogue (NPCConv021)
+    runDialogue(21);
+}
+
+// ---------------------------------------------------------
+// 7. Door animation helpers
 // ---------------------------------------------------------
 static void holodeckDoorSetFrame(void)
 {
@@ -110,7 +135,7 @@ static void holodeckDoorCheck(void)
 }
 
 // ---------------------------------------------------------
-// 7. Trigger A icon logic
+// 8. Trigger A icon logic
 // ---------------------------------------------------------
 static bool isPlayerNearHolodeckTrigger(void)
 {
@@ -152,7 +177,7 @@ static void updatePressAIconSpritesHolodeck(void)
 }
 
 // ---------------------------------------------------------
-// 8. Depth sorting
+// 9. Depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
@@ -163,7 +188,7 @@ static void updateDepth(void)
 }
 
 // ---------------------------------------------------------
-// 9. Main room logic
+// 10. Main room logic
 // ---------------------------------------------------------
 GameState runHoloDeck(void)
 {
@@ -196,6 +221,9 @@ GameState runHoloDeck(void)
 
     showPressAIcon = 0;
 
+    // NEW: mark room entry time
+    playerMarkRoomEntry();
+
     while (1)
     {
         frameCounter++;
@@ -208,9 +236,14 @@ GameState runHoloDeck(void)
         playerHandleInput();
         updateDepth();
 
+        // ---- Explainer ----
+        handleHolodeckExplainer();
+
+        // ---- Door logic ----
         holodeckDoorCheck();
         holodeckDoorAnimate();
 
+        // ---- Trigger A icon ----
         checkShowPressAIconHolodeck();
         updatePressAIconSpritesHolodeck();
 

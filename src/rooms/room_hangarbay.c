@@ -7,6 +7,7 @@
 #include "game_state.h"
 #include "room_sciencelab.h"
 #include "room_arcade1.h"
+#include "save_data.h"
 
 // ---------------------------------------------------------
 // 1. Externs
@@ -34,9 +35,6 @@ static Sprite* triggerASprite;
 static int drillingMachineX = 118;
 static int drillingMachineY = 85;
 
-// MSX → SGDK conversion:
-// HangarBayDrillMachiney = $54 + 4 = 84 + 4 = 88
-// HangarBayDrillMachinex = 128
 static const int hangarDrillX = 140;
 static const int hangarDrillY = 88;
 
@@ -50,7 +48,31 @@ static int triggerAY = 0;
 static u32 frameCounter = 0;
 
 // ---------------------------------------------------------
-// 5. Depth sorting
+// 5. Hangar Bay Explainer (bit 1, dialogue 16)
+// ---------------------------------------------------------
+static void handleHangarExplainer(void)
+{
+    // Bit 1 = Hangar Bay explainer
+    if (gSave.convEntityShipExplanations & 0b00000010)
+        return;
+
+    // Wait 1 second (300 frames)
+    if (!playerHasBeenInRoomFor(300))
+        return;
+
+    // Player must be centered
+    if (!playerIsCenterScreen())
+        return;
+
+    // Mark bit 1 as shown
+    gSave.convEntityShipExplanations |= 0b00000010;
+
+    // Start Hangar Bay explainer dialogue (NPCConv016)
+    runDialogue(16);
+}
+
+// ---------------------------------------------------------
+// 6. Depth sorting
 // ---------------------------------------------------------
 static void updateDepth(void)
 {
@@ -62,7 +84,7 @@ static void updateDepth(void)
 }
 
 // ---------------------------------------------------------
-// 6. Trigger helpers
+// 7. Trigger helpers
 // ---------------------------------------------------------
 static bool isPlayerNear(int tx, int ty)
 {
@@ -103,7 +125,7 @@ static void updatePressAIconSpritesHangar(void)
 }
 
 // ---------------------------------------------------------
-// 7. Room logic
+// 8. Room logic
 // ---------------------------------------------------------
 GameState runHangarBay(void)
 {
@@ -138,17 +160,22 @@ GameState runHangarBay(void)
 
     showPressAIcon = 0;
 
+    // NEW: mark room entry time
+    playerMarkRoomEntry();
+
     while (1)
     {
         frameCounter++;
 
-        // 1. Room logic FIRST
+        // ---- Explainer ----
+        handleHangarExplainer();
+
+        // ---- Trigger A logic ----
         checkShowPressAIconHangar();
 
-        // 2. THEN player movement
+        // ---- Player movement ----
         playerHandleInput();
 
-        // 3. Continue as normal
         updateDepth();
         updatePressAIconSpritesHangar();
 

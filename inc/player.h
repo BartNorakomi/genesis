@@ -40,6 +40,9 @@ extern int PLAYERANDNPC_OFFSET_Y;
 void playerUpdateSprite(void);
 void playerHandleInput(void);
 void getTileContentPlayer(void);
+bool playerIsCenterScreen(void);
+void playerMarkRoomEntry(void);
+bool playerHasBeenInRoomFor(u32 ticks);
 
 // NEW: healing trigger
 void playerStartHealing(void);
