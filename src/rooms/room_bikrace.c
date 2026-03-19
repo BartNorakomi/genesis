@@ -5,6 +5,7 @@
 #include "room_bikerace.h"
 #include "game_state.h"
 #include "room_arcade1.h"
+#include "player.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -48,12 +49,16 @@ GameState runBikeRace(void)
     globalTileIndex += arcademachine.tileset->numTile;
 
     SPR_reset();
+    SPR_update();
+    waitMs(120); // ~2 seconds wait until screen has faded in completely
 
     BikeRaceState brState = BR_STATE_TITLE;
 
     while (1)
     {
-        u16 joy = JOY_readJoypad(JOY_1);
+        // Centralized input system
+        playerHandleInput();
+        u16 joyNew = playerGetJoyNew();
 
         switch (brState)
         {
@@ -63,13 +68,13 @@ GameState runBikeRace(void)
             case BR_STATE_TITLE:
 
                 // Press B → exit back to arcade hall
-                if (joy & BUTTON_B)
+                if (joyNew & BUTTON_B)
                 {
                     return STATE_ARCADE1;
                 }
 
                 // Press A → start game
-                if (joy & BUTTON_A)
+                if (joyNew & BUTTON_A)
                 {
                     // Fade out only PAL0 (monitor)
                     PAL_fadeOut(0, 15, 8, FALSE);
@@ -97,7 +102,7 @@ GameState runBikeRace(void)
             case BR_STATE_GAME:
 
                 // Press B → return to title screen
-                if (joy & BUTTON_B)
+                if (joyNew & BUTTON_B)
                 {
                     // Fade out only PAL0
                     PAL_fadeOut(0, 15, 8, FALSE);
@@ -116,12 +121,6 @@ GameState runBikeRace(void)
                     PAL_fadeIn(0, 15, bikeracetitlescreen.palette->data, 8, FALSE);
 
                     brState = BR_STATE_TITLE;
-                }
-
-                // Press START → exit to arcade hall
-                if (joy & BUTTON_START)
-                {
-                    return STATE_ARCADE1;
                 }
 
                 break;

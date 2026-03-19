@@ -86,6 +86,7 @@ GameState runArcade2(void)
     while (1)
     {
         playerHandleInput();
+        u16 joyNew = playerGetJoyNew();
         updateDepth();
 
         // ---- Room transition logic ----

@@ -163,8 +163,7 @@ static bool isPlayerNearNPC(int npcX, int npcY)
 // 12. Unique NPC routines
 // ---------------------------------------------------------
 
-// GIRL NPC — 2‑stage conversation via bit 0 of convGirl
-static void updateGirlNPC(void)
+static void updateGirlNPC(u16 joyNew)
 {
     if (gSave.gamesPlayed <= 1)
         return;
@@ -174,16 +173,12 @@ static void updateGirlNPC(void)
         SPR_setVisibility(convoCloudSprite, VISIBLE);
         SPR_setPosition(convoCloudSprite, girlX, girlY);
 
-        if (JOY_readJoypad(JOY_1) & BUTTON_A)
+        if (joyNew & BUTTON_A)
         {
             if (gSave.convGirl & 0b00000001)
-            {
-                // bit 0 set → second conversation
                 runDialogue(002);
-            }
             else
             {
-                // bit 0 not set → set it and run first conversation
                 gSave.convGirl |= 0b00000001;
                 runDialogue(001);
             }
@@ -191,8 +186,7 @@ static void updateGirlNPC(void)
     }
 }
 
-// CAPGIRL NPC — multi‑stage conversation using bits 0 and 1 of convCapGirl
-static void updateCapGirlNPC(void)
+static void updateCapGirlNPC(u16 joyNew)
 {
     if (gSave.gamesPlayed <= 3)
         return;
@@ -202,41 +196,36 @@ static void updateCapGirlNPC(void)
         SPR_setVisibility(convoCloudSprite, VISIBLE);
         SPR_setPosition(convoCloudSprite, capgirlX, capgirlY);
 
-        if (JOY_readJoypad(JOY_1) & BUTTON_A)
+        if (joyNew & BUTTON_A)
         {
             u8* flags = &gSave.convCapGirl;
 
-            // Case 1: bit 0 not set → first conversation, set bit 0
             if ((*flags & 0b00000001) == 0)
             {
                 *flags |= 0b00000001;
-                runDialogue(003);   // NPCConv003
+                runDialogue(003);
                 return;
             }
 
-            // Case 2: bit 0 set, but gamesPlayed <= 6 → still NPCConv003
             if (gSave.gamesPlayed <= 6)
             {
                 runDialogue(003);
                 return;
             }
 
-            // Case 3: gamesPlayed > 6 and bit 1 not set → set bit 1, NPCConv004
             if ((*flags & 0b00000010) == 0)
             {
                 *flags |= 0b00000010;
-                runDialogue(004);   // NPCConv004
+                runDialogue(004);
                 return;
             }
 
-            // Case 4: bit 1 set → NPCConv005
-            runDialogue(005);       // NPCConv005
+            runDialogue(005);
         }
     }
 }
 
-// REDHEAD BOY NPC — currently single‑stage
-static void updateRedBoyNPC(void)
+static void updateRedBoyNPC(u16 joyNew)
 {
     if (gSave.gamesPlayed <= 8)
         return;
@@ -246,7 +235,7 @@ static void updateRedBoyNPC(void)
         SPR_setVisibility(convoCloudSprite, VISIBLE);
         SPR_setPosition(convoCloudSprite, redheadboyX, redheadboyY);
 
-        if (JOY_readJoypad(JOY_1) & BUTTON_A)
+        if (joyNew & BUTTON_A)
             runDialogue(006);
     }
 }
@@ -296,7 +285,6 @@ GameState runArcade1(void)
                                      redheadboyY + PLAYERANDNPC_OFFSET_Y,
                                      TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 
-    // Hide NPCs based on gamesPlayed
     if (gSave.gamesPlayed <= 1)
         SPR_setVisibility(girlSprite, HIDDEN);
 
@@ -317,6 +305,8 @@ GameState runArcade1(void)
     while (1)
     {
         playerHandleInput();
+        u16 joyNew = playerGetJoyNew();
+
         updateDepth();
 
         // Arcade machine logic
@@ -325,12 +315,12 @@ GameState runArcade1(void)
 
         // NPC logic
         SPR_setVisibility(convoCloudSprite, HIDDEN);
-        updateGirlNPC();
-        updateCapGirlNPC();
-        updateRedBoyNPC();
+        updateGirlNPC(joyNew);
+        updateCapGirlNPC(joyNew);
+        updateRedBoyNPC(joyNew);
 
         // Arcade machine A‑press
-        if ((JOY_readJoypad(JOY_1) & BUTTON_A) && showPressAIcon != 0)
+        if ((joyNew & BUTTON_A) && showPressAIcon != 0)
         {
             switch (showPressAIcon)
             {
@@ -356,10 +346,6 @@ GameState runArcade1(void)
             playerY = 69;
             return STATE_HOLODECK;
         }
-
-        // Start → Sleeping Quarters
-        if (JOY_readJoypad(JOY_1) & BUTTON_START)
-            return STATE_SLEEPINGQUARTERS;
 
         drawDebugInfo();
         playerUpdateSprite();

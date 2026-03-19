@@ -30,11 +30,21 @@ Sprite *playerSprite;
 
 // Healing state machine
 static bool playerIsHealing = false;
-static u8   healingPhase = 0;     // 0..3
-static u16  healingTimer = 0;     // generic timer
+static u8   healingPhase = 0;
+static u16  healingTimer = 0;
 
 // ---------------------------------------------------------
-// 4. Footstep SFX helper
+// 4. Input state (centralized)
+// ---------------------------------------------------------
+static u16 joy     = 0;
+static u16 joyPrev = 0;
+static u16 joyNew  = 0;
+
+u16 playerGetJoy(void)     { return joy; }
+u16 playerGetJoyNew(void)  { return joyNew; }
+
+// ---------------------------------------------------------
+// 5. Footstep SFX helper
 // ---------------------------------------------------------
 static void playerHandleFootsteps(void)
 {
@@ -51,7 +61,7 @@ static void playerHandleFootsteps(void)
 }
 
 // ---------------------------------------------------------
-// 5. Internal helper functions
+// 6. Internal helper functions
 // ---------------------------------------------------------
 void getTileContentPlayer(void)
 {
@@ -65,7 +75,7 @@ void getTileContentPlayer(void)
 }
 
 // ---------------------------------------------------------
-// 6. Public API: sprite update
+// 7. Public API: sprite update
 // ---------------------------------------------------------
 void playerUpdateSprite(void)
 {
@@ -81,7 +91,7 @@ void playerUpdateSprite(void)
 }
 
 // ---------------------------------------------------------
-// 7. NEW: Healing API (entry point)
+// 8. NEW: Healing API (entry point)
 // ---------------------------------------------------------
 void playerStartHealing(void)
 {
@@ -93,7 +103,7 @@ void playerStartHealing(void)
 }
 
 // ---------------------------------------------------------
-// 8. Internal: Healing state machine
+// 9. Internal: Healing state machine
 // ---------------------------------------------------------
 static void playerUpdateHealing(void)
 {
@@ -101,15 +111,14 @@ static void playerUpdateHealing(void)
 
     switch (healingPhase)
     {
-        case 0: // move into bed, show healing frame 0
+        case 0:
         {
             playerX = 66;
             playerY = 84;
             playerFacingRight = true;
 
-            // Advance animation every 8 frames
-            u8 frame = healingTimer >> 3;   // divide by 8
-            if (frame > 6) frame = 6;       // clamp to last frame
+            u8 frame = healingTimer >> 3;
+            if (frame > 6) frame = 6;
 
             SPR_setAnimAndFrame(playerSprite, POSE_HEALING, frame);
 
@@ -121,7 +130,7 @@ static void playerUpdateHealing(void)
             break;
         }
 
-        case 1: // fade out (same style as main.c)
+        case 1:
         {
             PAL_fadeOut(0, 63, 8, FALSE);
 
@@ -134,7 +143,7 @@ static void playerUpdateHealing(void)
             break;
         }
 
-        case 2: // fade in (same style as main.c)
+        case 2:
         {
             PAL_fadeIn(0, 63, our_level_palette, 8, TRUE);
 
@@ -146,11 +155,10 @@ static void playerUpdateHealing(void)
             break;
         }
 
-        case 3: // climb out of bed, reverse healing animation
+        case 3:
         {
-            // Reverse animation every 8 frames
-            u8 frame = 6 - (healingTimer >> 3);  // reverse from frame 6 to 0
-            if (frame > 6) frame = 0;            // clamp to first frame
+            u8 frame = 6 - (healingTimer >> 3);
+            if (frame > 6) frame = 0;
 
             SPR_setAnimAndFrame(playerSprite, POSE_HEALING, frame);
 
@@ -166,10 +174,12 @@ static void playerUpdateHealing(void)
             }
             break;
         }
-
     }
 }
 
+// ---------------------------------------------------------
+// 10. Room timing helpers
+// ---------------------------------------------------------
 static u32 roomEnterTick = 0;
 
 void playerMarkRoomEntry(void)
@@ -188,11 +198,14 @@ bool playerIsCenterScreen(void)
 }
 
 // ---------------------------------------------------------
-// 9. Public API: input + movement + collision + SFX
+// 11. Public API: movement + collision + SFX
 // ---------------------------------------------------------
 void playerHandleInput(void)
 {
-    u16 joy = JOY_readJoypad(JOY_1);
+    // Centralized input read
+    joy = JOY_readJoypad(JOY_1);
+    joyNew = joy & ~joyPrev;
+    joyPrev = joy;
 
     // If healing, ignore movement and run healing logic
     if (playerIsHealing)

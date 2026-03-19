@@ -6,6 +6,7 @@
 #include "game_state.h"
 #include "room_arcade1.h"
 #include "save_data.h"
+#include "player.h"
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -49,12 +50,16 @@ GameState runJumpQuest(void)
     globalTileIndex += arcademachine.tileset->numTile;
 
     SPR_reset();
+    SPR_update();
+    waitMs(120); // ~2 seconds wait until screen has faded in completely
 
     JumpQuestState jqState = JQ_STATE_TITLE;
 
     while (1)
     {
-        u16 joy = JOY_readJoypad(JOY_1);
+            // Centralized input system
+        playerHandleInput();
+        u16 joyNew = playerGetJoyNew();
 
         switch (jqState)
         {
@@ -64,14 +69,14 @@ GameState runJumpQuest(void)
             case JQ_STATE_TITLE:
 
                 // NEW: Press B to exit back to arcade room
-                if (joy & BUTTON_B)
+                if (joyNew & BUTTON_B)
                 {
                     gSave.gamesPlayed++;   // <-- increment here
                     saveSaveData();
                     return STATE_ARCADE1;
                 }
 
-                if (joy & BUTTON_A)
+                if (joyNew & BUTTON_A)
                 {
                     // Fade out only PAL0 (monitor)
                     PAL_fadeOut(0, 15, 8, FALSE);
@@ -98,7 +103,7 @@ GameState runJumpQuest(void)
             // -------------------------------------------------
             case JQ_STATE_GAME:
 
-                if (joy & BUTTON_B)
+                if (joyNew & BUTTON_B)
                 {
                     // Fade out only PAL0 (monitor)
                     PAL_fadeOut(0, 15, 8, FALSE);
@@ -117,13 +122,6 @@ GameState runJumpQuest(void)
                     PAL_fadeIn(0, 15, jumpquesttitlescreen.palette->data, 8, FALSE);
 
                     jqState = JQ_STATE_TITLE;
-                }
-
-                if (joy & BUTTON_START)
-                {
-                    gSave.gamesPlayed++;   // <-- increment here
-                    saveSaveData();
-                    return STATE_ARCADE1;
                 }
 
                 break;

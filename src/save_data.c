@@ -160,10 +160,10 @@ void resetSaveData(void)
     gSave.convGingerBoy = 0;
 
     gSave.convHost = 0;
-    gSave.convEntity = 0b00000000; //bit 7=science lab ship explainer
-//    gSave.convEntity = 0b10000000; //bit 7=science lab ship explainer
-    gSave.convEntityShipExplanations = 0b00000000; //b7=medical bay , b6=holodeck, b5=armory vault, b4=sleeping quarters, b3=reactor chamber, b2=training deck, b1=hangar bay, b0=hydroponics
-//    gSave.convEntityShipExplanations = 0b11111111; //b7=medical bay , b6=holodeck, b5=armory vault, b4=sleeping quarters, b3=reactor chamber, b2=training deck, b1=hangar bay, b0=hydroponics
+//    gSave.convEntity = 0b00000000; //bit 7=science lab ship explainer
+    gSave.convEntity = 0b10000000; //bit 7=science lab ship explainer
+//    gSave.convEntityShipExplanations = 0b00000000; //b7=medical bay , b6=holodeck, b5=armory vault, b4=sleeping quarters, b3=reactor chamber, b2=training deck, b1=hangar bay, b0=hydroponics
+    gSave.convEntityShipExplanations = 0b11111111; //b7=medical bay , b6=holodeck, b5=armory vault, b4=sleeping quarters, b3=reactor chamber, b2=training deck, b1=hangar bay, b0=hydroponics
 
     gSave.startWakeUpEvent = 1;
 

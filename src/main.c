@@ -135,6 +135,8 @@ void drawRoomBackground(u8 room)
     if (room == ROOM_BIKERACE) memcpy(&our_level_palette[16], arcademachine.palette->data, 16 * 2);
     // Build palette 2
     memcpy(&our_level_palette[32], playerSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_BASKETBALL) memcpy(&our_level_palette[32], basketBallSpriteDef.palette->data, 16 * 2);
+
     // Build palette 3
     if (room == ROOM_REACTORCHAMBER) memcpy(&our_level_palette[48], reactorSpriteDef.palette->data, 16 * 2);
     if (room == ROOM_MEDICALBAY) memcpy(&our_level_palette[48], medicalBayChairSpriteDef.palette->data, 16 * 2);
@@ -204,7 +206,7 @@ int main(bool hardReset)
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
 
-    GameState state = STATE_HYDROPONICSBAY;
+    GameState state = STATE_BASKETBALL;
 
     while (state != STATE_QUIT)
     {

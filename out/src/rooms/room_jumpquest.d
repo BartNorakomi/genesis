@@ -22,4 +22,4 @@ out/src/rooms/room_jumpquest.o: src/rooms/room_jumpquest.c \
  C:/sgdk211/inc/string.h C:/sgdk211/inc/maths.h C:/sgdk211/inc/dma.h \
  res/resources.h res/music.h inc/rooms.h inc/room_jumpquest.h \
  inc/game_state.h inc/game_state.h inc/room_arcade1.h inc/rooms.h \
- inc/save_data.h
+ inc/save_data.h inc/player.h

@@ -20,7 +20,7 @@ typedef enum
     POSE_IDLE,
     POSE_SITTING,
     POSE_RUNNING,
-    POSE_HEALING      // NEW pose for Medical Bay healing
+    POSE_HEALING
 } PlayerPose;
 
 // ---------------------------------------------------------
@@ -35,16 +35,24 @@ extern int PLAYERANDNPC_OFFSET_X;
 extern int PLAYERANDNPC_OFFSET_Y;
 
 // ---------------------------------------------------------
-// 5. Function prototypes
+// 5. Centralized Input API
 // ---------------------------------------------------------
-void playerUpdateSprite(void);
+// NOTE: playerUpdateInput() was removed — do NOT declare it.
+u16 playerGetJoy(void);
+u16 playerGetJoyNew(void);
+
+// ---------------------------------------------------------
+// 6. Player logic API
+// ---------------------------------------------------------
 void playerHandleInput(void);
+void playerUpdateSprite(void);
 void getTileContentPlayer(void);
+
 bool playerIsCenterScreen(void);
 void playerMarkRoomEntry(void);
 bool playerHasBeenInRoomFor(u32 ticks);
 
-// NEW: healing trigger
+// Healing trigger
 void playerStartHealing(void);
 
 #endif

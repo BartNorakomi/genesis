@@ -83,6 +83,12 @@ SPRITE fingerSpriteDef "sprites/roomicons/finger.bmp" 2 2 FAST NONE
 SPRITE triggerASpriteDef "sprites/roomicons/triggerA.bmp" 2 2 FAST NONE
 SPRITE textCloudSpriteDef "sprites/roomicons/textCloud.bmp" 3 2 FAST NONE
 
+SPRITE basketBallSpriteDef "sprites/games/basketball/basketball.bmp" 2 2 FAST NONE
+SPRITE basketBallNetSpriteDef "sprites/games/basketball/net.bmp" 2 2 FAST NONE
+SPRITE basketBallShadowSpriteDef "sprites/games/basketball/shadow.bmp" 2 2 FAST NONE
+SPRITE basketBallCoinSpriteDef "sprites/games/basketball/coin.bmp" 2 2 FAST NONE
+SPRITE basketBallPoleSpriteDef "sprites/games/basketball/basketballpole.bmp" 4 12 FAST NONE
+
 #option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"
 #option 2: export audio in audacity: 7500 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=TRUE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_7.5khz.raw"
 #the lower the khz the higher the pitch

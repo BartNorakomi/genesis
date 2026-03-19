@@ -84,5 +84,10 @@ extern const SpriteDefinition titlescreenpressbuttonSpriteDef;
 extern const SpriteDefinition fingerSpriteDef;
 extern const SpriteDefinition triggerASpriteDef;
 extern const SpriteDefinition textCloudSpriteDef;
+extern const SpriteDefinition basketBallSpriteDef;
+extern const SpriteDefinition basketBallNetSpriteDef;
+extern const SpriteDefinition basketBallShadowSpriteDef;
+extern const SpriteDefinition basketBallCoinSpriteDef;
+extern const SpriteDefinition basketBallPoleSpriteDef;
 
 #endif // _RES_RESOURCES_H_
