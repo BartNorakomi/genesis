@@ -17,6 +17,7 @@ IMAGE jumpquesttitlescreen "graphics/games/jumpquesttitlescreen.bmp" BEST ALL
 IMAGE jumpquestingameexample "graphics/games/jumpquestingameexample.bmp" BEST ALL
 IMAGE basketballtitlescreen "graphics/games/basketballtitlescreen.bmp" BEST ALL
 IMAGE basketballingameexample "graphics/games/basketballingameexample.bmp" BEST ALL
+IMAGE basketballgameover "graphics/games/basketballgameover.bmp" BEST ALL
 IMAGE blockcannontitlescreen "graphics/games/blockcannontitlescreen.bmp" BEST ALL
 IMAGE blockcannoningameexample "graphics/games/blockcannoningameexample.bmp" BEST ALL
 IMAGE bikeracetitlescreen "graphics/games/bikeracetitlescreen.bmp" BEST ALL
@@ -88,6 +89,8 @@ SPRITE basketBallNetSpriteDef "sprites/games/basketball/net.bmp" 2 2 FAST NONE
 SPRITE basketBallShadowSpriteDef "sprites/games/basketball/shadow.bmp" 2 2 FAST NONE
 SPRITE basketBallCoinSpriteDef "sprites/games/basketball/coin.bmp" 2 2 FAST NONE
 SPRITE basketBallPoleSpriteDef "sprites/games/basketball/basketballpole.bmp" 4 12 FAST NONE
+
+SPRITE penguinSpriteDef "sprites/games/penguinbikerace/penguinsprite.bmp" 19 15 FAST NONE
 
 #option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"
 #option 2: export audio in audacity: 7500 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=TRUE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_7.5khz.raw"

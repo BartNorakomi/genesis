@@ -206,7 +206,7 @@ int main(bool hardReset)
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
 
-    GameState state = STATE_BASKETBALL;
+    GameState state = STATE_BIKERACE;
 
     while (state != STATE_QUIT)
     {

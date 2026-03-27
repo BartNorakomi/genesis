@@ -37,6 +37,7 @@ extern const Image jumpquesttitlescreen;
 extern const Image jumpquestingameexample;
 extern const Image basketballtitlescreen;
 extern const Image basketballingameexample;
+extern const Image basketballgameover;
 extern const Image blockcannontitlescreen;
 extern const Image blockcannoningameexample;
 extern const Image bikeracetitlescreen;
@@ -89,5 +90,6 @@ extern const SpriteDefinition basketBallNetSpriteDef;
 extern const SpriteDefinition basketBallShadowSpriteDef;
 extern const SpriteDefinition basketBallCoinSpriteDef;
 extern const SpriteDefinition basketBallPoleSpriteDef;
+extern const SpriteDefinition penguinSpriteDef;
 
 #endif // _RES_RESOURCES_H_
