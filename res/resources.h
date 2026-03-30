@@ -91,5 +91,13 @@ extern const SpriteDefinition basketBallShadowSpriteDef;
 extern const SpriteDefinition basketBallCoinSpriteDef;
 extern const SpriteDefinition basketBallPoleSpriteDef;
 extern const SpriteDefinition penguinSpriteDef;
+extern const SpriteDefinition bikeRaceWarningIconSpriteDef;
+extern const SpriteDefinition bikeRaceStarSpriteDef;
+extern const SpriteDefinition bikeRacePizzaSpriteDef;
+extern const SpriteDefinition bikeRaceExtraTimeSpriteDef;
+extern const SpriteDefinition bikeRaceStoneSpriteDef;
+extern const SpriteDefinition bikeRaceSpikeSpriteDef;
+extern const SpriteDefinition bikeRaceMushroom1SpriteDef;
+extern const SpriteDefinition bikeRaceMushroom2SpriteDef;
 
 #endif // _RES_RESOURCES_H_

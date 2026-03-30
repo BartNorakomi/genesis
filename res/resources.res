@@ -90,8 +90,16 @@ SPRITE basketBallShadowSpriteDef "sprites/games/basketball/shadow.bmp" 2 2 FAST 
 SPRITE basketBallCoinSpriteDef "sprites/games/basketball/coin.bmp" 2 2 FAST NONE
 SPRITE basketBallPoleSpriteDef "sprites/games/basketball/basketballpole.bmp" 4 12 FAST NONE
 
-SPRITE penguinSpriteDef "sprites/games/penguinbikerace/penguinsprite.bmp" 19 15 FAST NONE
-
+SPRITE penguinSpriteDef "sprites/games/penguinbikerace/penguinsprite152x120.bmp" 19 15 FAST NONE
+SPRITE bikeRaceWarningIconSpriteDef "sprites/games/penguinbikerace/warningicon.bmp" 2 2 FAST NONE
+SPRITE bikeRaceStarSpriteDef "sprites/games/penguinbikerace/star.bmp" 2 2 FAST NONE
+SPRITE bikeRacePizzaSpriteDef "sprites/games/penguinbikerace/pizza.bmp" 2 2 FAST NONE
+SPRITE bikeRaceExtraTimeSpriteDef "sprites/games/penguinbikerace/extratime.bmp" 2 2 FAST NONE
+SPRITE bikeRaceStoneSpriteDef "sprites/games/penguinbikerace/stone.bmp" 2 2 FAST NONE
+SPRITE bikeRaceSpikeSpriteDef "sprites/games/penguinbikerace/spike.bmp" 2 2 FAST NONE
+SPRITE bikeRaceMushroom1SpriteDef "sprites/games/penguinbikerace/mushroom1.bmp" 2 4 FAST NONE
+SPRITE bikeRaceMushroom2SpriteDef "sprites/games/penguinbikerace/mushroom2.bmp" 2 4 FAST NONE
+ 
 #option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"
 #option 2: export audio in audacity: 7500 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=TRUE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_7.5khz.raw"
 #the lower the khz the higher the pitch
