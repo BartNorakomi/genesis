@@ -39,8 +39,11 @@ extern const SpriteDefinition bikeRaceMushroom2SpriteDef;
 typedef enum
 {
     BR_STATE_TITLE,
-    BR_STATE_GAME
+    BR_STATE_GAME,
+    BR_STATE_GAMEOVER
 } BikeRaceState;
+
+BikeRaceState brState = BR_STATE_GAME;
 
 // ---------------------------------------------------------
 // 3. Penguin game globals
@@ -50,6 +53,7 @@ static u8 PenguinGameRandomValue = 0;
 
 static u8 SpawnFrequencyPizza = 0;
 static u8 SpawnFrequencyExtraTime = 0;
+static u8 SpawnFrequencyStar = 0;
 
 static u16 PenguinDistance = 0;
 static u8 PenguinMaxSpeed = 30;
@@ -64,6 +68,7 @@ static u8 PenguinGameLevel = 1;
 static u8 PenguinGameLaps = 1;
 static u8 PenguinGameLapsCopy = 1;
 static u8 PenguinGameTime = 61;
+static u8 PenguinGameTimeSpeed = 0;
 
 // Penguin position
 static s16 penguinX = 30;
@@ -71,6 +76,7 @@ static s16 penguinY = 10;
 
 //static u8 SpawnFrequencyWarning = 0;
 static u8 SpawnFrequencyWarning = 1;
+
 
 // ---------------------------------------------------------
 // 4. Penguin game object struct
@@ -300,8 +306,8 @@ static void HandleObjectWarning(PenguinObject* obj)
 
 static void SpawnObjectFromWarning(PenguinObject* warning)
 {
-        TrySpawnMushroom1(warning);
-        return;
+        // TrySpawnMushroom2(warning);
+        // return;
 
     // Random 0–3
     u8 r = random() & 3;
@@ -618,17 +624,109 @@ static void HandlePenguinGameObjects(void)
 
 static void HandleObjectStar(PenguinObject* obj)
 {
-    // TODO: implement
+    if (!obj->on)
+        return;
+
+    // Duration countdown
+    if (obj->duration > 0)
+    {
+        obj->duration--;
+        if (obj->duration == 0)
+        {
+            // Remove star
+            SPR_setVisibility(obj->spr[0], HIDDEN);
+            obj->on = false;
+            obj->distance = 0;
+            return;
+        }
+    }
+
+    // Update XY
+    HandleObject_SetXY(obj);
+
+    // Collision check
+    if (CheckCollisionPenguin(obj))
+    {
+        // Star effect: invulnerability
+        PenguinInvulnerable = 200;
+
+        // Remove star
+        SPR_setVisibility(obj->spr[0], HIDDEN);
+        obj->on = false;
+        obj->distance = 0;
+        return;
+    }
 }
 
 static void HandleObjectPizza(PenguinObject* obj)
 {
-    // TODO: implement
+    if (!obj->on)
+        return;
+
+    // Duration countdown
+    if (obj->duration > 0)
+    {
+        obj->duration--;
+        if (obj->duration == 0)
+        {
+            // Remove pizza
+            SPR_setVisibility(obj->spr[0], HIDDEN);
+            obj->on = false;
+            obj->distance = 0;
+            return;
+        }
+    }
+
+    // Update XY
+    HandleObject_SetXY(obj);
+
+    // Collision check
+    if (CheckCollisionPenguin(obj))
+    {
+        // Pizza effect: speed boost
+        AddedPizzaSpeedBoost = 90;
+
+        // Remove pizza
+        SPR_setVisibility(obj->spr[0], HIDDEN);
+        obj->on = false;
+        obj->distance = 0;
+    }
 }
 
 static void HandleObjectExtraTime(PenguinObject* obj)
 {
-    // TODO: implement
+    if (!obj->on)
+        return;
+
+    // Duration countdown
+    if (obj->duration > 0)
+    {
+        obj->duration--;
+        if (obj->duration == 0)
+        {
+            // Remove object
+            SPR_setVisibility(obj->spr[0], HIDDEN);
+            obj->on = false;
+            obj->distance = 0;
+            return;
+        }
+    }
+
+    // Update XY
+    HandleObject_SetXY(obj);
+
+    // Collision check
+    if (CheckCollisionPenguin(obj))
+    {
+        // Extra time effect: +5 seconds
+        PenguinGameTimeExtended = 5;
+
+        // Remove object
+        SPR_setVisibility(obj->spr[0], HIDDEN);
+        obj->on = false;
+        obj->distance = 0;
+        return;
+    }
 }
 
 static void HandleObjectStone(PenguinObject* obj)
@@ -676,12 +774,25 @@ static void HandleObjectStone(PenguinObject* obj)
 
 static bool CheckCollisionPenguin(PenguinObject* obj)
 {
-    // TODO: real collision check
-    // For now: never collides
-    (void)obj;
-    return false;
-}
+    // Distance difference (object - penguin)
+    s16 diff = (s16)obj->distance - (s16)PenguinDistance;
 
+    // MSX logic:
+    // If objectDistance - 10 > penguinDistance → no collision
+    if (diff > 10)
+        return false;
+
+    // If objectDistance + 10 < penguinDistance → no collision
+    if (diff < -10)
+        return false;
+
+    // Inside/outside must match
+    if (obj->insideOval != PenguinInsideOval)
+        return false;
+
+    // Collision!
+    return true;
+}
 
 static void AnimateSpike(PenguinObject* obj)
 {
@@ -813,11 +924,49 @@ static void HandleObjectMushroom1(PenguinObject* obj)
     obj->distance = 0;
 }
 
-
 static void HandleObjectMushroom2(PenguinObject* obj)
 {
-    // TODO: implement
+    if (!obj->on)
+        return;
+
+    /// --- Duration countdown ---
+    if (obj->duration > 0)
+    {
+        obj->duration--;
+        if (obj->duration == 0)
+        {
+            // Remove mushroom
+            SPR_setVisibility(obj->spr[0], HIDDEN);
+            obj->on = false;
+            obj->distance = 0;
+            return;
+        }
+    }
+
+    // --- Update XY ---
+    HandleObject_SetXY(obj);
+
+    // Position the single sprite
+    SPR_setPosition(obj->spr[0], obj->x, obj->y);
+
+    // --- Collision check ---
+    if (PenguinInvulnerable)
+        return;
+
+    if (!CheckCollisionPenguin(obj))
+        return;
+
+    // --- Collision effect: reduce speed by 15 ---
+    int newSpeed = (int)PenguinSpeed - 15;
+    if (newSpeed < 0) newSpeed = 0;
+    PenguinSpeed = (u8)newSpeed;
+
+    /// --- Remove mushroom after collision ---
+    SPR_setVisibility(obj->spr[0], HIDDEN);
+    obj->on = false;
+    obj->distance = 0;
 }
+
 
 static bool TrySpawnStone(PenguinObject* warning)
 {
@@ -883,16 +1032,16 @@ static bool TrySpawnMushroom1(PenguinObject* warning)
     u16 dist = warning->distance;
 
     // --- Placement rules ---
-    if (!warning->insideOval)
+    if (warning->insideOval)
     {
-        // Outside oval → only top straight (distance < 180)
-        if (dist >= 180)
+        // Inside oval → only bottom straight (220 ≤ dist < 360)
+        if (dist < 220 || dist >= 360)
             return false;
     }
     else
     {
-        // Inside oval → only bottom straight (140 ≤ dist < 180)
-        if (dist < 140 || dist >= 180)
+        // Outside oval → only top straight (distance < 180)
+        if (dist >= 180)
             return false;
     }
 
@@ -911,14 +1060,135 @@ static bool TrySpawnMushroom1(PenguinObject* warning)
 
 static bool TrySpawnMushroom2(PenguinObject* warning)
 {
-    // TODO: implement
-    return false;
+    PenguinObject* mush = &Mushroom2Obj;
+
+    if (mush->on)
+        return false;
+
+    u16 dist = warning->distance;
+
+    if (!warning->insideOval)
+    {
+        // OUTSIDE oval → only bottom straight (140 ≤ d < 220)
+        if (dist < 220 || dist >= 360)
+            return false;
+    }
+    else
+    {
+        // INSIDE oval → only top straight (d < 180)
+        if (dist >= 180)
+            return false;
+    }
+
+    // Place Mushroom2
+    mush->on = true;
+    mush->distance = dist;
+    mush->insideOval = warning->insideOval;
+    mush->duration = 255;
+    mush->animStep = 0;
+
+    SPR_setVisibility(mush->spr[0], VISIBLE);
+
+    return true;
+}
+
+static void HandlePenguinGameHud(void)
+{
+    u8 phase = framecounter2 & 15;
+
+    // 0: adjust time + laps copy + time ticking
+    if (phase == 0)
+    {
+        // Apply extended time (from ExtraTime / level up)
+        if (PenguinGameTimeExtended > 0)
+        {
+            PenguinGameTime += PenguinGameTimeExtended;
+            PenguinGameTimeExtended = 0;
+        }
+
+        // Copy laps
+        PenguinGameLapsCopy = PenguinGameLaps;
+
+        // Time speed logic (every 3 ticks, decrement time)
+        PenguinGameTimeSpeed++;
+        if (PenguinGameTimeSpeed >= 3)
+        {
+            PenguinGameTimeSpeed = 0;
+
+            if (PenguinGameTime > 0)
+                PenguinGameTime--;
+        }
+
+        return;
+    }
+
+    // 1–4: draw time
+    if (phase < 5)
+    {
+        char buf[4];
+        sprintf(buf, "%3d", PenguinGameTime);
+        // TimeDX=29 → ~x=4, TimeDY=8 → y=1
+        VDP_drawTextBG(BG_A, "   ", 4, 1);      // erase
+        VDP_drawTextBG(BG_A, buf, 4, 1);
+        return;
+    }
+
+    // 5–8: draw level
+    if (phase < 9)
+    {
+        char buf[4];
+        sprintf(buf, "%3d", PenguinGameLevel);
+        // LevelDX=140 → ~x=18, LevelDY=8 → y=1
+        VDP_drawTextBG(BG_A, "   ", 18, 1);     // erase
+        VDP_drawTextBG(BG_A, buf, 18, 1);
+        return;
+    }
+
+    // 9–15: draw laps (using PenguinGameLapsCopy)
+    {
+        char buf[4];
+        sprintf(buf, "%3d", PenguinGameLapsCopy);
+        // LapsDX=231 → ~x=29, LapsDY=8 → y=1
+        VDP_drawTextBG(BG_A, "   ", 27, 1);     // erase
+        VDP_drawTextBG(BG_A, buf, 27, 1);
+    }
 }
 
 
-static void HandlePenguinGameHud(void) {}
-static void HandlePenguinGameOver(void) {}
 
+
+static void HandlePenguinGameOver(void)
+{
+    u16 joy = playerGetJoy();
+
+    // If trigger B is pressed → jump directly to GAME OVER
+    if (joy & BUTTON_B)
+        goto GAME_OVER;
+
+    // If time > 0 → not game over
+    if (PenguinGameTime > 0)
+        return;
+
+    // If speed > 0 → not game over
+    if (PenguinSpeed > 0)
+        return;
+
+    // Time == 0 AND Speed == 0 → game over
+GAME_OVER:
+
+    // Draw game over gfx
+    VDP_drawImageEx(
+        BG_B,
+        &basketballgameover,
+        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+        0, 0,
+        FALSE,
+        TRUE
+    );
+
+    // Switch state
+    brState = BR_STATE_GAMEOVER;
+}
 
 static const u16 DistanceTable[33] =
 {
@@ -963,6 +1233,9 @@ static void PutNewWarningObjects(void)
     // Random inside/outside
     WarningObj.insideOval = (random() & 1);
 
+    // Update XY
+    HandleObject_SetXY(&WarningObj);
+
     // Make sprite visible
     SPR_setVisibility(WarningObj.spr[0], VISIBLE);
 }
@@ -987,9 +1260,138 @@ static bool CheckDistanceAlreadyInUseByOtherObject(u16 dist)
 
 
 
-static void PutNewPizzaObjects(void) {}
-static void PutNewStarObjects(void) {}
-static void PutNewExtraTimeObjects(void) {}
+
+static void PutNewPizzaObjects(void)
+{
+    PenguinObject* obj = &PizzaObj;
+
+    // Already active?
+    if (obj->on)
+        return;
+
+    // Spawn frequency countdown
+    if (SpawnFrequencyPizza > 0)
+    {
+        SpawnFrequencyPizza--;
+        if (SpawnFrequencyPizza > 0)
+            return;
+    }
+
+    // Reset spawn timer (MSX uses 100)
+    SpawnFrequencyPizza = 100;
+
+    // Pick random distance index (0–31)
+    u8 r = random() & 31;
+    u16 dist = DistanceTable[r];
+
+    // Check if distance is already used
+    if (CheckDistanceAlreadyInUseByOtherObject(dist))
+        return;
+
+    // Activate pizza
+    obj->on = true;
+    obj->duration = 250;
+    obj->distance = dist;
+
+    // insideOval = r & 1
+    obj->insideOval = (r & 1);
+
+        // Update XY
+    HandleObject_SetXY(obj);
+
+    SPR_setVisibility(obj->spr[0], VISIBLE);
+}
+
+static void PutNewStarObjects(void)
+{
+    PenguinObject* obj = &StarObj;
+
+    // Already active?
+    if (obj->on)
+        return;
+
+    // Spawn frequency countdown
+    if (SpawnFrequencyStar > 0)
+    {
+        SpawnFrequencyStar--;
+        if (SpawnFrequencyStar > 0)
+            return;
+    }
+
+    // Reset spawn timer (MSX uses 50)
+    SpawnFrequencyStar = 50;
+
+    // Extra MSX rule: only spawn if PenguinGameRandomValue & 7 == 0
+    if (PenguinGameRandomValue & 7)
+        return;
+
+    // Pick random distance index (0–31)
+    u8 r = random() & 31;
+    u16 dist = DistanceTable[r];
+
+    // Check if distance is already used
+    if (CheckDistanceAlreadyInUseByOtherObject(dist))
+        return;
+
+    // Activate star
+    obj->on = true;
+    obj->duration = 250;
+    obj->distance = dist;
+
+    // insideOval = r & 1
+    obj->insideOval = (r & 1);
+
+    // Update XY
+    HandleObject_SetXY(obj);
+
+    SPR_setVisibility(obj->spr[0], VISIBLE);
+}
+
+static void PutNewExtraTimeObjects(void)
+{
+    PenguinObject* obj = &ExtraTimeObj;
+
+    // Already active?
+    if (obj->on)
+        return;
+
+    // Spawn frequency countdown
+    if (SpawnFrequencyExtraTime > 0)
+    {
+        SpawnFrequencyExtraTime--;
+        if (SpawnFrequencyExtraTime > 0)
+            return;
+    }
+
+    // NOTE:
+    // MSX commented out the reset:
+    //   ld a,250
+    //   ld (SpawnFrequencyExtraTime),a
+    // So we DO NOT reset it here.
+    // ExtraTime spawns only once per countdown cycle.
+
+    // Pick random distance index (0–31)
+    u8 r = random() & 31;
+    u16 dist = DistanceTable[r];
+
+    // Check if distance is already used
+    if (CheckDistanceAlreadyInUseByOtherObject(dist))
+        return;
+
+    // Activate ExtraTime
+    obj->on = true;
+    obj->duration = 190;
+    obj->distance = dist;
+
+    // insideOval = r & 1
+    obj->insideOval = (r & 1);
+
+        // Update XY
+    HandleObject_SetXY(obj);
+
+    SPR_setVisibility(obj->spr[0], VISIBLE);
+}
+
 
 static void SetPenguinSprite(void)
 {
@@ -1046,6 +1448,7 @@ static void ResetVariablesPenguinRace(void)
 {
     SpawnFrequencyPizza = random() & 0xFF;
     SpawnFrequencyExtraTime = 255;
+    SpawnFrequencyStar = 200;
 
     PenguinDistance = 0;
     PenguinMaxSpeed = 30;
@@ -1229,8 +1632,6 @@ GameState runBikeRace(void)
     SPR_update();
     waitMs(120);
 
-    BikeRaceState brState = BR_STATE_GAME;
-
     VDP_drawImageEx(
         BG_B,
         &bikeraceingameexample,
@@ -1279,9 +1680,12 @@ GameState runBikeRace(void)
                 break;
 
             case BR_STATE_GAME:
-
                 PenguinMovementRoutine();
+                break;
 
+            case BR_STATE_GAMEOVER:
+            {
+                // Wait for button press to exit
                 if (joyNew & BUTTON_B)
                 {
                     PAL_fadeOut(0, 15, 8, FALSE);
@@ -1301,6 +1705,7 @@ GameState runBikeRace(void)
                 }
 
                 break;
+            }
         }
 
         SPR_update();
