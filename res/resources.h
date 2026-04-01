@@ -42,6 +42,7 @@ extern const Image blockcannontitlescreen;
 extern const Image blockcannoningameexample;
 extern const Image bikeracetitlescreen;
 extern const Image bikeraceingameexample;
+extern const Image bikeracegameover;
 extern const Image neonhorizon;
 extern const Image trainingdeckgame;
 extern const Image drillinggame;
@@ -99,5 +100,7 @@ extern const SpriteDefinition bikeRaceStoneSpriteDef;
 extern const SpriteDefinition bikeRaceSpikeSpriteDef;
 extern const SpriteDefinition bikeRaceMushroom1SpriteDef;
 extern const SpriteDefinition bikeRaceMushroom2SpriteDef;
+extern const SpriteDefinition blockCannonBlockSpriteDef;
+extern const SpriteDefinition blockCannonCannonSpriteDef;
 
 #endif // _RES_RESOURCES_H_

@@ -1176,10 +1176,13 @@ static void HandlePenguinGameOver(void)
     // Time == 0 AND Speed == 0 → game over
 GAME_OVER:
 
+    SPR_reset();
+    SPR_update();
+
     // Draw game over gfx
     VDP_drawImageEx(
         BG_B,
-        &basketballgameover,
+        &bikeracegameover,
         TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
         0, 0,
         FALSE,
@@ -1686,7 +1689,7 @@ GameState runBikeRace(void)
             case BR_STATE_GAMEOVER:
             {
                 // Wait for button press to exit
-                if (joyNew & BUTTON_B)
+            if (joyNew & (BUTTON_A | BUTTON_B))
                 {
                     PAL_fadeOut(0, 15, 8, FALSE);
 

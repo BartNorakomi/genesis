@@ -22,6 +22,7 @@ IMAGE blockcannontitlescreen "graphics/games/blockcannontitlescreen.bmp" BEST AL
 IMAGE blockcannoningameexample "graphics/games/blockcannoningameexample.bmp" BEST ALL
 IMAGE bikeracetitlescreen "graphics/games/bikeracetitlescreen.bmp" BEST ALL
 IMAGE bikeraceingameexample "graphics/games/bikeraceingameexample.bmp" BEST ALL
+IMAGE bikeracegameover "graphics/games/bikeracegameover.bmp" BEST ALL
 
 IMAGE neonhorizon "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE trainingdeckgame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
@@ -99,6 +100,8 @@ SPRITE bikeRaceStoneSpriteDef "sprites/games/penguinbikerace/stone.bmp" 2 2 FAST
 SPRITE bikeRaceSpikeSpriteDef "sprites/games/penguinbikerace/spike.bmp" 2 2 FAST NONE
 SPRITE bikeRaceMushroom1SpriteDef "sprites/games/penguinbikerace/mushroom1.bmp" 2 4 FAST NONE
 SPRITE bikeRaceMushroom2SpriteDef "sprites/games/penguinbikerace/mushroom2.bmp" 2 4 FAST NONE
+SPRITE blockCannonBlockSpriteDef "sprites/games/blockcannon/block.bmp" 2 2 FAST NONE
+SPRITE blockCannonCannonSpriteDef "sprites/games/blockcannon/cannon.bmp" 5 4 FAST NONE
  
 #option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"
 #option 2: export audio in audacity: 7500 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=TRUE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_7.5khz.raw"

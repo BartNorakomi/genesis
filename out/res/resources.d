@@ -8,6 +8,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/medicalbay.bmp 
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/arcade1Wall.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/arcade1.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/bikeracetitlescreen.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/blockcannon/cannon.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/player/playersprite.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/sleepingquarters.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/jumpquesttitlescreen.bmp \
@@ -34,6 +35,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomicons/triggerA.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sfx/startgame.wav \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/blockcannontitlescreen.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sfx/Large\ Crowd\ Applause\ 04.wav \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/bikeracegameover.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/hangarbay.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/basketballingameexample.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/bikeraceingameexample.bmp \
@@ -80,6 +82,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapreactorchamber.
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/arcade2tablewithentity.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaphydroponicsbay.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/penguinbikerace/stone.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/blockcannon/block.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/armoryvaultpanel.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/npcdialogue/portraitDidYouKnow.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/basketballtitlescreen.bmp \
