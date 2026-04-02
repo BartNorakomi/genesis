@@ -36,15 +36,1051 @@ typedef enum
 static Sprite* cannonSprite;
 static u8 CannonRow = 2;   // middle row
 
-// MSX dy offsets: 16, 38, 60, 82, 104 (+ one extra row)
-static const s16 CannonRowY[6] = {
+// MSX dy offsets: 16, 38, 60, 82, 104
+static const s16 CannonRowY[5] = {
     16,   // row 0
     38,   // row 1
     60,   // row 2
     82,   // row 3
     104,  // row 4
-    126   // row 5
 };
+
+typedef enum {
+    BlockColorGreen  = 1,
+    BlockColorYellow = 2,
+    BlockColorRed    = 3
+} BlockColor;
+
+
+static const u8* BlocksColumnsTablePointer;
+
+// ---------------------------------------------------------
+// BlocksColumnsTable (converted from MSX db statements)
+// Each row has 5 columns
+// ---------------------------------------------------------
+static const u8 BlocksColumnsTable[][5] = {
+    // level 1
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+
+    {0,0,1,1,1},
+    {1,0,1,0,1},
+    {0,1,1,1,0},
+    {0,1,0,1,0},
+
+    {1,1,0,0,1},
+    {0,0,1,1,1},
+    {1,1,1,0,0},
+    {1,0,0,0,1},
+
+    {0,1,1,1,0},
+    {1,0,0,0,1},
+    {1,1,0,1,1},
+    {0,1,1,0,0},
+
+    {1,0,1,0,1},
+    {0,0,1,1,1},
+    {1,1,0,1,0},
+    {1,0,0,0,1},
+
+    {0,1,1,1,0},
+    {0,0,1,1,1},
+    {1,0,0,1,1},
+    {1,1,0,0,0},
+
+    {1,1,1,0,0},
+    {0,0,1,1,1},
+    {1,0,0,1,0},
+    {0,1,0,1,1},
+
+    {0,0,1,0,1},
+    {1,0,0,1,1},
+    {0,1,0,1,1},
+    {1,0,1,0,0},
+
+    {0,1,1,1,0},
+    {1,0,0,1,1},
+    {0,0,1,0,1},
+    {0,1,0,1,0},
+
+    {1,1,0,0,0},
+    {0,0,1,1,1},
+    {1,1,0,1,0},
+    {0,1,0,0,1},
+
+    {1,0,1,0,1},
+    {0,1,0,1,0},
+    {1,0,1,1,0},
+    {1,0,0,1,1},
+
+    {0,1,1,0,0},
+    {1,0,0,1,1},
+    {0,1,1,0,1},
+    {0,0,0,1,1},
+
+    {1,1,0,0,0},
+    {0,0,1,1,1},
+    {0,1,1,0,0},
+    {1,0,0,1,1},
+
+    {0,1,1,0,1},
+    {1,0,0,1,1},
+    {1,0,1,0,1},
+    {1,1,1,1,1},
+
+// level 2
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,1,1,1,0},
+{1,0,0,1,1},
+{0,1,1,0,1},
+{1,0,0,0,1},
+
+{0,1,1,1,0},
+{1,0,0,1,1},
+{0,1,0,1,0},
+{1,0,1,0,0},
+
+{0,1,1,0,1},
+{0,0,2,1,1},
+{1,1,0,1,0},
+{0,0,0,1,1},
+
+{0,1,1,1,0},
+{1,0,0,1,1},
+{0,1,1,0,1},
+{1,0,0,0,1},
+
+{0,1,1,1,0},
+{1,0,0,1,1},
+{0,1,0,1,0},
+{1,0,1,0,0},
+
+{0,1,1,0,1},
+{0,0,2,1,1},
+{1,1,0,1,0},
+{0,0,0,1,1},
+
+{0,1,1,1,0},
+{0,0,1,1,1},
+{1,0,0,1,1},
+{1,1,0,0,0},
+
+{1,1,1,0,0},
+{0,0,1,1,1},
+{1,0,0,1,0},
+{0,1,0,1,1},
+
+{0,0,1,0,1},
+{1,0,0,1,1},
+{0,1,0,1,1},
+{1,0,1,0,0},
+
+{0,1,1,1,0},
+{1,0,0,1,1},
+{0,0,0,0,1},
+{0,1,0,1,0},
+
+{1,1,1,0,0},
+{0,0,0,1,1},
+{1,1,0,1,0},
+{0,1,0,0,0},
+
+{1,0,1,0,1},
+{0,1,0,1,0},
+{1,0,1,1,0},
+{1,0,0,1,0},
+
+{0,1,1,0,0},
+{1,0,0,1,1},
+{0,1,1,0,1},
+{0,0,0,1,0},
+
+{1,1,0,0,0},
+{0,0,1,1,1},
+{0,1,1,0,0},
+{1,0,0,1,1},
+
+{0,1,1,0,1},
+{1,0,0,1,1},
+{1,0,1,0,1},
+{1,1,1,1,1},
+
+// level 3
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,2,1,1,0},
+{1,0,0,1,1},
+{0,1,1,0,1},
+{1,0,0,0,1},
+
+{0,2,1,1,0},
+{1,0,0,1,1},
+{0,1,0,1,0},
+{2,0,1,0,0},
+
+{0,2,1,0,1},
+{0,0,2,1,1},
+{1,1,0,1,0},
+{0,0,0,1,1},
+
+{0,2,2,1,0},
+{1,0,0,1,1},
+{0,1,1,0,1},
+{1,0,0,0,1},
+
+{0,1,1,2,0},
+{1,0,0,1,1},
+{0,1,0,2,0},
+{1,0,1,0,0},
+
+{0,1,0,0,1},
+{0,0,2,1,1},
+{1,0,0,1,0},
+{0,1,0,1,1},
+
+{0,0,1,1,0},
+{0,1,1,0,1},
+{1,0,0,1,1},
+{1,1,0,0,0},
+
+{1,1,1,0,0},
+{0,0,1,1,1},
+{1,0,0,1,0},
+{0,1,0,1,1},
+
+{0,0,1,0,1},
+{1,0,0,1,1},
+{0,1,0,1,1},
+{1,0,1,0,0},
+
+{0,1,1,1,0},
+{1,0,0,1,1},
+{0,0,0,0,1},
+{0,1,0,1,0},
+
+{1,1,1,0,0},
+{0,0,0,1,1},
+{1,1,0,1,0},
+{0,1,0,0,0},
+
+{1,0,1,0,1},
+{0,1,0,1,0},
+{1,0,1,1,0},
+{1,0,0,1,0},
+
+{0,1,1,0,0},
+{1,0,0,1,1},
+{0,1,1,0,1},
+{0,0,0,1,0},
+
+{1,1,0,0,0},
+{0,0,1,1,1},
+{0,2,2,0,0},
+{1,0,0,1,1},
+
+{0,1,1,0,1},
+{1,0,0,1,1},
+{1,0,1,0,1},
+{1,1,1,1,1},
+
+
+// level 4
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{1},   // this is the standalone "db 1"
+
+{0,1,1,1,0},
+{0,0,1,1,1},
+{1,0,0,1,1},
+{0,1,0,0,0},
+
+{0,1,1,0,0},
+{0,0,0,1,1},
+{1,0,0,1,0},
+{0,1,0,0,1},
+
+{0,0,1,0,1},
+{1,0,0,1,1},
+{0,1,0,0,1},
+{1,0,0,0,0},
+
+{0,1,1,1,0},
+{0,0,0,1,1},
+{0,0,0,0,1},
+{0,1,0,1,0},
+
+{1,0,1,0,0},
+{0,0,0,0,1},
+{1,1,0,1,0},
+{0,1,0,0,0},
+
+{1,0,1,0,1},
+{0,0,0,1,0},
+{1,0,1,1,0},
+{1,0,0,1,0},
+
+{0,1,1,1,0},
+{1,0,0,1,1},
+{0,0,0,0,1},
+{0,1,0,1,0},
+
+{1,1,1,0,0},
+{0,0,0,1,1},
+{1,1,0,1,0},
+{0,1,0,0,0},
+
+{1,0,1,0,1},
+{0,1,0,1,0},
+{1,0,1,1,0},
+{1,0,0,1,0},
+
+{0,1,1,1,0},
+{1,0,0,1,1},
+{0,0,2,0,1},
+{0,2,0,1,0},
+
+{1,1,0,0,0},
+{0,0,1,1,1},
+{1,1,0,1,0},
+{0,2,0,0,1},
+
+{1,0,1,0,1},
+{0,1,0,1,0},
+{1,0,2,1,0},
+{1,0,0,1,1},
+
+{0,1,1,0,0},
+{1,0,0,1,1},
+{0,1,2,0,1},
+{0,0,0,1,1},
+
+{1,1,0,0,0},
+{0,0,1,1,1},
+{0,2,2,0,0},
+{1,0,0,1,1},
+
+{0,1,1,0,1},
+{1,0,0,2,2},
+{2,0,2,0,1},
+{1,1,1,1},
+
+// level 5
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{1,2,1,0,0},
+{0,0,1,0,1},
+{1,0,0,1,0},
+{0,1,0,1,0},
+
+{0,0,1,0,2},
+{1,0,0,2,2},
+{0,2,0,1,1},
+{2,0,1,0,0},
+
+{0,2,1,1,0},
+{2,0,0,1,1},
+{0,0,0,0,1},
+{0,2,0,2,0},
+
+{1,2,1,0,0},
+{0,0,0,2,1},
+{1,1,0,1,0},
+{0,2,0,0,0},
+
+{1,0,1,0,1},
+{0,1,0,1,0},
+{1,0,0,0,0},
+{1,0,0,1,0},
+
+{0,1,1,0,0},
+{1,0,0,0,1},
+{0,1,0,1,1},
+{0,1,1,0,0},
+
+{1,0,0,0,1},
+{0,0,1,1,0},
+{1,1,0,1,0},
+{1,0,0,0,1},
+
+{0,3,1,1,0},
+{0,0,1,1,1},
+{2,0,0,1,1},
+{1,1,0,0,0},
+
+{1,3,1,0,0},
+{0,0,1,1,1},
+{1,0,0,1,0},
+{0,1,0,2,1},
+
+{0,0,1,0,1},
+{1,0,0,1,1},
+{0,1,0,1,1},
+{1,0,3,0,0},
+
+{0,1,1,1,0},
+{1,0,0,1,1},
+{0,0,2,0,1},
+{0,3,0,1,0},
+
+{1,1,0,0,0},
+{0,0,1,1,1},
+{1,1,0,1,0},
+{0,2,0,0,1},
+
+{1,0,1,0,1},
+{0,1,0,1,0},
+{1,0,2,1,0},
+{1,0,0,1,1},
+
+{0,1,1,0,0},
+{1,0,0,1,1},
+{0,1,2,0,1},
+{0,0,0,1,1},
+
+{1,1,0,0,0},
+{0,0,1,1,1},
+{0,1,2,0,0},
+{1,0,0,1,1},
+
+{0,1,1,0,1},
+{1,0,0,2,1},
+{1,0,1,0,1},
+{1,1,1,1,1},
+
+// level 6
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,2,1,1,0},
+{3,3,0,3,1},
+{0,1,0,1,0},
+{2,0,1,0,0},
+
+{0,2,1,0,1},
+{0,0,2,1,1},
+{1,1,0,1,0},
+{0,0,0,1,1},
+
+{0,2,1,1,0},
+{1,0,0,1,1},
+{0,1,3,0,1},
+{1,0,0,0,1},
+
+{0,1,1,2,0},
+{1,0,0,1,1},
+{0,1,0,2,0},
+{1,0,1,0,0},
+
+{0,1,0,0,1},
+{0,0,2,1,1},
+{1,0,0,1,0},
+{0,1,0,1,1},
+
+{0,0,1,3,0},
+{0,1,1,0,1},
+{2,0,0,1,1},
+{1,1,0,0,0},
+
+{3,1,1,0,0},
+{0,0,1,1,1},
+{1,0,0,1,0},
+{0,1,0,1,1},
+
+{0,0,1,0,1},
+{1,0,0,2,1},
+{0,1,0,1,1},
+{1,0,1,0,0},
+
+{0,2,2,3,0},
+{1,0,0,2,1},
+{0,0,0,0,1},
+{0,1,0,2,0},
+
+{1,1,1,1,1},
+{0,0,0,0,0},
+{1,1,0,1,0},
+{0,2,0,0,0},
+
+{1,0,1,0,1},
+{0,1,0,1,0},
+{1,0,1,1,0},
+{1,0,0,1,0},
+
+{0,2,2,0,0},
+{2,0,0,2,2},
+{0,2,2,0,2},
+{0,0,0,2,0},
+
+{2,2,0,0,0},
+{0,0,1,1,1},
+{0,1,1,0,0},
+{2,0,0,2,2},
+
+{0,1,1,0,2},
+{2,0,0,1,2},
+{2,0,2,0,2},
+{1,1,1,1,1},
+
+// level 7
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,0,2,2,2},
+{2,0,2,0,2},
+{0,2,2,2,0},
+{0,2,0,2,0},
+
+{2,2,0,0,2},
+{0,0,2,2,2},
+{2,2,2,0,0},
+{2,0,0,0,2},
+
+{1,1,1,1,1},
+{0,0,0,0,0},
+{2,2,0,2,2},
+{0,2,2,0,0},
+
+{2,0,2,0,2},
+{0,0,2,2,2},
+{2,2,0,2,0},
+{2,0,0,0,2},
+
+{0,2,2,2,0},
+{0,0,2,2,2},
+{2,0,0,2,2},
+{2,2,0,0,0},
+
+{2,2,2,0,0},
+{0,0,2,2,2},
+{2,0,0,2,0},
+{0,2,0,2,2},
+
+{1,1,1,1,1},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{2,0,2,0,0},
+
+{0,2,2,2,0},
+{2,0,0,2,2},
+{0,0,2,0,2},
+{0,2,0,2,0},
+
+{2,2,0,0,0},
+{0,0,2,2,2},
+{2,2,0,2,0},
+{0,2,0,0,2},
+
+{2,0,2,0,2},
+{0,2,0,2,0},
+{2,0,2,2,0},
+{2,0,0,2,2},
+
+{2,0,0,0,0},
+{1,1,1,1,1},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{2,2,0,0,0},
+{0,0,2,2,2},
+{0,2,2,0,0},
+{2,0,0,2,2},
+
+{0,2,2,0,2},
+{2,0,0,2,2},
+{2,0,2,0,2},
+{1,1,1,1,1},
+
+// level 8
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,3,1,1,0},
+{0,0,1,1,1},
+{1,0,0,1,1},
+{0,1,0,0,0},
+
+{0,1,3,0,0},
+{0,0,0,1,1},
+{1,0,0,1,0},
+{0,1,0,0,1},
+
+{0,0,3,0,1},
+{1,0,0,1,1},
+{0,1,0,0,1},
+{1,0,0,0,0},
+
+{0,3,1,1,0},
+{0,0,0,1,1},
+{1,0,0,0,1},
+{0,1,0,1,0},
+
+{1,0,3,0,0},
+{0,0,0,0,1},
+{1,1,0,1,0},
+{0,1,0,0,0},
+
+{1,0,3,0,1},
+{0,0,0,1,0},
+{1,0,1,1,0},
+{1,0,0,1,1},
+
+{0,3,1,1,0},
+{1,0,0,1,1},
+{0,0,0,0,1},
+{0,1,0,1,0},
+
+{1,1,3,0,0},
+{0,0,0,1,1},
+{1,1,0,1,0},
+{0,1,0,0,0},
+
+{3,0,1,0,1},
+{0,1,0,1,0},
+{1,0,1,1,0},
+{1,0,0,1,0},
+
+{0,1,1,1,0},
+{3,0,0,1,1},
+{0,0,2,0,1},
+{0,2,0,1,0},
+
+{1,1,0,0,0},
+{0,0,2,1,1},
+{1,1,0,1,0},
+{0,2,0,0,1},
+
+{1,0,1,0,1},
+{0,1,0,1,0},
+{1,0,2,1,0},
+{1,0,0,2,1},
+
+{0,1,1,0,0},
+{1,0,0,1,1},
+{0,1,2,0,1},
+{0,0,0,1,2},
+
+{1,1,0,0,0},
+{0,0,1,1,3},
+{0,2,2,0,0},
+{1,0,0,1,1},
+
+{0,1,1,0,3},
+{1,0,0,2,2},
+{2,0,2,0,1},
+{1,1,1,1,1},
+
+{0,0,0,0,0},
+{2,0,0,2,2},
+{2,0,2,0,2},
+{1,1,1,1,1},
+
+// level 9
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,3,1,0,1},
+{0,0,2,1,1},
+{0,0,0,0,0},
+{1,1,1,1,1},
+
+{0,1,1,1,0},
+{0,0,1,3,1},
+{0,0,0,0,0},
+{1,1,1,1,1},
+
+{1,1,3,0,0},
+{0,0,1,1,1},
+{0,0,0,0,0},
+{1,1,1,1,1},
+
+{0,0,1,0,1},
+{1,0,0,3,1},
+{0,0,0,0,0},
+{1,1,1,1,1},
+
+{0,1,1,1,0},
+{1,0,0,1,3},
+{0,0,0,0,0},
+{1,1,1,1,1},
+
+{1,1,1,0,0},
+{0,0,0,3,1},
+{1,1,0,1,0},
+{0,1,1,0,0},
+
+{0,0,0,0,1},
+{0,0,0,0,0},
+{1,1,3,1,1},
+{1,0,1,1,0},
+{1,0,0,1,0},
+
+{0,1,2,0,0},
+{1,0,0,1,1},
+{0,0,0,0,0},
+{1,1,1,1,1},
+
+{1,1,0,0,0},
+{0,0,3,1,1},
+{0,1,1,0,0},
+{1,0,0,1,3},
+
+{0,0,0,0,0},
+{1,1,1,1,1},
+{0,1,1,0,1},
+{1,0,0,0,1},
+
+{0,2,1,1,0},
+{1,0,0,3,1},
+{0,0,0,0,0},
+{1,1,1,1,1},
+
+{0,2,1,0,1},
+{0,0,2,3,1},
+{1,1,0,1,0},
+{0,0,0,1,1},
+
+{0,2,2,1,0},
+{1,0,0,3,1},
+{0,0,0,0,0},
+{1,1,1,1,1},
+
+{0,1,1,2,0},
+{1,0,0,1,1},
+{0,1,0,2,0},
+{1,0,2,0,0},
+
+{0,0,0,0,0},
+{2,0,0,2,2},
+{2,0,3,0,2},
+{1,1,1,1,1},
+
+// level 10
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{1,1,0,0,2},
+{0,0,1,1,1},
+{1,2,1,0,0},
+{1,0,0,0,3},
+
+{0,1,1,1,0},
+{2,0,0,0,1},
+{1,1,0,2,1},
+{0,1,3,0,0},
+
+{1,0,1,0,1},
+{0,0,1,1,1},
+{1,2,0,1,0},
+{1,0,0,0,1},
+
+{0,3,3,3,0},
+{0,0,1,1,1},
+{1,0,0,2,1},
+{1,1,0,0,0},
+
+{2,2,1,0,0},
+{0,0,2,2,2},
+{1,0,0,3,0},
+{0,1,0,1,1},
+
+{0,0,1,0,1},
+{1,0,0,1,1},
+{0,1,0,2,1},
+{1,0,3,0,0},
+
+{0,1,1,1,0},
+{1,0,0,2,1},
+{0,0,1,0,1},
+{0,2,0,1,0},
+
+{1,3,0,0,0},
+{0,0,1,2,1},
+{1,1,0,1,0},
+{0,1,0,0,1},
+
+{1,0,2,0,1},
+{0,1,0,2,0},
+{2,0,1,1,0},
+{1,0,0,1,2},
+
+{0,3,1,0,0},
+{1,0,0,1,1},
+{0,1,1,0,1},
+{0,0,0,1,1},
+
+{1,1,0,0,0},
+{0,0,2,1,1},
+{0,1,1,0,0},
+{1,0,0,1,3},
+
+{0,2,1,0,1},
+{1,0,0,1,1},
+{1,0,3,0,2},
+{1,1,1,1,1},
+
+// level 11
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,2,1,1,0},
+{3,3,0,3,1},
+{0,1,0,1,0},
+{2,0,1,0,0},
+
+{0,3,1,0,1},
+{0,0,2,1,1},
+{1,1,0,1,0},
+{0,0,0,1,1},
+
+{0,3,1,1,0},
+{1,0,0,1,1},
+{0,1,3,0,1},
+{1,0,0,0,1},
+
+{0,1,1,2,0},
+{1,0,0,1,1},
+{0,1,0,2,0},
+{1,0,3,0,0},
+
+{0,1,0,0,1},
+{0,0,2,1,1},
+{1,0,0,3,0},
+{0,1,0,1,1},
+
+{0,0,1,3,0},
+{0,1,1,0,1},
+{2,0,0,1,1},
+{1,1,0,0,0},
+
+{3,1,1,0,0},
+{0,0,1,1,1},
+{1,0,0,1,0},
+{0,1,0,3,1},
+
+{0,0,1,0,1},
+{1,0,0,2,1},
+{0,1,0,1,1},
+{1,0,1,0,0},
+
+{0,2,2,3,0},
+{1,0,0,2,1},
+{0,0,0,0,1},
+{0,2,0,2,0},
+
+{1,1,1,1,1},
+{0,0,0,0,0},
+{1,3,0,1,0},
+{0,2,0,0,0},
+
+{1,1,1,1,1},
+
+// level 12
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,2,1,1,0},
+{3,3,0,3,1},
+{0,1,0,1,0},
+{2,0,1,0,0},
+
+{0,3,1,0,1},
+{0,0,2,1,1},
+{1,1,0,3,0},
+{0,0,0,1,1},
+
+{0,3,1,1,0},
+{1,0,0,1,1},
+{0,1,3,0,1},
+{1,0,0,0,1},
+
+{0,1,3,2,0},
+{1,0,0,1,1},
+{0,1,0,2,0},
+{1,0,3,0,0},
+
+{0,1,0,0,1},
+{0,0,2,1,1},
+{1,0,0,3,0},
+{0,3,0,1,1},
+
+{0,0,1,3,0},
+{0,1,1,0,1},
+{2,0,0,1,1},
+{1,3,0,0,0},
+
+{3,1,1,0,0},
+{0,0,1,1,1},
+{1,0,0,1,0},
+{0,1,0,3,1},
+
+{0,0,1,0,1},
+{1,0,0,2,1},
+{0,1,0,1,1},
+{1,0,1,0,0},
+
+{0,2,2,3,0},
+{1,0,0,2,3},
+{0,0,0,0,1},
+{0,2,0,2,0},
+
+{1,1,1,1,1},
+{0,0,0,0,0},
+{1,3,0,1,0},
+{0,2,0,0,0},
+
+{1,1,1,1,1},
+
+// level 13
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,2,2,1,0},
+{3,3,0,3,1},
+{0,1,0,1,0},
+{2,0,1,0,0},
+
+{0,3,1,0,1},
+{0,0,2,1,1},
+{1,2,0,3,0},
+{0,0,0,1,1},
+
+{0,3,1,1,0},
+{1,0,0,1,1},
+{0,1,3,0,2},
+{1,0,0,0,1},
+
+{0,1,3,2,0},
+{1,0,0,1,1},
+{0,1,0,2,0},
+{2,0,3,0,0},
+
+{0,1,0,0,1},
+{0,0,2,1,1},
+{1,0,0,3,0},
+{0,3,0,1,1},
+
+{0,0,1,3,0},
+{0,1,1,0,1},
+{2,0,0,1,1},
+{1,3,0,0,0},
+
+{3,1,1,0,0},
+{0,0,1,2,1},
+{1,0,0,1,0},
+{0,1,0,3,1},
+
+{0,0,1,0,1},
+{1,0,0,2,1},
+{0,1,0,1,1},
+{1,0,1,0,0},
+
+{0,2,2,3,0},
+{1,0,0,2,3},
+{0,0,0,0,1},
+{0,2,0,2,0},
+
+{1,1,1,1,1},
+{0,0,0,0,0},
+{1,3,0,2,0},
+{0,2,0,0,0},
+
+{1,1,1,1,1},
+
+// level 14
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+{0,2,2,1,0},
+{3,3,0,3,1},
+{0,1,0,1,0},
+{2,0,1,0,0},
+
+{0,3,1,0,1},
+{0,0,2,1,1},
+{1,2,0,3,0},
+{0,0,0,2,1},
+
+{0,3,1,2,0},
+{1,0,0,1,1},
+{0,1,3,0,2},
+{1,0,0,0,1},
+
+{0,1,3,2,0},
+{1,0,0,1,1},
+{0,2,0,2,0},
+{2,0,3,0,0},
+
+{0,2,0,0,1},
+{0,0,2,1,1},
+{1,0,0,3,0},
+{0,3,0,1,1},
+
+{0,0,1,3,0},
+{0,1,1,0,1},
+{2,0,0,1,1},
+{1,3,0,0,0},
+
+{3,1,1,0,0},
+{0,0,1,2,1},
+{1,0,0,1,0},
+{0,1,0,3,2},
+
+{0,0,1,0,1},
+{1,0,0,2,1},
+{0,1,0,1,1},
+{1,0,2,0,0},
+
+{0,2,2,3,0},
+{1,0,0,2,3},
+{0,0,0,0,1},
+{0,2,0,2,0},
+
+{1,1,1,1,1},
+{0,0,0,0,0},
+{2,3,0,2,0},
+{0,2,0,0,0},
+
+{1,1,1,1,1},
+
+// level 15
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+{0,0,0,0,0},
+
+};
+
 
 typedef struct {
     bool active;
@@ -56,41 +1092,185 @@ typedef struct {
 typedef struct {
     bool active;
     bool exploding;
-    u8 explosionFrame;
+    u8 explosionFrame;   // 1–13
+    u8 baseColor;        // 1=green, 2=yellow, 3=red
+    u8 currentFrame;     // actual sprite frame index
     s16 x, y;
     Sprite* spr;
 } Block;
 
+
 static Projectile projectile;
 static Block blocks[32];
 
-// ---------------------------------------------------------
-// 4. EMPTY ROUTINES (stubs)
-// ---------------------------------------------------------
+// Shoot flags (MSX equivalents)
+static bool requestShoot = FALSE;
+static bool animateShoot = FALSE;
+static u8 cannonAnimTimer = 0;
 
-void AnimateBlockExplosion(void) {}
-void CheckInitiateExplosionEntireColumn(void) {}
+// MSX variables we must add
+static u8 PutNewBlocksCounter = 1;
+static u16 ScoreBlockHitGame = 0;
+
+// ---------------------------------------------------------
+// 4. ResetVariablesBlockHitGame (MSX logic port)
+// ---------------------------------------------------------
+void ResetVariablesBlockHitGame(void)
+{
+    CannonRow = 3;
+    PutNewBlocksCounter = 1;
+    requestShoot = FALSE;
+    animateShoot = FALSE;
+    cannonAnimTimer = 0;
+
+    // MSX: ld hl,BlocksColumnsTable-5
+    BlocksColumnsTablePointer = &BlocksColumnsTable[0][0] - 5;
+
+    ScoreBlockHitGame = 0;
+}
+
+
 void CheckGameOverBlockHitGame(void) {}
-void MoveProjectile(void) {}
-void CheckProjectileHitsBlock(void) {}
-void CheckShootNewProjectile(void) {}
+   
 void SetScoreBlockHitGame(void) {}
-void PutNewBlocks(void) {}
-void MoveBlocks(void) {}
+
+static void ColorBlock(u8 color, Block* blk)
+{
+    blk->baseColor = color;
+
+    switch (color)
+    {
+        case BlockColorGreen:
+            blk->currentFrame = 0;
+            break;
+
+        case BlockColorYellow:
+            blk->currentFrame = 14;
+            break;
+
+        case BlockColorRed:
+            blk->currentFrame = 28;
+            break;
+    }
+
+    SPR_setFrame(blk->spr, blk->currentFrame);
+}
+
+
+static s16 findFreeBlockIndex(void)
+{
+    for (s16 i = 0; i < 31; i++)
+    {
+        if (!blocks[i].active)
+            return i;
+    }
+    return -1;
+}
+
+void PutNewBlocks(void)
+{
+    // 1. Timing
+    PutNewBlocksCounter--;
+    if (PutNewBlocksCounter != 0)
+        return;
+
+    PutNewBlocksCounter = 26;
+
+    // 2. Advance table pointer (ix += 5)
+    BlocksColumnsTablePointer += 5;
+
+    // char buf[8];
+    // sprintf(buf, "%3d", BlocksColumnsTablePointer);
+    // VDP_drawTextBG(BG_A, buf, 25, 27);
+
+    // 3. Row loop: c = 19, +22 each row, stop at 107+22
+    u8 c = 19;                       // first block Y
+    const u8* p = BlocksColumnsTablePointer;
+
+    while (1)
+    {
+        u8 color = *p;               // 0=no block, 1/2/3 = block colors
+
+        if (color != 0)
+        {
+            // Find free block entry
+            s16 idx = findFreeBlockIndex();
+            if (idx < 0)
+                return;              // no free sprite → bail out
+
+            blocks[idx].active = TRUE;
+            blocks[idx].exploding = FALSE;
+            blocks[idx].explosionFrame = 0;
+
+            blocks[idx].x = 250;     // SetXBlockTo250
+            blocks[idx].y = c;       // SetYBlock
+
+            if (blocks[idx].spr == NULL)
+            {
+                blocks[idx].spr = SPR_addSprite(
+                    &blockCannonBlockSpriteDef,
+                    blocks[idx].x,
+                    blocks[idx].y,
+                    TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+                );
+            }
+            else
+            {
+                SPR_setPosition(blocks[idx].spr, blocks[idx].x, blocks[idx].y);
+            }
+
+            // SetColorBlock (1=green, 2=yellow, 3=red)
+            ColorBlock(color, &blocks[idx]);
+        }
+
+        // Next row
+        c += 22;
+        if (c >= 129) return;
+
+        p++;    // inc ix
+    }
+}
+
+
+void MoveBlocks(void)
+{
+    for (int i = 0; i < 31; i++)
+    {
+        if (!blocks[i].active)
+            continue;
+
+        // Move block left by 1 pixel
+        blocks[i].x--;
+
+        // If block reaches X == 1 → deactivate (MSX behavior)
+        if (blocks[i].x <= 1)
+        {
+            blocks[i].active = FALSE;
+            SPR_setPosition(blocks[i].spr, -32, -32);
+            continue;
+        }
+
+        // Update sprite position
+        SPR_setPosition(blocks[i].spr, blocks[i].x, blocks[i].y);
+
+        // MSX threshold: 249 - 12 = 237
+        if (blocks[i].x < 237)
+            continue;
+    }
+}
+
 
 // ---------------------------------------------------------
-// 5. MSX timing logic port
+// 6. MSX timing logic port
 // ---------------------------------------------------------
 void HandleBlockTiming(void)
 {
     u16 joy = playerGetJoy();   // held buttons
     u8 interval = 3;
 
-    // If RIGHT is held → faster block movement
     if (joy & BUTTON_RIGHT)
         interval = 1;
 
-    // Only update blocks every interval frames
     if ((framecounter2 % interval) != 0)
         return;
 
@@ -99,39 +1279,316 @@ void HandleBlockTiming(void)
 }
 
 // ---------------------------------------------------------
-// 6. MoveCannon (SGDK version of your MSX routine)
+// 7. MoveCannon
 // ---------------------------------------------------------
 void MoveCannon(void)
 {
     u16 joyNew = playerGetJoyNew();
 
-    // UP pressed?
     if (joyNew & BUTTON_UP)
     {
         if (CannonRow > 0)
             CannonRow--;
     }
 
-    // DOWN pressed?
     if (joyNew & BUTTON_DOWN)
     {
-        if (CannonRow < 5)
+        if (CannonRow < 4)
             CannonRow++;
     }
 
-    // Update sprite position
-    SPR_setPosition(cannonSprite, 120, CannonRowY[CannonRow]);
+    SPR_setPosition(cannonSprite, 8, CannonRowY[CannonRow] - 2);
 }
 
 // ---------------------------------------------------------
-// 7. Room logic (Block Cannon minigame)
+// 8. HandleAnimateShootCannon
+// ---------------------------------------------------------
+void HandleAnimateShootCannon(void)
+{
+    if (!animateShoot)
+        return;
+
+    if (cannonAnimTimer == 0)
+        cannonAnimTimer = 1;
+    else
+        cannonAnimTimer++;
+
+    if (cannonAnimTimer < 4)
+    {
+        SPR_setFrame(cannonSprite, 1);
+    }
+    else if (cannonAnimTimer < 6)
+    {
+        SPR_setFrame(cannonSprite, 2);
+    }
+    else if (cannonAnimTimer < 8)
+    {
+        SPR_setFrame(cannonSprite, 1);
+    }
+    else
+    {
+        SPR_setFrame(cannonSprite, 0);
+        cannonAnimTimer = 0;
+        animateShoot = FALSE;
+    }
+}
+
+// ---------------------------------------------------------
+// 9. CheckShootNewProjectile
+// ---------------------------------------------------------
+void CheckShootNewProjectile(void)
+{
+    u16 joyNew = playerGetJoyNew();
+
+    if (!requestShoot)
+    {
+        if (joyNew & BUTTON_A)
+            requestShoot = TRUE;
+        else
+            return;
+    }
+
+    if (projectile.active)
+        return;
+
+    animateShoot = TRUE;
+    requestShoot = FALSE;
+
+    projectile.active = TRUE;
+    projectile.x = 47;
+    projectile.dx = 20;
+    projectile.dy = 0;
+
+    switch (CannonRow)
+    {
+        case 0: projectile.y = 19; break;
+        case 1: projectile.y = 19 + 22; break;
+        case 2: projectile.y = 19 + 44; break;
+        case 3: projectile.y = 19 + 66; break;
+        case 4: projectile.y = 19 + 88; break;
+    }
+
+    SPR_setPosition(projectile.spr, projectile.x, projectile.y);
+}
+
+// ---------------------------------------------------------
+// 10. MoveProjectile
+// ---------------------------------------------------------
+void MoveProjectile(void)
+{
+    if (!projectile.active)
+        return;
+
+    projectile.x += 20;
+
+    if (projectile.x >= 240)
+    {
+        projectile.active = FALSE;
+        projectile.x = 1;
+        projectile.y = 213;
+
+        SPR_setPosition(projectile.spr, -32, -32);
+        return;
+    }
+
+    SPR_setPosition(projectile.spr, projectile.x, projectile.y);
+}
+
+
+void CheckProjectileHitsBlock(void)
+{
+    if (!projectile.active)
+        return;
+
+    s16 projX = projectile.x;
+    s16 projY = projectile.y;
+
+    // MSX: if projectile.x == 1 → not in play
+    if (projX <= 1)
+        return;
+
+    // Loop through all blocks (0–30)
+    for (int i = 0; i < 31; i++)
+    {
+        if (!blocks[i].active)
+            continue;
+
+        // Compare Y first (MSX: exact match)
+        if (blocks[i].y != projY)
+            continue;
+
+        // Compare X with MSX offset: projectile.x + 26 >= block.x
+        if (projX + 26 < blocks[i].x)
+            continue;
+
+        // Check if block is already exploding
+        if (blocks[i].exploding)
+            continue;
+
+        // --- HIT DETECTED ---
+
+        // Remove projectile (MSX: x=1, y=213)
+        projectile.active = FALSE;
+        projectile.x = 1;
+        projectile.y = 213;
+        SPR_setPosition(projectile.spr, -32, -32);
+
+        // Find free block slot (MSX loop2)
+        s16 freeIdx = findFreeBlockIndex();
+        if (freeIdx < 0)
+            return;
+
+        // Add new block in front of the hit block
+        blocks[freeIdx].active = TRUE;
+        blocks[freeIdx].exploding = FALSE;
+        blocks[freeIdx].explosionFrame = 0;
+
+        // MSX: newX = hitBlockX - 26
+        blocks[freeIdx].x = blocks[i].x - 26;
+        blocks[freeIdx].y = projY;
+
+        if (blocks[freeIdx].spr == NULL)
+        {
+            blocks[freeIdx].spr = SPR_addSprite(
+                &blockCannonBlockSpriteDef,
+                blocks[freeIdx].x,
+                blocks[freeIdx].y,
+                TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+            );
+        }
+        else
+        {
+            SPR_setPosition(blocks[freeIdx].spr, blocks[freeIdx].x, blocks[freeIdx].y);
+        }
+
+        // MSX: new block color = 1 (green)
+        ColorBlock(BlockColorGreen, &blocks[freeIdx]);
+
+
+        return;
+    }
+}
+
+void CheckInitiateExplosionEntireColumn(void)
+{
+    // 1. Find lowest X among all normal blocks
+    s16 lowestX = 255;
+
+    for (int i = 0; i < 31; i++)
+    {
+        if (!blocks[i].active)
+            continue;
+
+        if (blocks[i].exploding)
+            continue;
+
+        // Only full blocks (frame 0 of their color)
+        if (blocks[i].explosionFrame != 0)
+            continue;
+
+        if (blocks[i].x < lowestX)
+            lowestX = blocks[i].x;
+    }
+
+    if (lowestX == 255)
+        return;
+
+    // 2. Count blocks at this X
+    u8 count = 0;
+
+    for (int i = 0; i < 31; i++)
+    {
+        if (!blocks[i].active)
+            continue;
+
+        if (blocks[i].x != lowestX)
+            continue;
+
+        if (blocks[i].exploding)
+            continue;
+
+        count++;
+    }
+
+    if (count != 5)
+        return;
+
+    // 3. Score +5
+    ScoreBlockHitGame += 5;
+
+    // 4. Process each block
+    for (int i = 0; i < 31; i++)
+    {
+        if (!blocks[i].active)
+            continue;
+
+        if (blocks[i].x != lowestX)
+            continue;
+
+        // Reduce color
+        if (blocks[i].baseColor > 1)
+        {
+            blocks[i].baseColor--;
+            ColorBlock(blocks[i].baseColor, &blocks[i]);
+        }
+        else
+        {
+            // Start explosion
+            blocks[i].exploding = TRUE;
+            blocks[i].explosionFrame = 1;
+
+            blocks[i].currentFrame =
+                (blocks[i].baseColor - 1) * 14 + blocks[i].explosionFrame;
+
+            SPR_setFrame(blocks[i].spr, blocks[i].currentFrame);
+        }
+    }
+}
+
+void AnimateBlockExplosion(void)
+{
+    for (int i = 0; i < 31; i++)
+    {
+        if (!blocks[i].active)
+            continue;
+
+        if (!blocks[i].exploding)
+            continue;
+
+        // Advance explosion frame
+        blocks[i].explosionFrame++;
+
+        // If explosion finished → remove block
+        if (blocks[i].explosionFrame > 13)
+        {
+            blocks[i].active = FALSE;
+            blocks[i].exploding = FALSE;
+            blocks[i].explosionFrame = 0;
+
+            // Move sprite offscreen
+            SPR_setPosition(blocks[i].spr, -32, -32);
+            continue;
+        }
+
+        // Compute correct animation frame
+        // baseColor: 1=green, 2=yellow, 3=red
+        u8 baseFrame = (blocks[i].baseColor - 1) * 14;
+
+        blocks[i].currentFrame = baseFrame + blocks[i].explosionFrame;
+
+        SPR_setFrame(blocks[i].spr, blocks[i].currentFrame);
+    }
+}
+
+
+// ---------------------------------------------------------
+// 11. Room logic
 // ---------------------------------------------------------
 GameState runBlockCannon(void)
 {
     drawRoomBackground(ROOM_BLOCKCANNON);
     playMusic(tune_ship);
 
-    // Foreground arcade cabinet
     VDP_loadTileSet(arcademachine.tileset, globalTileIndex, DMA);
     VDP_drawImageEx(
         BG_A,
@@ -149,7 +1606,6 @@ GameState runBlockCannon(void)
 
     BlockCannonState bcState = BC_STATE_TITLE;
 
-    // Draw game screen
     VDP_drawImageEx(
         BG_B,
         &blockcannoningameexample,
@@ -161,15 +1617,26 @@ GameState runBlockCannon(void)
 
     PAL_fadeIn(0, 15, blockcannoningameexample.palette->data, 8, FALSE);
 
-    // Create cannon sprite
     cannonSprite = SPR_addSprite(
         &blockCannonCannonSpriteDef,
-        120,
-        CannonRowY[CannonRow],
+        8,
+        CannonRowY[CannonRow] - 2,
         TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
     );
 
+    projectile.spr = SPR_addSprite(
+        &blockCannonBlockSpriteDef,
+        -32, -32,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+    projectile.active = FALSE;
+
     bcState = BC_STATE_GAME;
+
+    // -----------------------------------------------------
+    // CALL RESET HERE (MSX equivalent)
+    // -----------------------------------------------------
+    ResetVariablesBlockHitGame();
 
     while (1)
     {
@@ -206,6 +1673,7 @@ GameState runBlockCannon(void)
                 framecounter2++;
 
                 MoveCannon();
+                HandleAnimateShootCannon();
                 AnimateBlockExplosion();
                 CheckInitiateExplosionEntireColumn();
                 CheckGameOverBlockHitGame();

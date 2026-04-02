@@ -102,6 +102,10 @@ SPRITE bikeRaceMushroom1SpriteDef "sprites/games/penguinbikerace/mushroom1.bmp" 
 SPRITE bikeRaceMushroom2SpriteDef "sprites/games/penguinbikerace/mushroom2.bmp" 2 4 FAST NONE
 SPRITE blockCannonBlockSpriteDef "sprites/games/blockcannon/block.bmp" 2 2 FAST NONE
 SPRITE blockCannonCannonSpriteDef "sprites/games/blockcannon/cannon.bmp" 5 4 FAST NONE
+
+SPRITE blockCannonBlockGreenSpriteDef "sprites/games/blockcannon/blockgreen.bmp" 2 2 FAST NONE
+SPRITE blockCannonBlockYellowSpriteDef "sprites/games/blockcannon/blockyellow.bmp" 2 2 FAST NONE
+SPRITE blockCannonBlockRedSpriteDef "sprites/games/blockcannon/blockred.bmp" 2 2 FAST NONE
  
 #option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"
 #option 2: export audio in audacity: 7500 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=TRUE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_7.5khz.raw"

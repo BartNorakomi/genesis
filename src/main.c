@@ -136,6 +136,7 @@ void drawRoomBackground(u8 room)
     // Build palette 2
     memcpy(&our_level_palette[32], playerSpriteDef.palette->data, 16 * 2);
     if (room == ROOM_BASKETBALL) memcpy(&our_level_palette[32], basketBallSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_BLOCKCANNON) memcpy(&our_level_palette[32], blockCannonCannonSpriteDef.palette->data, 16 * 2);
 
     // Build palette 3
     if (room == ROOM_REACTORCHAMBER) memcpy(&our_level_palette[48], reactorSpriteDef.palette->data, 16 * 2);

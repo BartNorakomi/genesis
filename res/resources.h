@@ -102,5 +102,8 @@ extern const SpriteDefinition bikeRaceMushroom1SpriteDef;
 extern const SpriteDefinition bikeRaceMushroom2SpriteDef;
 extern const SpriteDefinition blockCannonBlockSpriteDef;
 extern const SpriteDefinition blockCannonCannonSpriteDef;
+extern const SpriteDefinition blockCannonBlockGreenSpriteDef;
+extern const SpriteDefinition blockCannonBlockYellowSpriteDef;
+extern const SpriteDefinition blockCannonBlockRedSpriteDef;
 
 #endif // _RES_RESOURCES_H_
