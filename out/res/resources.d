@@ -66,6 +66,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/trainingdecktrea
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/reactorchamber.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/basketball/coin.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/holodeck.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/blockcannongameover.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/penguinbikerace/mushroom2.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/blockcannontitlescreen.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sfx/Large\ Crowd\ Applause\ 04.wav \

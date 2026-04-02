@@ -27,8 +27,11 @@ static u16 framecounter2 = 0;
 typedef enum
 {
     BC_STATE_TITLE,
-    BC_STATE_GAME
+    BC_STATE_GAME,
+    BC_STATE_GAMEOVER
 } BlockCannonState;
+
+BlockCannonState bcState = BC_STATE_TITLE;
 
 // ---------------------------------------------------------
 // 3. Cannon + projectile + block placeholders
@@ -1117,7 +1120,16 @@ static u16 ScoreBlockHitGame = 0;
 // ---------------------------------------------------------
 void ResetVariablesBlockHitGame(void)
 {
-    CannonRow = 3;
+    SPR_reset();
+    SPR_update();
+
+    cannonSprite = NULL;
+    projectile.spr = NULL;
+
+    for (int i = 0; i < 31; i++)
+        blocks[i].spr = NULL;
+
+    CannonRow = 2;
     PutNewBlocksCounter = 1;
     requestShoot = FALSE;
     animateShoot = FALSE;
@@ -1127,10 +1139,45 @@ void ResetVariablesBlockHitGame(void)
     BlocksColumnsTablePointer = &BlocksColumnsTable[0][0] - 5;
 
     ScoreBlockHitGame = 0;
+
+    // Reset all block data
+    for (int i = 0; i < 31; i++)
+    {
+        blocks[i].active = FALSE;
+        blocks[i].exploding = FALSE;
+        blocks[i].explosionFrame = 0;
+        blocks[i].baseColor = 0;
+        blocks[i].currentFrame = 0;
+        blocks[i].x = 0;
+        blocks[i].y = 0;
+        blocks[i].spr = NULL;   // after SPR_reset
+        if (blocks[i].spr)
+            SPR_setPosition(blocks[i].spr, -32, -32);
+    }
+
+    cannonSprite = SPR_addSprite(
+        &blockCannonCannonSpriteDef,
+        8,
+        CannonRowY[CannonRow] - 2,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    projectile.spr = SPR_addSprite(
+        &blockCannonBlockSpriteDef,
+        -32, -32,
+        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+    );
+
+    projectile.active = FALSE;
+    projectile.x = 1;
+    projectile.y = 213;
+    projectile.dx = 0;
+    projectile.dy = 0;
+
+    if (projectile.spr)
+        SPR_setPosition(projectile.spr, -32, -32);
+
 }
-
-
-void CheckGameOverBlockHitGame(void) {}
    
 void SetScoreBlockHitGame(void) {}
 
@@ -1155,7 +1202,6 @@ static void ColorBlock(u8 color, Block* blk)
 
     SPR_setFrame(blk->spr, blk->currentFrame);
 }
-
 
 static s16 findFreeBlockIndex(void)
 {
@@ -1580,6 +1626,52 @@ void AnimateBlockExplosion(void)
     }
 }
 
+void CheckGameOverBlockHitGame(void)
+{
+    u16 joy = playerGetJoyNew();
+
+    // If B is pressed → GAME OVER
+    if (joy & BUTTON_B)
+        goto GAME_OVER;
+
+    // Check if any normal block reached X < 48
+    for (int i = 0; i < 31; i++)
+    {
+        if (!blocks[i].active)
+            continue;
+
+        if (blocks[i].exploding)
+            continue;
+
+        if (blocks[i].x < 48)
+            goto GAME_OVER;
+    }
+
+    // No game over condition → return normally
+    return;
+
+GAME_OVER:
+
+    ResetVariablesBlockHitGame();
+
+    SPR_reset();
+    SPR_update();
+
+    cannonSprite = NULL;
+
+    // Draw game over gfx
+    VDP_drawImageEx(
+        BG_B,
+        &blockcannongameover,
+        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+        0, 0,
+        FALSE,
+        TRUE
+    );
+
+    // Switch state
+    bcState = BC_STATE_GAMEOVER;
+}
 
 // ---------------------------------------------------------
 // 11. Room logic
@@ -1604,8 +1696,6 @@ GameState runBlockCannon(void)
     SPR_update();
     waitMs(120);
 
-    BlockCannonState bcState = BC_STATE_TITLE;
-
     VDP_drawImageEx(
         BG_B,
         &blockcannoningameexample,
@@ -1617,26 +1707,12 @@ GameState runBlockCannon(void)
 
     PAL_fadeIn(0, 15, blockcannoningameexample.palette->data, 8, FALSE);
 
-    cannonSprite = SPR_addSprite(
-        &blockCannonCannonSpriteDef,
-        8,
-        CannonRowY[CannonRow] - 2,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
-
-    projectile.spr = SPR_addSprite(
-        &blockCannonBlockSpriteDef,
-        -32, -32,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
-    projectile.active = FALSE;
-
-    bcState = BC_STATE_GAME;
-
     // -----------------------------------------------------
     // CALL RESET HERE (MSX equivalent)
     // -----------------------------------------------------
     ResetVariablesBlockHitGame();
+
+    bcState = BC_STATE_GAME;
 
     while (1)
     {
@@ -1665,6 +1741,13 @@ GameState runBlockCannon(void)
 
                     PAL_fadeIn(0, 15, blockcannoningameexample.palette->data, 8, FALSE);
 
+                    cannonSprite = SPR_addSprite(
+                        &blockCannonCannonSpriteDef,
+                        8,
+                        CannonRowY[CannonRow] - 2,
+                        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
+                    );
+
                     bcState = BC_STATE_GAME;
                 }
                 break;
@@ -1681,10 +1764,13 @@ GameState runBlockCannon(void)
                 CheckProjectileHitsBlock();
                 CheckShootNewProjectile();
                 SetScoreBlockHitGame();
-
                 HandleBlockTiming();
+                break;
 
-                if (joyNew & BUTTON_B)
+            case BC_STATE_GAMEOVER:
+            {
+                // Wait for button press to exit
+            if (joyNew & (BUTTON_A | BUTTON_B))
                 {
                     PAL_fadeOut(0, 15, 8, FALSE);
 
@@ -1698,10 +1784,12 @@ GameState runBlockCannon(void)
                     );
 
                     PAL_fadeIn(0, 15, blockcannontitlescreen.palette->data, 8, FALSE);
-
                     bcState = BC_STATE_TITLE;
                 }
+
                 break;
+            }
+
         }
 
         SPR_update();

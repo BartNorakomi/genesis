@@ -40,6 +40,7 @@ extern const Image basketballingameexample;
 extern const Image basketballgameover;
 extern const Image blockcannontitlescreen;
 extern const Image blockcannoningameexample;
+extern const Image blockcannongameover;
 extern const Image bikeracetitlescreen;
 extern const Image bikeraceingameexample;
 extern const Image bikeracegameover;

@@ -20,6 +20,7 @@ IMAGE basketballingameexample "graphics/games/basketballingameexample.bmp" BEST 
 IMAGE basketballgameover "graphics/games/basketballgameover.bmp" BEST ALL
 IMAGE blockcannontitlescreen "graphics/games/blockcannontitlescreen.bmp" BEST ALL
 IMAGE blockcannoningameexample "graphics/games/blockcannoningameexample.bmp" BEST ALL
+IMAGE blockcannongameover "graphics/games/blockcannongameover.bmp" BEST ALL
 IMAGE bikeracetitlescreen "graphics/games/bikeracetitlescreen.bmp" BEST ALL
 IMAGE bikeraceingameexample "graphics/games/bikeraceingameexample.bmp" BEST ALL
 IMAGE bikeracegameover "graphics/games/bikeracegameover.bmp" BEST ALL
