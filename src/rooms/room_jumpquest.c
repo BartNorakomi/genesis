@@ -8,6 +8,8 @@
 #include "save_data.h"
 #include "player.h"
 
+extern const MapDefinition jump_quest_map;
+
 // ---------------------------------------------------------
 // 1. Externs from other modules
 // ---------------------------------------------------------
@@ -20,6 +22,9 @@ extern void drawDebugInfo(void);
 // Shared global tile index from main.c
 extern u16 globalTileIndex;
 
+static u16 bgScroll = 0;
+
+
 // ---------------------------------------------------------
 // 2. Internal JumpQuest states
 // ---------------------------------------------------------
@@ -29,6 +34,8 @@ typedef enum
     JQ_STATE_GAME
 } JumpQuestState;
 
+JumpQuestState jqState = JQ_STATE_TITLE;
+    
 // ---------------------------------------------------------
 // 3. Room logic (JumpQuest minigame)
 // ---------------------------------------------------------
@@ -53,12 +60,36 @@ GameState runJumpQuest(void)
     SPR_update();
     waitMs(120); // ~2 seconds wait until screen has faded in completely
 
-    JumpQuestState jqState = JQ_STATE_TITLE;
+    jqState = JQ_STATE_TITLE;
+
+    
+    jqState = JQ_STATE_GAME;
+
+
+
+    // load tileset & MAP
+    Map* level_1_map;
+
+    VDP_loadTileSet(&jump_quest_tileset, globalTileIndex, DMA);
+
+    level_1_map = MAP_create(
+        &jump_quest_map,
+        BG_B,
+        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, globalTileIndex)
+    );
+
+    // Draw map
+    MAP_scrollTo(level_1_map, 0, 0);
+
+    // Fade in using game palette
+    PAL_fadeIn(0, 15, jumpquestmap.palette->data, 8, FALSE);
+
+//    VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
     while (1)
     {
             // Centralized input system
-        playerHandleInput();
+        populateControls();
         u16 joyNew = playerGetJoyNew();
 
         switch (jqState)
@@ -76,26 +107,26 @@ GameState runJumpQuest(void)
                     return STATE_ARCADE1;
                 }
 
-                if (joyNew & BUTTON_A)
-                {
-                    // Fade out only PAL0 (monitor)
-                    PAL_fadeOut(0, 15, 8, FALSE);
+                // if (joyNew & BUTTON_A)
+                // {
+                //     // Fade out only PAL0 (monitor)
+                //     PAL_fadeOut(0, 15, 8, FALSE);
 
-                    // Draw game screen
-                    VDP_drawImageEx(
-                        BG_B,
-                        &jumpquestingameexample,
-                        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
-                        0, 0,
-                        FALSE,
-                        TRUE
-                    );
+                //     // Draw game screen
+                //     VDP_drawImageEx(
+                //         BG_B,
+                //         &jumpquestingameexample,
+                //         TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+                //         0, 0,
+                //         FALSE,
+                //         TRUE
+                //     );
 
-                    // Fade in using game palette
-                    PAL_fadeIn(0, 15, jumpquestingameexample.palette->data, 8, FALSE);
+                //     // Fade in using game palette
+                //     PAL_fadeIn(0, 15, jumpquestingameexample.palette->data, 8, FALSE);
 
-                    jqState = JQ_STATE_GAME;
-                }
+                //     jqState = JQ_STATE_GAME;
+                // }
                 break;
 
             // -------------------------------------------------
@@ -103,26 +134,32 @@ GameState runJumpQuest(void)
             // -------------------------------------------------
             case JQ_STATE_GAME:
 
-                if (joyNew & BUTTON_B)
-                {
-                    // Fade out only PAL0 (monitor)
-                    PAL_fadeOut(0, 15, 8, FALSE);
+                // Increase scroll every frame
+                bgScroll++;
+//                VDP_setVerticalScroll(BG_B, bgScroll);
+                MAP_scrollTo(level_1_map, 0, bgScroll);
 
-                    // Draw title screen
-                    VDP_drawImageEx(
-                        BG_B,
-                        &jumpquesttitlescreen,
-                        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
-                        0, 0,
-                        FALSE,
-                        TRUE
-                    );
 
-                    // Fade in using title palette
-                    PAL_fadeIn(0, 15, jumpquesttitlescreen.palette->data, 8, FALSE);
+                // if (joyNew & BUTTON_B)
+                // {
+                //     // Fade out only PAL0 (monitor)
+                //     PAL_fadeOut(0, 15, 8, FALSE);
 
-                    jqState = JQ_STATE_TITLE;
-                }
+                //     // Draw title screen
+                //     VDP_drawImageEx(
+                //         BG_B,
+                //         &jumpquesttitlescreen,
+                //         TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+                //         0, 0,
+                //         FALSE,
+                //         TRUE
+                //     );
+
+                //     // Fade in using title palette
+                //     PAL_fadeIn(0, 15, jumpquesttitlescreen.palette->data, 8, FALSE);
+
+                //     jqState = JQ_STATE_TITLE;
+                // }
 
                 break;
         }

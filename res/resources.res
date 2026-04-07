@@ -13,8 +13,6 @@ IMAGE sciencelab "graphics/backgrounds/sciencelab.bmp" BEST ALL
 IMAGE sleepingquarters "graphics/backgrounds/sleepingquarters.bmp" BEST ALL
 IMAGE trainingdeck "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 
-IMAGE jumpquesttitlescreen "graphics/games/jumpquesttitlescreen.bmp" BEST ALL
-IMAGE jumpquestingameexample "graphics/games/jumpquestingameexample.bmp" BEST ALL
 IMAGE basketballtitlescreen "graphics/games/basketballtitlescreen.bmp" BEST ALL
 IMAGE basketballingameexample "graphics/games/basketballingameexample.bmp" BEST ALL
 IMAGE basketballgameover "graphics/games/basketballgameover.bmp" BEST ALL
@@ -24,6 +22,12 @@ IMAGE blockcannongameover "graphics/games/blockcannongameover.bmp" BEST ALL
 IMAGE bikeracetitlescreen "graphics/games/bikeracetitlescreen.bmp" BEST ALL
 IMAGE bikeraceingameexample "graphics/games/bikeraceingameexample.bmp" BEST ALL
 IMAGE bikeracegameover "graphics/games/bikeracegameover.bmp" BEST ALL
+IMAGE jumpquesttitlescreen "graphics/games/jumpquesttitlescreen.bmp" BEST ALL
+IMAGE jumpquestingameexample "graphics/games/jumpquestingameexample.bmp" BEST ALL
+IMAGE jumpquestmap "graphics/games/jumpquestmap.bmp" BEST ALL
+ 
+TILESET jump_quest_tileset "graphics/games/jumpquestmap.bmp" BEST ALL
+MAP jump_quest_map "graphics/games/jumpquestmap.bmp" jump_quest_tileset BEST 0
 
 IMAGE neonhorizon "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE trainingdeckgame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
@@ -107,6 +111,10 @@ SPRITE blockCannonCannonSpriteDef "sprites/games/blockcannon/cannon.bmp" 5 4 FAS
 SPRITE blockCannonBlockGreenSpriteDef "sprites/games/blockcannon/blockgreen.bmp" 2 2 FAST NONE
 SPRITE blockCannonBlockYellowSpriteDef "sprites/games/blockcannon/blockyellow.bmp" 2 2 FAST NONE
 SPRITE blockCannonBlockRedSpriteDef "sprites/games/blockcannon/blockred.bmp" 2 2 FAST NONE
+
+SPRITE jumpQuestRabbitSpriteDef "sprites/games/jumpquest/rabbit.bmp" 4 5 FAST NONE
+SPRITE jumpQuestSpikeSpriteDef "sprites/games/jumpquest/spike.bmp" 2 3 FAST NONE
+SPRITE jumpQuestTrampolineSpriteDef "sprites/games/jumpquest/trampoline.bmp" 4 2 FAST NONE
  
 #option 1: export audio in audacity: 15000 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=FALSE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_15khz.raw"
 #option 2: export audio in audacity: 7500 Hz, RAW, Signed 8-bit PCM and play back HALF RATE=TRUE: BIN sfx_startgame "sfx/StartGame_ActionMusical_AP1.104_7.5khz.raw"

@@ -1038,7 +1038,7 @@ GameState runBasketball(void)
 
     while (1)
     {
-        playerHandleInput();
+        populateControls();
         u16 joyNew = playerGetJoyNew();
 
         switch (bbState)

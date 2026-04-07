@@ -1,5 +1,6 @@
 out/res/resources.o: res/resources.res \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/biopod.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/jumpquest/rabbit.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapholodeck.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/titlescreen/titlescreen.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/arcade1Wall.bmp \
@@ -11,6 +12,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/basketball/basketballp
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/npcdialogue/portraitSoldier.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sfx/player_footstep.wav \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/medicalbaylights.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/jumpquest/trampoline.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/npcs/girl.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapmedicalbay.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/penguinbikerace/extratime.bmp \
@@ -37,6 +39,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/basketball/basketball.
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapArcade1.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/font/font.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/holodeckdoor.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/jumpquestmap.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaptrainingdeck.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/hydroponicsbayfoodright.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapreactorchamber.bin \
@@ -57,6 +60,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/sleepingquarter
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/npcdialogue/portraitAI.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/npcdialogue/portraitRedHeadBoy.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapsleepingquarters.bin \
+C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/jumpquest/spike.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/arcade2.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/reactor.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomicons/finger.bmp \

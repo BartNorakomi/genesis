@@ -197,6 +197,14 @@ bool playerIsCenterScreen(void)
     return (playerX >= 80 && playerX < 176);
 }
 
+void populateControls(void)
+{
+    // Centralized input read
+    joy = JOY_readJoypad(JOY_1);
+    joyNew = joy & ~joyPrev;
+    joyPrev = joy;
+}
+
 // ---------------------------------------------------------
 // 11. Public API: movement + collision + SFX
 // ---------------------------------------------------------

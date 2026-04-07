@@ -48,6 +48,8 @@ static const s16 CannonRowY[5] = {
     104,  // row 4
 };
 
+static bool gameJustStarted = FALSE;
+
 typedef enum {
     BlockColorGreen  = 1,
     BlockColorYellow = 2,
@@ -1151,8 +1153,6 @@ void ResetVariablesBlockHitGame(void)
         blocks[i].x = 0;
         blocks[i].y = 0;
         blocks[i].spr = NULL;   // after SPR_reset
-        if (blocks[i].spr)
-            SPR_setPosition(blocks[i].spr, -32, -32);
     }
 
     cannonSprite = SPR_addSprite(
@@ -1179,7 +1179,33 @@ void ResetVariablesBlockHitGame(void)
 
 }
    
-void SetScoreBlockHitGame(void) {}
+void SetScoreBlockHitGame(void)
+{
+    // 1. Determine mask based on RIGHT being held
+    u16 joy = playerGetJoy();   // held buttons
+    u8 mask = 31;
+
+    if (joy & BUTTON_RIGHT)
+        mask = 7;
+
+    // 2. Throttle scoring using framecounter2
+    if ((framecounter2 & mask) != 0)
+        return;
+
+    // 3. Increment score
+    ScoreBlockHitGame++;
+
+    // 4. Draw score on screen
+    char buf[6];
+    sprintf(buf, "%u", ScoreBlockHitGame);
+
+    // Clear old score area (tile coords: 19,1 width 6 tiles)
+    VDP_clearTextArea(19, 1, 6, 1);
+
+    // Draw new score
+    VDP_drawText(buf, 19, 1);
+}
+
 
 static void ColorBlock(u8 color, Block* blk)
 {
@@ -1652,7 +1678,7 @@ void CheckGameOverBlockHitGame(void)
 
 GAME_OVER:
 
-    ResetVariablesBlockHitGame();
+//    ResetVariablesBlockHitGame();
 
     SPR_reset();
     SPR_update();
@@ -1710,18 +1736,19 @@ GameState runBlockCannon(void)
     // -----------------------------------------------------
     // CALL RESET HERE (MSX equivalent)
     // -----------------------------------------------------
-    ResetVariablesBlockHitGame();
+//    ResetVariablesBlockHitGame();
 
     bcState = BC_STATE_GAME;
 
     while (1)
     {
-        playerHandleInput();
+        populateControls();
         u16 joyNew = playerGetJoyNew();
 
         switch (bcState)
         {
             case BC_STATE_TITLE:
+                gameJustStarted = FALSE;
 
                 if (joyNew & BUTTON_B)
                     return STATE_ARCADE1;
@@ -1753,8 +1780,12 @@ GameState runBlockCannon(void)
                 break;
 
             case BC_STATE_GAME:
+                if (!gameJustStarted)
+                {
+                    ResetVariablesBlockHitGame();
+                    gameJustStarted = TRUE;
+                }
                 framecounter2++;
-
                 MoveCannon();
                 HandleAnimateShootCannon();
                 AnimateBlockExplosion();
