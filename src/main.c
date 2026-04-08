@@ -137,6 +137,7 @@ void drawRoomBackground(u8 room)
     memcpy(&our_level_palette[32], playerSpriteDef.palette->data, 16 * 2);
     if (room == ROOM_BASKETBALL) memcpy(&our_level_palette[32], basketBallSpriteDef.palette->data, 16 * 2);
     if (room == ROOM_BLOCKCANNON) memcpy(&our_level_palette[32], blockCannonCannonSpriteDef.palette->data, 16 * 2);
+    if (room == ROOM_JUMPQUEST) memcpy(&our_level_palette[32], jumpQuestRabbitSpriteDef.palette->data, 16 * 2);
 
     // Build palette 3
     if (room == ROOM_REACTORCHAMBER) memcpy(&our_level_palette[48], reactorSpriteDef.palette->data, 16 * 2);
@@ -203,7 +204,7 @@ int main(bool hardReset)
     resetSaveData();
     loadSaveData();
 
-    VDP_setScreenWidth256();
+//    VDP_setScreenWidth256();
     SPR_init();
     VDP_drawText("x:     y:     tile:", 0, 27);
 
