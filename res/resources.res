@@ -29,6 +29,7 @@ IMAGE jumpquestmap "graphics/games/jumpquestmap.bmp" BEST ALL
 TILESET jump_quest_tileset "graphics/games/jumpquestmap.bmp" BEST ALL
 MAP jump_quest_map "graphics/games/jumpquestmap.bmp" jump_quest_tileset BEST 0
 
+
 IMAGE neonhorizon "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE trainingdeckgame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE drillinggame "graphics/backgrounds/trainingdeck.bmp" BEST ALL
@@ -58,6 +59,7 @@ BIN level_col_reactorchamber "collisionmaps/tilemapreactorchamber.bin"
 BIN level_col_sciencelab "collisionmaps/tilemapsciencelab.bin"
 BIN level_col_sleepingquarters "collisionmaps/tilemapsleepingquarters.bin"
 BIN level_col_trainingdeck "collisionmaps/tilemaptrainingdeck.bin"
+BIN tilemapjumpdowngame "collisionmaps/tilemapjumpdowngame.bin"
 
 SPRITE playerSpriteDef "sprites/player/playersprite.bmp" 10 10 FAST 3
 SPRITE girlSpriteDef "sprites/npcs/girl.bmp" 10 10 FAST 30

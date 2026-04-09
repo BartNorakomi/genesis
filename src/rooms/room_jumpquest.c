@@ -11,6 +11,18 @@
 extern const MapDefinition jump_quest_map;
 
 // ---------------------------------------------------------
+// Tile constants (MSX tile numbers)
+// ---------------------------------------------------------
+#define JumpDownSpikeTile        0x0B
+#define JumpDownTrampolineTile   0x06
+
+// ---------------------------------------------------------
+// Forward declarations for tile object scanners
+// ---------------------------------------------------------
+static void CheckForSpikeObject(u8 tile, s16 x, s16 y);
+static void CheckForTrampolineObject(u8 tile, s16 x, s16 y);
+
+// ---------------------------------------------------------
 // 1. Externs from other modules
 // ---------------------------------------------------------
 extern const u8* currentColMap;
@@ -24,6 +36,18 @@ extern u16 globalTileIndex;
 // Shared frame counter
 u16 framecounter2 = 0;
 
+typedef struct
+{
+    s16 x;
+    s16 y;
+    u8 On;
+} JumpObject;
+
+static JumpObject FreeToUseObject0;
+static JumpObject FreeToUseObject1;
+static JumpObject FreeToUseObject2;
+static JumpObject FreeToUseObject3;
+
 // Map pointer
 static Map* level_1_map;
 
@@ -36,6 +60,17 @@ static Sprite* bunnySpr = NULL;
 static s16 bunnyX;
 static s16 bunnyY;
 
+static Sprite* spikeSpr1 = NULL;
+static Sprite* spikeSpr2 = NULL;
+
+static const u8 spikeAnimFrames[32] =
+{
+    0,0,0,0,0,0,0,0,   // 8 frames of idle
+    1,2,3,4,5,6,7,8,   // rising
+    9,10,10,10,10,10,10,9, // peak hold
+    8,7,6,5,4,3,2,1    // falling
+};
+
 // ---------------------------------------------------------
 // JumpQuest states
 // ---------------------------------------------------------
@@ -46,6 +81,12 @@ typedef enum
 } JumpQuestState;
 
 JumpQuestState jqState = JQ_STATE_TITLE;
+
+static u8 GetSpikeAnimFrame(void)
+{
+    u8 idx = (framecounter2 >> 1) & 31;   // /2 then mod 32
+    return spikeAnimFrames[idx];
+}
 
 // ---------------------------------------------------------
 // JumpDownGame variables
@@ -59,7 +100,11 @@ static u8 JumpDownGameTilesY = 216;
 static u8 Row6Wide = 1;
 static u8 BuildUpNewRowJumpDownGame = 1;
 
-static u16 TileRowTablePointer = 0x8000;
+extern const u8 tilemapjumpdowngame[];
+extern const u32 tilemapjumpdowngame_size;
+
+static const u8* TileRowTablePointer = tilemapjumpdowngame;
+
 
 static u8 PutRemainderTile = 0;
 static u16 Scroll27LinesDown = 0;
@@ -103,6 +148,38 @@ static u16 Controls = 0;
 static u8 GetTileBunnyStandsOn(void) { return 0; }
 static u8 GetTileBunnyStandsOnOffset(s16 offset) { (void)offset; return 0; }
 
+static void UpdateSpikePosition(Sprite* spr, s16 x, s16 y)
+{
+    SPR_setPosition(spr, x, y);
+}
+
+static void HandleSpikeObject(void)
+{
+    // Spike 1
+    if (Object0On)
+    {
+        u8 frame = GetSpikeAnimFrame();
+        SPR_setFrame(spikeSpr1, frame);
+        UpdateSpikePosition(spikeSpr1, FreeToUseObject0.x, FreeToUseObject0.y);
+    }
+    else
+    {
+        SPR_setPosition(spikeSpr1, -32, -32);   // hide
+    }
+
+    // Spike 2
+    if (Object1On)
+    {
+        u8 frame = GetSpikeAnimFrame();
+        SPR_setFrame(spikeSpr2, frame);
+        UpdateSpikePosition(spikeSpr2, FreeToUseObject1.x, FreeToUseObject1.y);
+    }
+    else
+    {
+        SPR_setPosition(spikeSpr2, -32, -32);   // hide
+    }
+}
+
 // ---------------------------------------------------------
 // Empty routines
 // ---------------------------------------------------------
@@ -111,10 +188,104 @@ static void CheckBunnyInLavaNothingIceOrSpike(void) {}
 static void CheckBunnyOffScreen(void) {}
 static void CheckShouldBunnyJumpOnTrampoline(void) {}
 static void HandleBunnyDied(void) {}
-static void HandleSpikeObject(void) {}
+
 static void HandleTrampolineObject(void) {}
 static void PutEdgesOfArcadeMachineFrameBottom(void) {}
-static void BuildUpBackgroundJumpDownGame(void) {}
+
+static void BuildUpBackgroundJumpDownGame(void)
+{
+    if (!BuildUpNewRowJumpDownGame)
+        return;
+
+    // MSX increments this state machine
+    BuildUpNewRowJumpDownGame++;
+
+    // Skip erase steps (2 and 3) – we don’t draw tiles
+    if (BuildUpNewRowJumpDownGame == 2 || BuildUpNewRowJumpDownGame == 3)
+        return;
+
+    // --- SCAN ONE ROW OF TILES ---
+
+    s16 x = JumpDownGameTilesX;
+    s16 y = JumpDownGameTilesY;
+
+    const u8* p = TileRowTablePointer;
+
+    while (x < 215)
+    {
+        u8 tile = *p;
+
+        // Spawn spike or trampoline if needed
+        CheckForSpikeObject(tile, x, y);
+        CheckForTrampolineObject(tile, x, y);
+
+        p++;        // next tile
+        x += 36;    // next screen X position
+    }
+
+    // Save updated pointer
+    TileRowTablePointer = p;
+
+    // --- END OF ROW ---
+
+    // Toggle row width (MSX alternates 6-wide / 5-wide)
+    Row6Wide ^= 1;
+
+    // Reset X based on row width
+    JumpDownGameTilesX = Row6Wide ? (22 - 2) : (40 - 2);
+
+    // Move down one row
+    JumpDownGameTilesY += 27;
+
+    // Reset state machine
+    BuildUpNewRowJumpDownGame = 0;
+}
+
+static void CheckForSpikeObject(u8 tile, s16 x, s16 y)
+{
+    if (tile != JumpDownSpikeTile)
+        return;
+
+    if (!FreeToUseObject0.On)
+    {
+        FreeToUseObject0.On = 1;
+        FreeToUseObject0.x  = x + 9;
+        FreeToUseObject0.y  = y + 2;
+        return;
+    }
+
+    if (!FreeToUseObject1.On)
+    {
+        FreeToUseObject1.On = 1;
+        FreeToUseObject1.x  = x + 9;
+        FreeToUseObject1.y  = y + 2;
+        return;
+    }
+}
+
+static void CheckForTrampolineObject(u8 tile, s16 x, s16 y)
+{
+    if (tile != JumpDownTrampolineTile)
+        return;
+
+    if (!FreeToUseObject2.On)
+    {
+        FreeToUseObject2.On = 1;
+        FreeToUseObject2.x  = x + 2;
+        FreeToUseObject2.y  = y + 6;
+        return;
+    }
+
+    if (!FreeToUseObject3.On)
+    {
+        FreeToUseObject3.On = 1;
+        FreeToUseObject3.x  = x + 2;
+        FreeToUseObject3.y  = y + 6;
+        return;
+    }
+}
+
+
 static void HandleScore(void) {}
 static void SetBunnySpatCoordinates(void) {}
 static void PutEdgesOfArcadeMachineFrameTop(void) {}
@@ -167,14 +338,14 @@ static const s8 JumpRightTable[] =
 {
     +1,-2,  +0,-2,  +1,-1,  +1,-1,  +0, 0,  +1, 0,  +1,+1,  +0, 0,  +1,+1,  +1,+1,
     +0, 0,  +1,+1,  +1,+1,  +0,+1,  +1,+2,  +1,+1,  +0,+1,  +1,+2,  +1,+1,  +0,+2,
-    +1,+2,  +1,+2,  +0,+2,  +1,+3,  +1,+3,  +0,+3,  +1,+3
+    +1,+2,  +1,+2,  +0,+2,  +1,+3,  +1,+3,  +0,+3,  +2,+2
 };
 
 static const s8 JumpLeftTable[] =
 {
     -1,-2,   0,-2,   -1,-1,  -1,-1,   0, 0,   -1, 0,   -1,+1,   0, 0,   -1,+1,   -1,+1,
      0, 0,  -1,+1,  -1,+1,   0,+1,   -1,+2,  -1,+1,   0,+1,   -1,+2,  -1,+1,    0,+2,
-    -1,+2,  -1,+2,   0,+2,  -1,+3,  -1,+3,   0,+3,   -1,+3
+    -1,+2,  -1,+2,   0,+2,  -1,+3,  -1,+3,   0,+3,   -2,+2
 };
 
 static void MoveBunnyRight(void)
@@ -335,7 +506,7 @@ static void CheckShouldBunnyJump(void)
     {
         JumpBunnyLeft = 1;
         BuildUpNewRowJumpDownGame = 1;
-        Scroll27LinesDown = 27;
+        Scroll27LinesDown = 27 + 1; // we increase by one because on the genesis the background rows are 1 line longer
         return;
     }
 
@@ -343,7 +514,7 @@ static void CheckShouldBunnyJump(void)
     {
         JumpBunnyRight = 1;
         BuildUpNewRowJumpDownGame = 1;
-        Scroll27LinesDown = 27;
+        Scroll27LinesDown = 27 + 1; // we increase by one because on the genesis the background rows are 1 line longer
         return;
     }
 }
@@ -368,7 +539,7 @@ static void HandlePhase(void)
     Row6Wide = 1;
     BuildUpNewRowJumpDownGame = 1;
 
-    TileRowTablePointer = 0x8000;
+    TileRowTablePointer = tilemapjumpdowngame;
 
     PutRemainderTile = 0;
     Scroll27LinesDown = 0;
@@ -433,6 +604,8 @@ void JumpDownGameRoutine(void)
     HandlePhase();
 }
 
+
+
 // ---------------------------------------------------------
 // runJumpQuest
 // ---------------------------------------------------------
@@ -468,12 +641,11 @@ GameState runJumpQuest(void)
 
     PAL_fadeIn(0, 15, jumpquestmap.palette->data, 8, FALSE);
 
-    bunnySpr = SPR_addSprite(
-        &jumpQuestRabbitSpriteDef,
-        bunnyX,
-        bunnyY,
-        TILE_ATTR(PAL2, FALSE, FALSE, FALSE)
-    );
+    bunnySpr = SPR_addSprite(&jumpQuestRabbitSpriteDef, bunnyX, bunnyY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
+    spikeSpr1 = SPR_addSprite(&jumpQuestSpikeSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    spikeSpr2 = SPR_addSprite(&jumpQuestSpikeSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+
 
     while (1)
     {

@@ -18,6 +18,7 @@ extern const u8 level_col_reactorchamber[3712];
 extern const u8 level_col_sciencelab[3712];
 extern const u8 level_col_sleepingquarters[3712];
 extern const u8 level_col_trainingdeck[3712];
+extern const u8 tilemapjumpdowngame[2366];
 extern const u8 titlescreenpressbuttonSpriteDef_animation0_frame0_tileset_data[0];
 extern const Image titlescreen;
 extern const Image arcade1;

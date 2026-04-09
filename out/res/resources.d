@@ -16,6 +16,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/jumpquest/trampoline.b
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/npcs/girl.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapmedicalbay.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/penguinbikerace/extratime.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemapjumpdowngame.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomicons/triggerA.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sfx/startgame.wav \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/hangarbay.bmp \
