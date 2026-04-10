@@ -11,10 +11,19 @@
 extern const MapDefinition jump_quest_map;
 
 // ---------------------------------------------------------
-// Tile constants (MSX tile numbers)
+// Tile constants (MSX tile numbers / map values)
 // ---------------------------------------------------------
-#define JumpDownSpikeTile        0x0B
-#define JumpDownTrampolineTile   0x06
+#define JumpDownNothingTile          0
+#define JumpDownTreeTile             2
+#define JumpDownLavaTile             5
+#define JumpDownSpikeTile            0x0B   // 11
+#define JumpDownSpiderWebTile        7
+#define JumpDownIceTile              8
+#define JumpDownReverseControlsTile  9
+#define JumpDownSandTile             10
+#define JumpDownTrampolineTile       0x06   // 6
+#define JumpDownCloudsTile           12
+
 
 // ---------------------------------------------------------
 // Forward declarations for tile object scanners
@@ -55,20 +64,20 @@ static Map* level_1_map;
 // Bunny sprite
 // ---------------------------------------------------------
 static Sprite* bunnySpr = NULL;
+static Sprite* spikeSpr1 = NULL;
+static Sprite* spikeSpr2 = NULL;
 
 // Bunny world position
 static s16 bunnyX;
 static s16 bunnyY;
 
-static Sprite* spikeSpr1 = NULL;
-static Sprite* spikeSpr2 = NULL;
-
+// ---------------------------------------------------------
 static const u8 spikeAnimFrames[32] =
 {
-    0,0,0,0,0,0,0,0,   // 8 frames of idle
-    1,2,3,4,5,6,7,8,   // rising
-    9,10,10,10,10,10,10,9, // peak hold
-    8,7,6,5,4,3,2,1    // falling
+    0,0,0,0,0,0,0,0,
+    1,2,3,4,5,6,7,8,
+    9,10,10,10,10,10,10,9,
+    8,7,6,5,4,3,2,1
 };
 
 // ---------------------------------------------------------
@@ -82,10 +91,10 @@ typedef enum
 
 JumpQuestState jqState = JQ_STATE_TITLE;
 
+// ---------------------------------------------------------
 static u8 GetSpikeAnimFrame(void)
 {
-    u8 idx = (framecounter2 >> 1) & 31;   // /2 then mod 32
-    return spikeAnimFrames[idx];
+    return spikeAnimFrames[(framecounter2 >> 1) & 31];
 }
 
 // ---------------------------------------------------------
@@ -104,7 +113,6 @@ extern const u8 tilemapjumpdowngame[];
 extern const u32 tilemapjumpdowngame_size;
 
 static const u8* TileRowTablePointer = tilemapjumpdowngame;
-
 
 static u8 PutRemainderTile = 0;
 static u16 Scroll27LinesDown = 0;
@@ -143,45 +151,80 @@ static u8 Scroll4RowsAtStartOfGame = 18;
 static u16 Controls = 0;
 
 // ---------------------------------------------------------
-// Stubs for tile lookup
+// Tile lookup
 // ---------------------------------------------------------
-static u8 GetTileBunnyStandsOn(void) { return 0; }
+static u8 GetTileBunnyStandsOn(void)
+{
+    // Only valid when Scroll4RowsAtStartOfGame == 1
+    // (you can re‑enable this when intro scroll is perfect)
+    // if (Scroll4RowsAtStartOfGame != 1)
+    //     return 1;
+
+    if (BuildUpNewRowJumpDownGame != 0)
+        return 1;
+
+    // Each row in the converted map is 6 tiles (6 bytes)
+    // 4 rows above the last built row = 24 bytes back
+    const u8* row = TileRowTablePointer - 24;
+
+    u8 x = (u8)bunnyX;
+
+    // ----- 5‑tile row (centered at 112) -----
+    if (x == 112 - 72) return row[0];
+    if (x == 112 - 36) return row[1];
+    if (x == 112)      return row[2];
+    if (x == 112 + 36) return row[3];
+    if (x == 112 + 72) return row[4];
+
+    // ----- 6‑tile row (centered at 94) -----
+    if (x == 94 - 72)  return row[0];
+    if (x == 94 - 36)  return row[1];
+    if (x == 94)       return row[2];
+    if (x == 94 + 36)  return row[3];
+    if (x == 94 + 72)  return row[4];
+    if (x == 94 + 108) return row[5];
+
+    return 1;
+}
+
 static u8 GetTileBunnyStandsOnOffset(s16 offset) { (void)offset; return 0; }
 
+// ---------------------------------------------------------
+// Spike handling
+// ---------------------------------------------------------
 static void UpdateSpikePosition(Sprite* spr, s16 x, s16 y)
 {
     SPR_setPosition(spr, x, y);
 }
 
+// ---------------------------------------------------------
+// ? FIXED SPIKE HANDLER
+// ---------------------------------------------------------
 static void HandleSpikeObject(void)
 {
-    // Spike 1
     if (Object0On)
     {
-        u8 frame = GetSpikeAnimFrame();
-        SPR_setFrame(spikeSpr1, frame);
+        SPR_setFrame(spikeSpr1, GetSpikeAnimFrame());
         UpdateSpikePosition(spikeSpr1, FreeToUseObject0.x, FreeToUseObject0.y);
     }
     else
     {
-        SPR_setPosition(spikeSpr1, -32, -32);   // hide
+        SPR_setPosition(spikeSpr1, 100, 216);
     }
 
-    // Spike 2
     if (Object1On)
     {
-        u8 frame = GetSpikeAnimFrame();
-        SPR_setFrame(spikeSpr2, frame);
+        SPR_setFrame(spikeSpr2, GetSpikeAnimFrame());
         UpdateSpikePosition(spikeSpr2, FreeToUseObject1.x, FreeToUseObject1.y);
     }
     else
     {
-        SPR_setPosition(spikeSpr2, -32, -32);   // hide
+        SPR_setPosition(spikeSpr2, 100, 216);
     }
 }
 
 // ---------------------------------------------------------
-// Empty routines
+// Empty routines (to be ported later)
 // ---------------------------------------------------------
 static void swap_spat_col_and_char_table(void) {}
 static void CheckBunnyInLavaNothingIceOrSpike(void) {}
@@ -192,6 +235,18 @@ static void HandleBunnyDied(void) {}
 static void HandleTrampolineObject(void) {}
 static void PutEdgesOfArcadeMachineFrameBottom(void) {}
 
+static void HandleScore(void) {}
+static void SetBunnySpatCoordinates(void) {}
+static void PutEdgesOfArcadeMachineFrameTop(void) {}
+static void CheckGameOverJumpDownGame(void) {}
+static void SlideOnIceBunnyRight(void) {}
+static void SpiderWebJump(void) {}
+static void JumpBunnyLeftOnTrampolineRoutine(void) {}
+static void JumpBunnyRightOnTrampolineRoutine(void) {}
+
+// ---------------------------------------------------------
+// BuildUpBackgroundJumpDownGame
+// ---------------------------------------------------------
 static void BuildUpBackgroundJumpDownGame(void)
 {
     if (!BuildUpNewRowJumpDownGame)
@@ -228,7 +283,7 @@ static void BuildUpBackgroundJumpDownGame(void)
 
     // --- END OF ROW ---
 
-    // Toggle row width (MSX alternates 6-wide / 5-wide)
+    // Toggle row width (MSX alternates 6-wide / 5-wide visually)
     Row6Wide ^= 1;
 
     // Reset X based on row width
@@ -241,8 +296,21 @@ static void BuildUpBackgroundJumpDownGame(void)
     BuildUpNewRowJumpDownGame = 0;
 }
 
+// ---------------------------------------------------------
+// Object scanners
+// ---------------------------------------------------------
 static void CheckForSpikeObject(u8 tile, s16 x, s16 y)
 {
+    char buf[8];
+    sprintf(buf, "%3d", tile);
+    VDP_drawTextBG(BG_A, buf, 25, 27);
+
+    char buff[8];
+    sprintf(buff, "%3d", TileRowTablePointer);
+    VDP_drawTextBG(BG_A, buff, 18, 27);
+
+
+
     if (tile != JumpDownSpikeTile)
         return;
 
@@ -285,16 +353,6 @@ static void CheckForTrampolineObject(u8 tile, s16 x, s16 y)
     }
 }
 
-
-static void HandleScore(void) {}
-static void SetBunnySpatCoordinates(void) {}
-static void PutEdgesOfArcadeMachineFrameTop(void) {}
-static void CheckGameOverJumpDownGame(void) {}
-static void SlideOnIceBunnyRight(void) {}
-static void SpiderWebJump(void) {}
-static void JumpBunnyLeftOnTrampolineRoutine(void) {}
-static void JumpBunnyRightOnTrampolineRoutine(void) {}
-
 // ---------------------------------------------------------
 // Scroll background
 // ---------------------------------------------------------
@@ -332,7 +390,7 @@ static void Scroll4RowsAtStartOfGameRoutine(void)
 }
 
 // ---------------------------------------------------------
-// Jump right movement table
+// Jump movement tables
 // ---------------------------------------------------------
 static const s8 JumpRightTable[] =
 {
@@ -377,7 +435,7 @@ static void ShowBunnySittingStillSprite(void)
 }
 
 // ---------------------------------------------------------
-// JumpBunnyRightRoutine
+// Jump routines
 // ---------------------------------------------------------
 static void JumpBunnyRightRoutine(void)
 {
@@ -409,7 +467,6 @@ static void JumpBunnyRightRoutine(void)
     JumpBunnyRight = 0;
     SPR_setFrame(bunnySpr, 0);
     SPR_setHFlip(bunnySpr, FALSE);
-
 }
 
 static void JumpBunnyLeftRoutine(void)
@@ -444,9 +501,8 @@ static void JumpBunnyLeftRoutine(void)
     // End of jump
     JumpBunnyLeft = 0;
     SPR_setFrame(bunnySpr, 0);      // idle-left frame
-    SPR_setHFlip(bunnySpr, TRUE);  // ensure clean state
+    SPR_setHFlip(bunnySpr, TRUE);   // ensure clean state
 }
-
 
 // ---------------------------------------------------------
 // HandleBunnyJumpAndSetSpriteCharacterAndColor
@@ -487,35 +543,67 @@ static void HandleBunnyJumpAndSetSpriteCharacterAndColor(void)
     }
 }
 
-
 // ---------------------------------------------------------
 // CheckShouldBunnyJump – SGDK-style input
 // ---------------------------------------------------------
 static void CheckShouldBunnyJump(void)
 {
+    // Scroll intro still running? -> no jump
     if (Scroll4RowsAtStartOfGame > 1)
         return;
 
+    // Background still scrolling? -> no jump
     if (Scroll27LinesDown != 0)
         return;
 
+    // Bunny dead? -> no jump
     if (BunnyDied != 0)
         return;
 
-    if (Controls & BUTTON_LEFT)
+    // --- Tile under bunny decides special behavior ---
+    u8 tile = GetTileBunnyStandsOn();
+
+    // Spider web: handled elsewhere, just bail here
+    if (tile == JumpDownSpiderWebTile)
     {
-        JumpBunnyLeft = 1;
-        BuildUpNewRowJumpDownGame = 1;
-        Scroll27LinesDown = 27 + 1; // we increase by one because on the genesis the background rows are 1 line longer
+        // BunnyStandsInSpiderWeb equivalent is your SpiderWebJump / AnimateSpiderWebJump logic
         return;
     }
 
-    if (Controls & BUTTON_RIGHT)
+    // Reverse controls?
+    bool reverseControls = (tile == JumpDownReverseControlsTile);
+
+    // Sand tile uses "new press" instead of held input
+    u16 inputSource = (tile == JumpDownSandTile) ? playerGetJoyNew() : Controls;
+
+    // We only care about LEFT / RIGHT
+    u16 lrMask = BUTTON_LEFT | BUTTON_RIGHT;
+    u16 lr = inputSource & lrMask;
+
+    if (!lr)
+        return;
+
+    // Decide which direction is "right" depending on reverse controls
+    u16 wantRight = reverseControls ? BUTTON_LEFT : BUTTON_RIGHT;
+
+    if (lr & wantRight)
     {
+        // --- Jump RIGHT ---
+        // (CheckTreeWhenJumpingRight is your own routine if you port it later)
+        // CheckTreeWhenJumpingRight();
+
         JumpBunnyRight = 1;
         BuildUpNewRowJumpDownGame = 1;
-        Scroll27LinesDown = 27 + 1; // we increase by one because on the genesis the background rows are 1 line longer
-        return;
+        Scroll27LinesDown = 27 + 1;   // +1 because of Genesis row height difference
+    }
+    else
+    {
+        // --- Jump LEFT ---
+        // CheckTreeWhenJumpingLeft();
+
+        JumpBunnyLeft = 1;
+        BuildUpNewRowJumpDownGame = 1;
+        Scroll27LinesDown = 27 + 1;
     }
 }
 
@@ -589,6 +677,7 @@ void JumpDownGameRoutine(void)
     HandleBunnyDied();
 
     HandleSpikeObject();
+
     HandleTrampolineObject();
 
     PutEdgesOfArcadeMachineFrameBottom();
@@ -603,8 +692,6 @@ void JumpDownGameRoutine(void)
 
     HandlePhase();
 }
-
-
 
 // ---------------------------------------------------------
 // runJumpQuest
@@ -645,7 +732,6 @@ GameState runJumpQuest(void)
 
     spikeSpr1 = SPR_addSprite(&jumpQuestSpikeSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
     spikeSpr2 = SPR_addSprite(&jumpQuestSpikeSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-
 
     while (1)
     {
