@@ -86,7 +86,8 @@ static const u8 spikeAnimFrames[32] =
 typedef enum
 {
     JQ_STATE_TITLE,
-    JQ_STATE_GAME
+    JQ_STATE_GAME,
+    JQ_STATE_GAMEOVER
 } JumpQuestState;
 
 JumpQuestState jqState = JQ_STATE_TITLE;
@@ -163,20 +164,72 @@ static u8 GetTileBunnyStandsOn(void)
     if (BuildUpNewRowJumpDownGame != 0)
         return 1;
 
-    // Each row in the converted map is 6 tiles (6 bytes)
-    // 4 rows above the last built row = 24 bytes back
-    const u8* row = TileRowTablePointer - 24;
+    const u8* row = TileRowTablePointer - 39 + 6;
 
     u8 x = (u8)bunnyX;
 
-    // ----- 5‑tile row (centered at 112) -----
+    // // ----- 5‑tile row (centered at 112) -----
+    if (x == 112 - 72) return row[-5];
+    if (x == 112 - 36) return row[-4];
+    if (x == 112)      return row[-3];
+    if (x == 112 + 36) return row[-2];
+    if (x == 112 + 72) return row[-1];
+
+    // // ----- 6‑tile row (centered at 94) -----
+    if (x == 94 - 72)  return row[-6];
+    if (x == 94 - 36)  return row[-5];
+    if (x == 94)       return row[-4];
+    if (x == 94 + 36)  return row[-3];
+    if (x == 94 + 72)  return row[-2];
+    if (x == 94 + 108) return row[-1];
+
+    return 1;
+}
+
+static bool GetTileLeftUnderBunnyStandsOn(void)
+{
+    if (bunnyX == (94 - 72))
+        return true;
+
+    const u8* row = TileRowTablePointer - 39 + 6;
+
+    u8 x = (u8)bunnyX;
+
+    // // ----- 5‑tile row (centered at 112) -----
     if (x == 112 - 72) return row[0];
     if (x == 112 - 36) return row[1];
     if (x == 112)      return row[2];
     if (x == 112 + 36) return row[3];
     if (x == 112 + 72) return row[4];
 
-    // ----- 6‑tile row (centered at 94) -----
+    // // ----- 6‑tile row (centered at 94) -----
+    if (x == 94 - 72)  return row[-1];
+    if (x == 94 - 36)  return row[0];
+    if (x == 94)       return row[1];
+    if (x == 94 + 36)  return row[2];
+    if (x == 94 + 72)  return row[3];
+    if (x == 94 + 108) return row[4];
+
+    return 1;
+}
+
+static bool GetTileRightUnderBunnyStandsOn(void)
+{
+    if (bunnyX == (94 - 72))
+        return true;
+
+    const u8* row = TileRowTablePointer - 39 + 6;
+
+    u8 x = (u8)bunnyX;
+
+    // // ----- 5‑tile row (centered at 112) -----
+    if (x == 112 - 72) return row[1];
+    if (x == 112 - 36) return row[2];
+    if (x == 112)      return row[3];
+    if (x == 112 + 36) return row[4];
+    if (x == 112 + 72) return row[5];
+
+    // // ----- 6‑tile row (centered at 94) -----
     if (x == 94 - 72)  return row[0];
     if (x == 94 - 36)  return row[1];
     if (x == 94)       return row[2];
@@ -186,8 +239,6 @@ static u8 GetTileBunnyStandsOn(void)
 
     return 1;
 }
-
-static u8 GetTileBunnyStandsOnOffset(s16 offset) { (void)offset; return 0; }
 
 // ---------------------------------------------------------
 // Spike handling
@@ -227,10 +278,113 @@ static void HandleSpikeObject(void)
 // Empty routines (to be ported later)
 // ---------------------------------------------------------
 static void swap_spat_col_and_char_table(void) {}
-static void CheckBunnyInLavaNothingIceOrSpike(void) {}
+
+static void CheckBunnyInLavaNothingIceOrSpike(void)
+{
+    if (TileRowTablePointer < tilemapjumpdowngame + 50)
+        return;
+
+    // If bouncing on trampoline → ignore ground checks
+    if (JumpBunnyLeftOnTrampoline)
+        return;
+
+    if (JumpBunnyRightOnTrampoline)
+        return;
+
+    u8 tile = GetTileBunnyStandsOn();
+
+    // --- Instant death tiles ---
+    if (tile == JumpDownLavaTile)
+    {
+        if (!BunnyDied) BunnyDied = 1;
+        return;
+    }
+
+    if (tile == JumpDownNothingTile)
+    {
+        if (!BunnyDied) BunnyDied = 1;
+        return;
+    }
+
+    // --- Ice ---
+    if (tile == JumpDownIceTile)
+    {
+        // Sliding direction depends on facing
+        if (BunnyFacingRight)
+        {
+            // Jump right
+            JumpBunnyRight = 1;
+            BunnySlidingOnIce = 1;
+        }
+        else
+        {
+            // Jump left
+            JumpBunnyLeft = 1;
+            BunnySlidingOnIce = 1;
+        }
+
+        BuildUpNewRowJumpDownGame = 1;
+        Scroll27LinesDown = 27;
+
+        return;
+    }
+
+    // --- Spike ---
+    if (tile == JumpDownSpikeTile)
+    {
+        u8 a = (framecounter2 >> 1) & 31;
+
+        // Active spike window: (17-4) to (23+3)
+        if (a >= (17 - 4) && a < (23 + 3))
+        {
+            if (!BunnyDied)
+                BunnyDied = 80;   // explode version
+
+            return;
+        }
+
+        return;
+    }
+
+    // --- Clouds and beyond ---
+    if (tile >= JumpDownCloudsTile)
+    {
+        if (!BunnyDied) BunnyDied = 1;
+        return;
+    }
+}
+
 static void CheckBunnyOffScreen(void) {}
 static void CheckShouldBunnyJumpOnTrampoline(void) {}
-static void HandleBunnyDied(void) {}
+
+static void HandleBunnyDied(void)
+{
+    // If bunny is not in "dead" state, bail
+    if (!BunnyDied)
+        return;
+
+    // Advance death timer (wrap protection like the asm: inc + ret z)
+    if (BunnyDied != 0xFF)
+        BunnyDied++;
+
+    u8 t = BunnyDied;
+    u8 frame;
+
+    // These thresholds mirror the sub 20 / sub 6 steps in the asm
+    if (t < 20)          frame = 3;   // first phase
+    else if (t < 40)     frame = 4;
+    else if (t < 60)     frame = 3;
+    else if (t < 80)     frame = 4;
+    else if (t < 86)     frame = 5;
+    else if (t < 92)     frame = 6;
+    else if (t < 98)     frame = 7;
+    else if (t < 104)    frame = 8;
+    else                 frame = 9;   // final explosion frames
+
+    SPR_setFrame(bunnySpr, frame);
+    SPR_setHFlip(bunnySpr, BunnyFacingRight ? FALSE : TRUE);
+}
+
 
 static void HandleTrampolineObject(void) {}
 static void PutEdgesOfArcadeMachineFrameBottom(void) {}
@@ -238,7 +392,24 @@ static void PutEdgesOfArcadeMachineFrameBottom(void) {}
 static void HandleScore(void) {}
 static void SetBunnySpatCoordinates(void) {}
 static void PutEdgesOfArcadeMachineFrameTop(void) {}
-static void CheckGameOverJumpDownGame(void) {}
+
+static void CheckGameOverJumpDownGame(void)
+{
+    // If bunny death timer reached 120 → game over
+    if (BunnyDied == 120)
+    {
+        jqState = JQ_STATE_GAMEOVER;   // or whatever your game-over transition is
+        return;
+    }
+
+    // If player presses B → game over
+    if (Controls & BUTTON_B)
+    {
+        jqState = JQ_STATE_GAMEOVER;   // or STATE_ARCADE1 or whatever you use
+        return;
+    }
+}
+
 static void SlideOnIceBunnyRight(void) {}
 static void SpiderWebJump(void) {}
 static void JumpBunnyLeftOnTrampolineRoutine(void) {}
@@ -268,11 +439,11 @@ static void BuildUpBackgroundJumpDownGame(void)
 
     while (x < 215)
     {
-        u8 tile = *p;
+        u8 tileb = *p;
 
         // Spawn spike or trampoline if needed
-        CheckForSpikeObject(tile, x, y);
-        CheckForTrampolineObject(tile, x, y);
+        CheckForSpikeObject(tileb, x, y);
+        CheckForTrampolineObject(tileb, x, y);
 
         p++;        // next tile
         x += 36;    // next screen X position
@@ -299,19 +470,21 @@ static void BuildUpBackgroundJumpDownGame(void)
 // ---------------------------------------------------------
 // Object scanners
 // ---------------------------------------------------------
-static void CheckForSpikeObject(u8 tile, s16 x, s16 y)
+static void CheckForSpikeObject(u8 tileb, s16 x, s16 y)
 {
     char buf[8];
-    sprintf(buf, "%3d", tile);
+    sprintf(buf, "%3d", tilemapjumpdowngame[8]);
     VDP_drawTextBG(BG_A, buf, 25, 27);
 
     char buff[8];
     sprintf(buff, "%3d", TileRowTablePointer);
     VDP_drawTextBG(BG_A, buff, 18, 27);
 
+   char buffff[8];
+   sprintf(buffff, "%3d", tilemapjumpdowngame);
+   VDP_drawTextBG(BG_A, buffff, 0, 27);
 
-
-    if (tile != JumpDownSpikeTile)
+    if (tileb != JumpDownSpikeTile)
         return;
 
     if (!FreeToUseObject0.On)
@@ -331,9 +504,9 @@ static void CheckForSpikeObject(u8 tile, s16 x, s16 y)
     }
 }
 
-static void CheckForTrampolineObject(u8 tile, s16 x, s16 y)
+static void CheckForTrampolineObject(u8 tileb, s16 x, s16 y)
 {
-    if (tile != JumpDownTrampolineTile)
+    if (tileb != JumpDownTrampolineTile)
         return;
 
     if (!FreeToUseObject2.On)
@@ -563,6 +736,10 @@ static void CheckShouldBunnyJump(void)
     // --- Tile under bunny decides special behavior ---
     u8 tile = GetTileBunnyStandsOn();
 
+    char bufff[8];
+    sprintf(bufff, "%3d", tile);
+    VDP_drawTextBG(BG_A, bufff, 13, 27);
+
     // Spider web: handled elsewhere, just bail here
     if (tile == JumpDownSpiderWebTile)
     {
@@ -588,9 +765,12 @@ static void CheckShouldBunnyJump(void)
 
     if (lr & wantRight)
     {
-        // --- Jump RIGHT ---
-        // (CheckTreeWhenJumpingRight is your own routine if you port it later)
-        // CheckTreeWhenJumpingRight();
+        u8 tileRightUnderBunny = GetTileRightUnderBunnyStandsOn();
+
+        //        CheckTreeWhenJumpingLeft();
+        // --- Jump LEFT ---
+        if (tileRightUnderBunny == JumpDownTreeTile)
+            return;     // standing on a tree → cannot jump left
 
         JumpBunnyRight = 1;
         BuildUpNewRowJumpDownGame = 1;
@@ -599,7 +779,12 @@ static void CheckShouldBunnyJump(void)
     else
     {
         // --- Jump LEFT ---
-        // CheckTreeWhenJumpingLeft();
+        u8 tileLeftUnderBunny = GetTileLeftUnderBunnyStandsOn();
+
+        //        CheckTreeWhenJumpingLeft();
+        // --- Jump LEFT ---
+        if (tileLeftUnderBunny == JumpDownTreeTile)
+            return;     // standing on a tree → cannot jump left
 
         JumpBunnyLeft = 1;
         BuildUpNewRowJumpDownGame = 1;
