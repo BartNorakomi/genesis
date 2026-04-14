@@ -23,12 +23,10 @@ IMAGE bikeracetitlescreen "graphics/games/bikeracetitlescreen.bmp" BEST ALL
 IMAGE bikeraceingameexample "graphics/games/bikeraceingameexample.bmp" BEST ALL
 IMAGE bikeracegameover "graphics/games/bikeracegameover.bmp" BEST ALL
 IMAGE jumpquesttitlescreen "graphics/games/jumpquesttitlescreen.bmp" BEST ALL
-IMAGE jumpquestingameexample "graphics/games/jumpquestingameexample.bmp" BEST ALL
+IMAGE jumpquestgameover "graphics/games/jumpquestgameover.bmp" BEST ALL
 IMAGE jumpquestmap "graphics/games/jumpquestmap.bmp" BEST ALL
- 
 TILESET jump_quest_tileset "graphics/games/jumpquestmap.bmp" BEST ALL
 MAP jump_quest_map "graphics/games/jumpquestmap.bmp" jump_quest_tileset BEST 0
-
 
 IMAGE neonhorizon "graphics/backgrounds/trainingdeck.bmp" BEST ALL
 IMAGE trainingdeckgame "graphics/backgrounds/trainingdeck.bmp" BEST ALL

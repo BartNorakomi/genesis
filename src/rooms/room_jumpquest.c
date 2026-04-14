@@ -16,12 +16,12 @@ extern const MapDefinition jump_quest_map;
 #define JumpDownNothingTile          0
 #define JumpDownTreeTile             2
 #define JumpDownLavaTile             5
-#define JumpDownSpikeTile            0x0B   // 11
+#define JumpDownSpikeTile            6
 #define JumpDownSpiderWebTile        7
 #define JumpDownIceTile              8
 #define JumpDownReverseControlsTile  9
 #define JumpDownSandTile             10
-#define JumpDownTrampolineTile       0x06   // 6
+#define JumpDownTrampolineTile       11
 #define JumpDownCloudsTile           12
 
 
@@ -30,6 +30,7 @@ extern const MapDefinition jump_quest_map;
 // ---------------------------------------------------------
 static void CheckForSpikeObject(u8 tile, s16 x, s16 y);
 static void CheckForTrampolineObject(u8 tile, s16 x, s16 y);
+
 
 // ---------------------------------------------------------
 // 1. Externs from other modules
@@ -50,7 +51,11 @@ typedef struct
     s16 x;
     s16 y;
     u8 On;
+    u8 JumpedOn;   // trampoline animation counter
 } JumpObject;
+
+static void CheckCollisionTrampoline(JumpObject* obj);
+static void AnimateTrampolineWhenBunnyJumpsOnIt(JumpObject* obj);
 
 static JumpObject FreeToUseObject0;
 static JumpObject FreeToUseObject1;
@@ -66,6 +71,8 @@ static Map* level_1_map;
 static Sprite* bunnySpr = NULL;
 static Sprite* spikeSpr1 = NULL;
 static Sprite* spikeSpr2 = NULL;
+static Sprite* trampolineSpr1 = NULL;
+static Sprite* trampolineSpr2 = NULL;
 
 // Bunny world position
 static s16 bunnyX;
@@ -128,11 +135,6 @@ static u8 AnimateSpiderWebJump = 0;
 
 static u8 BunnyJumpedOnTrampoline2 = 0;
 static u8 BunnyJumpedOnTrampoline3 = 0;
-
-static u8 Object0On = 0;
-static u8 Object1On = 0;
-static u8 Object2On = 0;
-static u8 Object3On = 0;
 
 static u8 JumpBunnyLeftOnTrampoline = 0;
 static u8 JumpBunnyRightOnTrampoline = 0;
@@ -253,7 +255,7 @@ static void UpdateSpikePosition(Sprite* spr, s16 x, s16 y)
 // ---------------------------------------------------------
 static void HandleSpikeObject(void)
 {
-    if (Object0On)
+    if (FreeToUseObject0.On)
     {
         SPR_setFrame(spikeSpr1, GetSpikeAnimFrame());
         UpdateSpikePosition(spikeSpr1, FreeToUseObject0.x, FreeToUseObject0.y);
@@ -263,7 +265,7 @@ static void HandleSpikeObject(void)
         SPR_setPosition(spikeSpr1, 100, 216);
     }
 
-    if (Object1On)
+    if (FreeToUseObject1.On)
     {
         SPR_setFrame(spikeSpr2, GetSpikeAnimFrame());
         UpdateSpikePosition(spikeSpr2, FreeToUseObject1.x, FreeToUseObject1.y);
@@ -273,6 +275,89 @@ static void HandleSpikeObject(void)
         SPR_setPosition(spikeSpr2, 100, 216);
     }
 }
+
+static void HandleTrampolineObject(void)
+{
+    // Trampoline 1 (object 2)
+    if (FreeToUseObject2.On)
+    {
+        CheckCollisionTrampoline(&FreeToUseObject2);
+        AnimateTrampolineWhenBunnyJumpsOnIt(&FreeToUseObject2);
+
+        SPR_setPosition(trampolineSpr1, FreeToUseObject2.x, FreeToUseObject2.y);
+    }
+    else
+    {
+        SPR_setPosition(trampolineSpr1, 100, 216);
+    }
+
+    // Trampoline 2 (object 3)
+    if (FreeToUseObject3.On)
+    {
+        CheckCollisionTrampoline(&FreeToUseObject3);
+        AnimateTrampolineWhenBunnyJumpsOnIt(&FreeToUseObject3);
+
+        SPR_setPosition(trampolineSpr2, FreeToUseObject3.x, FreeToUseObject3.y);
+    }
+    else
+    {
+        SPR_setPosition(trampolineSpr2, 100, 216);
+    }
+}
+
+static void CheckCollisionTrampoline(JumpObject* obj)
+{
+    if (!obj->On)
+        return;
+
+    // Bunny X range check
+    s16 bx = bunnyX;
+    s16 tx = obj->x;
+
+    if (bx < tx - 30) return;
+    if (bx > tx + 20) return;
+
+    // Bunny Y check
+    s16 by = bunnyY + 33;   // 11 + 22 from MSX
+    if (by != obj->y)
+        return;
+
+    // Already bouncing?
+    if (obj->JumpedOn)
+        return;
+
+    obj->JumpedOn = 1;
+}
+
+static void AnimateTrampolineWhenBunnyJumpsOnIt(JumpObject* obj)
+{
+    if (!obj->JumpedOn)
+        return;
+
+    obj->JumpedOn++;
+
+    // Move down (counter < 10)
+    if (obj->JumpedOn < 10)
+    {
+        obj->y += 2;
+        return;
+    }
+
+    // Move up (10–13)
+    if (obj->JumpedOn < 14)
+    {
+        obj->y -= 4;
+        return;
+    }
+
+    // Wait until 30
+    if (obj->JumpedOn < 30)
+        return;
+
+    // Reset
+    obj->JumpedOn = 0;
+}
+
 
 // ---------------------------------------------------------
 // Empty routines (to be ported later)
@@ -385,8 +470,6 @@ static void HandleBunnyDied(void)
     SPR_setHFlip(bunnySpr, BunnyFacingRight ? FALSE : TRUE);
 }
 
-
-static void HandleTrampolineObject(void) {}
 static void PutEdgesOfArcadeMachineFrameBottom(void) {}
 
 static void HandleScore(void) {}
@@ -397,17 +480,35 @@ static void CheckGameOverJumpDownGame(void)
 {
     // If bunny death timer reached 120 → game over
     if (BunnyDied == 120)
-    {
-        jqState = JQ_STATE_GAMEOVER;   // or whatever your game-over transition is
-        return;
-    }
+        goto GAME_OVER;
 
     // If player presses B → game over
     if (Controls & BUTTON_B)
-    {
-        jqState = JQ_STATE_GAMEOVER;   // or STATE_ARCADE1 or whatever you use
-        return;
-    }
+        goto GAME_OVER;
+
+    return;
+
+GAME_OVER:
+    SPR_reset();
+    SPR_update();
+
+    // bunnySpr = NULL;
+    // spikeSpr1 = NULL;
+    // spikeSpr2 = NULL;
+
+    // Draw game over gfx
+    VDP_drawImageEx(
+        BG_B,
+        &jumpquestgameover,
+        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+        0, 0,
+        FALSE,
+        TRUE
+    );
+
+    PAL_setPalette(PAL0, jumpquestgameover.palette->data, DMA);
+
+    jqState = JQ_STATE_GAMEOVER;   // or STATE_ARCADE1 or whatever you use
 }
 
 static void SlideOnIceBunnyRight(void) {}
@@ -490,16 +591,16 @@ static void CheckForSpikeObject(u8 tileb, s16 x, s16 y)
     if (!FreeToUseObject0.On)
     {
         FreeToUseObject0.On = 1;
-        FreeToUseObject0.x  = x + 9;
-        FreeToUseObject0.y  = y + 2;
+        FreeToUseObject0.x  = x + 10;
+        FreeToUseObject0.y  = 228;
         return;
     }
 
     if (!FreeToUseObject1.On)
     {
         FreeToUseObject1.On = 1;
-        FreeToUseObject1.x  = x + 9;
-        FreeToUseObject1.y  = y + 2;
+        FreeToUseObject1.x  = x + 10;
+        FreeToUseObject1.y  = 228;
         return;
     }
 }
@@ -513,7 +614,7 @@ static void CheckForTrampolineObject(u8 tileb, s16 x, s16 y)
     {
         FreeToUseObject2.On = 1;
         FreeToUseObject2.x  = x + 2;
-        FreeToUseObject2.y  = y + 6;
+        FreeToUseObject2.y  = 228;
         return;
     }
 
@@ -521,7 +622,7 @@ static void CheckForTrampolineObject(u8 tileb, s16 x, s16 y)
     {
         FreeToUseObject3.On = 1;
         FreeToUseObject3.x  = x + 2;
-        FreeToUseObject3.y  = y + 6;
+        FreeToUseObject3.y  = 228;
         return;
     }
 }
@@ -538,6 +639,15 @@ static void ScrollBackgroundJumpDownGame(void)
     r23onLineIntJumpDownGame++;
 
     bunnyY--;
+    FreeToUseObject0.y--;
+    FreeToUseObject1.y--;
+    FreeToUseObject2.y--;
+    FreeToUseObject3.y--;
+
+    if (FreeToUseObject0.y <= -16) FreeToUseObject0.On = 0;
+    if (FreeToUseObject1.y <= -16) FreeToUseObject1.On = 0;
+    if (FreeToUseObject2.y <= -16) FreeToUseObject2.On = 0;
+    if (FreeToUseObject3.y <= -16) FreeToUseObject3.On = 0;
 
     MAP_scrollTo(level_1_map, 0, r23onLineIntJumpDownGame);
 }
@@ -825,11 +935,11 @@ static void HandlePhase(void)
 
     BunnyJumpedOnTrampoline2 = 0;
     BunnyJumpedOnTrampoline3 = 0;
-
-    Object0On = 0;
-    Object1On = 0;
-    Object2On = 0;
-    Object3On = 0;
+ 
+    FreeToUseObject0.On = 0;
+    FreeToUseObject1.On = 0;
+    FreeToUseObject2.On = 0;
+    FreeToUseObject3.On = 0;
 
     JumpBunnyLeftOnTrampoline = 0;
     JumpBunnyRightOnTrampoline = 0;
@@ -842,6 +952,12 @@ static void HandlePhase(void)
     BunnyFacingRight = 1;
 
     Scroll4RowsAtStartOfGame = 18;
+
+    bunnySpr = SPR_addSprite(&jumpQuestRabbitSpriteDef, bunnyX, bunnyY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    spikeSpr1 = SPR_addSprite(&jumpQuestSpikeSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    spikeSpr2 = SPR_addSprite(&jumpQuestSpikeSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    trampolineSpr1 = SPR_addSprite(&jumpQuestTrampolineSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+    trampolineSpr2 = SPR_addSprite(&jumpQuestTrampolineSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 }
 
 // ---------------------------------------------------------
@@ -850,23 +966,16 @@ static void HandlePhase(void)
 void JumpDownGameRoutine(void)
 {
     framecounter2++;
-
     swap_spat_col_and_char_table();
     CheckBunnyInLavaNothingIceOrSpike();
     CheckBunnyOffScreen();
-
     CheckShouldBunnyJumpOnTrampoline();
     CheckShouldBunnyJump();
-
     HandleBunnyJumpAndSetSpriteCharacterAndColor();
     HandleBunnyDied();
-
     HandleSpikeObject();
-
     HandleTrampolineObject();
-
     PutEdgesOfArcadeMachineFrameBottom();
-
     ScrollBackgroundJumpDownGame();
     BuildUpBackgroundJumpDownGame();
     Scroll4RowsAtStartOfGameRoutine();
@@ -874,7 +983,6 @@ void JumpDownGameRoutine(void)
     SetBunnySpatCoordinates();
     PutEdgesOfArcadeMachineFrameTop();
     CheckGameOverJumpDownGame();
-
     HandlePhase();
 }
 
@@ -913,11 +1021,6 @@ GameState runJumpQuest(void)
 
     PAL_fadeIn(0, 15, jumpquestmap.palette->data, 8, FALSE);
 
-    bunnySpr = SPR_addSprite(&jumpQuestRabbitSpriteDef, bunnyX, bunnyY, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-
-    spikeSpr1 = SPR_addSprite(&jumpQuestSpikeSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-    spikeSpr2 = SPR_addSprite(&jumpQuestSpikeSpriteDef, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-
     while (1)
     {
         populateControls();
@@ -931,7 +1034,24 @@ GameState runJumpQuest(void)
                 {
                     gSave.gamesPlayed++;
                     saveSaveData();
+                    MAP_release(level_1_map);
                     return STATE_ARCADE1;
+                }
+                if (joyNew & BUTTON_A)
+                {
+                    VDP_loadTileSet(&jump_quest_tileset, globalTileIndex, DMA);
+                    MAP_release(level_1_map);
+                    
+                    level_1_map = MAP_create(
+                        &jump_quest_map,
+                        BG_B,
+                        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, globalTileIndex)
+                    );
+
+                    PAL_fadeIn(0, 15, jumpquestmap.palette->data, 8, FALSE);
+
+                    ObjectPhase = 0;
+                    jqState = JQ_STATE_GAME;
                 }
                 break;
 
@@ -939,6 +1059,34 @@ GameState runJumpQuest(void)
                 JumpDownGameRoutine();
                 SPR_setPosition(bunnySpr, bunnyX, bunnyY - 21);
                 break;
+
+            case JQ_STATE_GAMEOVER:
+                {
+                VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
+                VDP_setVerticalScroll(BG_B, 0);
+
+                    // Wait for button press to exit
+                if (joyNew & (BUTTON_A | BUTTON_B))
+                {
+                    PAL_fadeOut(0, 15, 8, FALSE);
+
+                        // Draw title screen gfx
+                    VDP_drawImageEx(
+                        BG_B,
+                        &jumpquesttitlescreen,
+                        TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USER_INDEX),
+                        0, 0,
+                        FALSE,
+                        TRUE
+                    );
+
+                    PAL_fadeIn(0, 15, jumpquesttitlescreen.palette->data, 8, FALSE);
+
+                    jqState = JQ_STATE_TITLE;
+                }
+
+                break;
+                }
         }
 
         SPR_update();

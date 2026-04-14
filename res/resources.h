@@ -44,7 +44,7 @@ extern const Image bikeracetitlescreen;
 extern const Image bikeraceingameexample;
 extern const Image bikeracegameover;
 extern const Image jumpquesttitlescreen;
-extern const Image jumpquestingameexample;
+extern const Image jumpquestgameover;
 extern const Image jumpquestmap;
 extern const TileSet jump_quest_tileset;
 extern const MapDefinition jump_quest_map;

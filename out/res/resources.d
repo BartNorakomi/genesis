@@ -21,6 +21,7 @@ C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomicons/triggerA.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sfx/startgame.wav \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/hangarbay.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/basketballingameexample.bmp \
+C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/jumpquestgameover.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomicons/textCloud.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/sciencelabhelix.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/graphics/backgrounds/sciencelab.bmp \
@@ -92,7 +93,6 @@ C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/blockcannoningameexam
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/arcade1opendoor.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/basketball/net.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/penguinbikerace/star.bmp \
-C:/Users/bartf/Documents/GitHub/genesis/res/graphics/games/jumpquestingameexample.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/roomobjects/trainingdeckwallright.bmp \
 C:/Users/bartf/Documents/GitHub/genesis/res/collisionmaps/tilemaphangarbay.bin \
 C:/Users/bartf/Documents/GitHub/genesis/res/sprites/games/blockcannon/blockred.bmp \
